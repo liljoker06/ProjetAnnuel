@@ -1,13 +1,20 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body{
+body {
     font-family: 'Readex Pro', sans-serif;
     background: #f5f5f5;
 }
 
 
+.gradient {
+    /* https://cssgradient.io/ */
+    background: linear-gradient(90deg, rgba(1, 85, 161, 1) 0%, rgba(139, 200, 209, 1) 100%);
+}
 
+.transition-main {
+    transition: all 0.5s;
+}

@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 /////////////////////////////////////////////
 //CSS
 
+import "./base.css"
 import "./fonts.css";
 import "./tailwind.css";
 
