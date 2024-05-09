@@ -1,0 +1,10 @@
+.navbar {
+    height: 70px;
+}
+
+.logo {
+    background-image: url('./../../../public/img/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
