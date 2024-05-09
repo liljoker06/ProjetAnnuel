@@ -32,7 +32,7 @@ export default function Vitrine() {
         </div>
       </div>
 
-      {/* Vague du bas */}
+      {/* Vague du début */}
       <div className="relative -mt-12 lg:-mt-24">
         <svg viewBox="0 0 1428 174" version="1.1" xmlns="http://www.w3.org/2000/svg" xlinkHref="http://www.w3.org/1999/xlink">
           <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
