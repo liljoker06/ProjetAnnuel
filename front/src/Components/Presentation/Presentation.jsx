@@ -9,7 +9,7 @@ export default function Presentation() {
         <TitlePart title="Réseau Cloud" />
 
         {/* Row 1 - Interface */}
-        <div className="flex flex-wrap">
+        <div className="flex gap-5 flex-col sm:flex-row">
           <div className="w-5/6 sm:w-1/2 p-6">
             <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">
               Une interface simple
@@ -24,7 +24,7 @@ export default function Presentation() {
         </div>
 
         {/* Row 2 - Gestion */}
-        <div className="flex flex-wrap flex-col-reverse sm:flex-row">
+        <div className="flex gap-5 flex-col-reverse sm:flex-row">
           <div className="w-full sm:w-1/2 p-6 mt-6">
             <img className="w-full sm:h-64 mx-auto" src='./img/presentation2.svg'></img>
 
