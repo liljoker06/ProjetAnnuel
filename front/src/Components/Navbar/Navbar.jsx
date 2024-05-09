@@ -79,7 +79,7 @@ export default function Navbar() {
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div className="pl-4 flex items-center">
           <div className="logo mr-3 h-10 w-10"></div>
-          <NavLink className={`toggleColour text-white no-underline hover:no-underline font-bold text-2xl lg:text-4xl ${logoTitleClass} transition-main`} to="/">
+          <NavLink className={`toggleColour no-underline hover:no-underline font-bold text-2xl lg:text-4xl ${logoTitleClass} transition-main`} to="/">
             Vitruve Cloud
           </NavLink>
         </div>
