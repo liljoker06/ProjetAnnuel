@@ -12,6 +12,7 @@ import "./tailwind.css";
 
 /////////////////////////////////////////////
 //Components
+import ScrollToTop from "./ScrollToTop";
 import Navbar from "./Components/Navbar/Navbar";
 
 import Home from "./Pages/Home/Home";
@@ -30,6 +31,8 @@ import Footer from "./Components/Footer/Footer";
 function App() {
   return (
     <div className="App">
+      <ScrollToTop />
+
       <header className="App-header">
         <Navbar />
       </header>
