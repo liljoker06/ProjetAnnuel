@@ -30,7 +30,6 @@ export default function CardPrice({ title, price, features, action, size }) {
             )}
 
             {size === 'big' && (
-
                 <div className="flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg z-10">
 
                     <div className="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
