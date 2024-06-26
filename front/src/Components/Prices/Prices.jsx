@@ -22,6 +22,7 @@ export default function Prices() {
                         ]}
                         action="S'abonner"
                         size="small"
+                        link="/register"
                     />
 
                     <CardPrice
@@ -34,6 +35,7 @@ export default function Prices() {
                         ]}
                         action="S'abonner"
                         size="big"
+                        link="/register"
                     />
 
                     <CardPrice
@@ -46,6 +48,7 @@ export default function Prices() {
                         ]}
                         action="S'abonner"
                         size="small"
+                        link="/register"
                     />
 
                 </div>
