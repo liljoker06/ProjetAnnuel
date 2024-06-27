@@ -292,7 +292,8 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Confirmer
+              {loading ? 'Chargement...' : 'Confirmer'}
+
               </button>
             </div>
             {
@@ -390,7 +391,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Confirmer
+              {loading ? 'Chargement...' : 'Confirmer'}
               </button>
             </div>
             {
@@ -468,7 +469,8 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Suivant
+              {loading ? 'Chargement...' : 'Suivant'}
+
               </button>
             </div>
             {
@@ -486,8 +488,7 @@ export default function Register() {
         return (
           <>
             <div className="mb-4 text-2xl font-bold text-gray-800">Paiement</div>
-            Faudra mettre stripe
-
+            {plan} - {plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             {/* Numéro de la carte */}
@@ -529,7 +530,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Suivant
+              {loading ? 'Chargement...' : 'Suivant'}
               </button>
             </div>
             {
@@ -612,8 +613,8 @@ export default function Register() {
                 </button>
               ) : (
                 <>
-                  <button onClick={nextStep} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                    S'abonner pour {plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois
+                  <button onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                  {loading ? 'Chargement...' : `S'abonner pour ${plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois`}
                   </button>
                 </>
               )}
@@ -921,6 +922,13 @@ export default function Register() {
       nextStep();
     }
   }
+
+  const checkPayment = () => {
+    setLoading(true);
+    nextStep();
+
+    setLoading(false);
+  } 
 
   /****************************************/
 
