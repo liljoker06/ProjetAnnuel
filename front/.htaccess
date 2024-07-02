@@ -1,0 +1,2 @@
+# /var/www/html/.htaccess
+FallbackResource /index.html
