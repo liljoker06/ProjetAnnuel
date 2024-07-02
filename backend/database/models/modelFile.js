@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     const File = sequelize.define('File', {
       file_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         primaryKey: true,
         unique: true,
         allowNull: false,

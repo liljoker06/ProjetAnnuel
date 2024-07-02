@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     const Logs = sequelize.define('Logs', {
       logs_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         primaryKey: true,
         unique: true,
         allowNull: false,
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.NOW,
       },
       logs_userid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'User',
           key: 'user_id'

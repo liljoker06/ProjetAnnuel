@@ -1,14 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
     const StorageFile = sequelize.define('StorageFile', {
       file_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'File',
           key: 'file_id'
         }
       },
       stor_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'UserStorage',
           key: 'stor_id'

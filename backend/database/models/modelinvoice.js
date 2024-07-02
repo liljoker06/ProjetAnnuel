@@ -1,34 +1,34 @@
 module.exports = (sequelize, DataTypes) => {
     const Invoice = sequelize.define('Invoice', {
       invo_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         primaryKey: true,
         unique: true,
         allowNull: false,
       },
       invo_userid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'User',
           key: 'user_id'
         }
       },
       invo_compid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'Company',
           key: 'comp_id'
         }
       },
       invo_subsid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'Subscription',
           key: 'subs_id'
         }
       },
       invo_cursid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         references: {
           model: 'CurrentSub',
           key: 'curs_id'
