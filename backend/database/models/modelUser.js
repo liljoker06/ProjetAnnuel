@@ -24,9 +24,9 @@ module.exports = (sequelize, DataTypes) => {
     user_date: DataTypes.DATE,
     user_valid: DataTypes.BOOLEAN,
     user_subid: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       references: {
-        model: 'Subscription',
+        model: 'Subscriptions',
         key: 'subs_id'
       }
     },

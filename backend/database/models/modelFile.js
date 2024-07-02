@@ -1,7 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
     const File = sequelize.define('File', {
       file_id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         unique: true,
         allowNull: false,
@@ -9,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       file_userid: {
         type: DataTypes.UUID,
         references: {
-          model: 'User',
+          model: 'Users',
           key: 'user_id'
         }
       },

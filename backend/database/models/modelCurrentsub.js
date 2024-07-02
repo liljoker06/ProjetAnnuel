@@ -9,14 +9,14 @@ module.exports = (sequelize, DataTypes) => {
     curs_userid: {
       type: DataTypes.UUID,
       references: {
-        model: 'User',
+        model: 'Users',
         key: 'user_id'
       }
     },
     curs_subsid: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       references: {
-        model: 'Subscription',
+        model: 'Subscriptions',
         key: 'subs_id'
       }
     },
