@@ -1,3 +1,149 @@
+/* Minecraft switch made by: csozi | Website: english.csozi.hu*/
+
+/* The switch - the box around the slider */
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 4em;
+  height: 2em;
+}
+
+.switch input {
+  opacity: 1;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.off {
+  position: absolute;
+  content: "";
+  height: 2em;
+  width: 2em;
+  background-color: white;
+  transition: .4s;
+  image-rendering: pixelated;
+  opacity: 1;
+}
+
+.on {
+  position: absolute;
+  content: "";
+  height: 2em;
+  width: 2em;
+  background-color: white;
+  transition: .4s;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+
+.switch input:checked + .slider {
+  background-color: #ccc;
+}
+
+.switch input:focus + .slider {
+  box-shadow: 0 0 1px #ccc;
+}
+
+.off, .on {
+  position: absolute;
+  content: "";
+  height: 2em;
+  width: 2em;
+  background-color: white;
+  transition: .4s;
+  image-rendering: pixelated;
+  top: 50%; /* Centrer verticalement par rapport au conteneur */
+  transform: translateY(-50%); /* Ajustement pour un centrage parfait */
+}
+
+.switch input:checked ~ .off {
+  transform: translateX(2em) translateY(-50%); /* Maintenir le centrage vertical après déplacement */
+  opacity: 1; /* Cacher l'image .off quand le switch est activé */
+}
+
+.switch input:checked ~ .on {
+  opacity: 1; /* Afficher l'image .on quand le switch est activé */
+  transform: translateX(2em) translateY(-50%); /* Déplacer et centrer verticalement */
+}
+
+/********************************************/
+
+.radio-input input {
+  display: none;
+}
+
+.radio-input {
+  --container_width: 75%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #000000;
+  width: var(--container_width);
+  overflow: hidden;
+  border: 1px solid rgba(53, 52, 52, 0.226);
+}
+
+.radio-input label {
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  font-weight: 600;
+  letter-spacing: -1px;
+  font-size: 14px;
+}
+
+.selection {
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: calc(100% / 3);
+  z-index: 0;
+  left: 0;
+  top: 0;
+  transition: .15s ease;
+}
+
+.radio-input label:has(input:checked) {
+  color: #fff;
+}
+
+.radio-input label:has(input:checked) ~ .selection {
+  background-color: #612194;
+  display: inline-block;
+}
+
+.radio-input label:nth-child(1):has(input:checked) ~ .selection {
+  transform: translateX(0%);
+}
+
+.radio-input label:nth-child(2):has(input:checked) ~ .selection {
+  transform: translateX(100%);
+}
+
+.radio-input label:nth-child(3):has(input:checked) ~ .selection {
+  transform: translateX(200%);
+}
+
+/********************************************/
 /* Début de l'entrée */
 .fade-enter {
   opacity: 0;

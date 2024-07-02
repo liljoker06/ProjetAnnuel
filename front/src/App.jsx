@@ -30,12 +30,13 @@ import Footer from "./Components/Footer/Footer";
 
 function App() {
   return (
-    <div className="App">
+    <div className="flex flex-col min-h-screen">
       <ScrollToTop />
 
-      <header className="App-header">
+      <header>
         <Navbar />
       </header>
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/prices" element={<Tarifs />} />

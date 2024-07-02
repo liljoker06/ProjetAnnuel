@@ -75,7 +75,7 @@ export default function Navbar() {
   const logoTitleClass = scrollPos > 10 ? "text-blue-500" : "text-white";
 
   return (
-    <nav id="header" className={`fixed w-full z-30 top-0 text-white ${headerClass} transition-main`}>
+    <nav id="header" className={`fixed w-full z-50 top-0 text-white ${headerClass} transition-main`}>
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <div className="pl-4 flex items-center">
           <div className="logo mr-3 h-10 w-10"></div>

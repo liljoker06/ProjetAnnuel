@@ -1,6 +1,7 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
-export default function CardPrice({ title, price, features, action, size }) {
+export default function CardPrice({ title, price, features, action, size, link }) {
     return (
         <>
             {size === 'small' && (
@@ -18,13 +19,15 @@ export default function CardPrice({ title, price, features, action, size }) {
                     <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
                         <div className="w-full pt-6 text-3xl text-gray-600 font-bold text-center">
                             {price}€
-                            <span className="text-base">/ utilisateur</span>
+                            <span className="text-base">/ mois</span>
                         </div>
+                        { action ? (
                         <div className="flex items-center justify-center">
-                            <button className="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                            <Link to={link} className="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
                                 {action}
-                            </button>
+                            </Link>
                         </div>
+                        ): null }   
                     </div>
                 </div>
             )}
@@ -53,14 +56,16 @@ export default function CardPrice({ title, price, features, action, size }) {
 
                         <div className="w-full pt-6 text-4xl font-bold text-center">
                             {price}€
-                            <span className="text-base">/ utilisateur</span>
+                            <span className="text-base">/ mois</span>
                         </div>
 
+                        { action ? (
                         <div className="flex items-center justify-center">
-                            <button className="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+                            <Link to={link} className="mx-auto lg:mx-0 hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
                                 {action}
-                            </button>
+                            </Link>
                         </div>
+                        ): null }  
 
                     </div>
                 </div>
