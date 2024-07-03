@@ -4,6 +4,8 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 
 //
+import consoleLog from '../../Functions/Dev/consoleLog';
+
 import { checkEmail } from '../../Functions/FormInput/checkEmail';
 import { checkPasswd } from '../../Functions/FormInput/checkPasswd';
 import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
@@ -42,7 +44,7 @@ export default function Login() {
 
   const skipCase = (Case) => {
     if (Case <= nbCases) {
-      console.log('Passage à l\'étape ' + Case);
+      consoleLog('Passage à la case : ' + Case);
       setCurrentCase(Case);
       window.scrollTo(0, 0);
     }
@@ -363,7 +365,8 @@ export default function Login() {
 
   const checkEmailPasswordForget = () => {
     setLoading(true);
-    console.log('Vérification de l\'adresse e-mail...');
+    consoleLog('START : checkEmailPasswordForget', "cyan");
+    consoleLog('Vérification des informations de connexion...', 'blue');
     const email = document.getElementById('email').value;
     const emailResult = checkEmail(email, setLoading);
     const newErrors = {};
@@ -378,14 +381,15 @@ export default function Login() {
     if (Object.values(newErrors).filter(error => error).length === 0) {
       setEmail(document.getElementById('email').value);
       skipCase(CASE_PASSWDFORGET);
-      console.log('Email : ' + document.getElementById('email').value);
+      consoleLog('END : checkEmailPasswordForget', "cyan");
     }
 
   };
 
   const checkLogin = () => {
     setLoading(true);
-    console.log('Vérification des informations de connexion...');
+    consoleLog('START : checkLogin', "cyan");
+    consoleLog('Vérification des informations de connexion...', 'blue');
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const newErrors = {};
@@ -410,14 +414,14 @@ export default function Login() {
     }
 
     setLoading(false);
-    console.log('Vérification terminée.');
+    consoleLog('Vérification terminée.', 'blue');
     console.log(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       setEmail(email);
       setPassword(password);
       skipCase(CASE_EMAIL);
-      console.log('Email : ' + email);
+      consoleLog('END : checkLogin', "cyan");
     }
   };
 

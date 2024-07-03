@@ -1,17 +1,20 @@
+import consoleLog from '../Dev/consoleLog';
+
 export const checkEmail = (email, setLoading) => {
   setLoading(true);
-  console.log('Vérification de l\'adresse e-mail...');
+  consoleLog('Vérification de l\'adresse e-mail...', 'blue');
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email) {
-    console.log('No email');
+    consoleLog('No email', 'red');
     setLoading(false);
     return { success: false, error: 'Veuillez renseigner votre adresse e-mail.' };
   }
   if (email && !emailRegex.test(email)) {
-    console.log('Invalid email');
+    consoleLog('Invalid email', 'red');
     setLoading(false);
     return { success: false, error: 'Email invalide.' };
   }
   setLoading(false);
+  consoleLog('Email is valid', 'green');
   return { success: true };
 };
