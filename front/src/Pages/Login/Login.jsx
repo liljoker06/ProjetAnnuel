@@ -3,6 +3,11 @@ import TitlePart from '../../Components/TitlePart/TitlePart';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 
+//
+import { checkEmail } from '../../Functions/FormInput/checkEmail';
+import { checkPasswd } from '../../Functions/FormInput/checkPasswd';
+import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
+
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -272,7 +277,6 @@ export default function Login() {
               </button>
               <button onClick={checkEmailPasswordForget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
-
               </button>
             </div>
             {
@@ -333,8 +337,6 @@ export default function Login() {
     }
   };
 
-  const getFullCode = () => codeMail.join('');
-
   const resendEmail = () => {
     if (canResend) {
       console.log('Renvoi de l\'email...');
@@ -354,39 +356,23 @@ export default function Login() {
     }
   };
 
-
   /****************************************/
   //    Vérification des forms            //
   /****************************************/
 
-  const checkEmail = () => {
-    setLoading(true);
-    console.log('Vérification de l\'adresse e-mail...');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const email = document.getElementById('email').value;
-    if (!email) {
-      setErrors({ email: 'Veuillez renseigner votre adresse e-mail.' });
-      setLoading(false);
-      return false;
-    }
-    if (email && !emailRegex.test(email)) {
-      setErrors({ email: 'Email invalide.' });
-      setLoading(false);
-      return false;
-    }
-    setLoading(false);
-    return true; 
-  };
 
   const checkEmailPasswordForget = () => {
     setLoading(true);
     console.log('Vérification de l\'adresse e-mail...');
-    const emailIsValid = checkEmail(); 
+    const email = document.getElementById('email').value;
+    const emailResult = checkEmail(email, setLoading);
     const newErrors = {};
 
-    newErrors.email = emailIsValid ? '' : 'Email invalide.';
+    if (!emailResult.success) {
+      newErrors.email = emailResult.error;
+    }
 
-    setErrors(newErrors);      
+    setErrors(newErrors);
     setLoading(false);
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
@@ -394,58 +380,63 @@ export default function Login() {
       skipCase(CASE_PASSWDFORGET);
       console.log('Email : ' + document.getElementById('email').value);
     }
-    
+
   };
 
   const checkLogin = () => {
     setLoading(true);
     console.log('Vérification des informations de connexion...');
-
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
     const newErrors = {};
 
-    const emailIsValid = checkEmail(); 
-    const password = document.getElementById('password').value;
+    // Appel des fonctions modifiées sans setErrors
+    const emailResult = checkEmail(email, setLoading);
+    const passwordResult = checkPasswd(password, setLoading);
 
-    if (!emailIsValid) {
+    // Mise à jour de newErrors basée sur les résultats
+    if (!emailResult.success) {
+      newErrors.email = emailResult.error;
+    }
+    if (!passwordResult.success) {
+      newErrors.password = passwordResult.error;
+    }
+
+    // Vérification s'il y a des erreurs
+    if (!emailResult.success || !passwordResult.success) {
       setLoading(false);
+      setErrors(newErrors);
       return;
     }
 
-    newErrors.email = emailIsValid ? '' : 'Email invalide.';
-    newErrors.password = password ? '' : 'Veuillez renseigner votre mot de passe.';
-    if (password && password.length < 6) newErrors.password = 'Mot de passe invalide.';
-
-    setErrors(newErrors);
     setLoading(false);
     console.log('Vérification terminée.');
     console.log(newErrors);
 
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      setEmail(document.getElementById('email').value);
+    if (Object.keys(newErrors).length === 0) {
+      setEmail(email);
       setPassword(password);
       skipCase(CASE_EMAIL);
-      console.log('Email : ' + document.getElementById('email').value);
+      console.log('Email : ' + email);
     }
   };
 
   const checkCodeEmail = () => {
     setLoading(true);
-    console.log('Vérification du code de vérification...');
     const newErrors = {};
+    const codeMailResult = checkCodeMail(codeMail)
 
-    // Vérification de la présence
-    const code = getFullCode();
-    console.log("code : " + code);
-    newErrors.codeMail = code.length !== 5 ? 'Code invalide.' : '';
-    console.log("codeMail : " + codeMail);
-
-    setErrors(newErrors); // Met à jour l'état des erreurs
-    setLoading(false); // Termine le chargement
-    console.log('Vérification terminée.');
-    console.log(newErrors);
+    if (!codeMailResult.success) {
+      newErrors.codeMail = codeMailResult.error;
+      setErrors(newErrors);
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(false);
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
-      navigate('/'); // Redirige vers la page d'accueil
+      navigate('/'); 
     }
   };
 
