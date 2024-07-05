@@ -33,6 +33,7 @@ export default function Register() {
   /****************************************/
 
   /*case 1*/
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -44,7 +45,6 @@ export default function Register() {
   const [ville, setVille] = useState('');
 
   /*case 2*/
-  const [email, setEmail] = useState('');
   const [codeMail, setCodeMail] = useState(Array(5).fill(''));
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef(codeMail.map(() => React.createRef()));
@@ -933,7 +933,7 @@ export default function Register() {
   /****************************************/
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 pt-16"> {/* Ajoutez pt-16 */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 pt-16">
       <div className={formClass()}>
         <TitlePart title="Inscription" />
         <div className={formClass()}>

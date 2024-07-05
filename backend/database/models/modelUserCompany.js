@@ -1,16 +1,16 @@
 module.exports = (sequelize, DataTypes) => {
     const UserCompany = sequelize.define('UserCompany', {
       user_id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         references: {
-          model: 'User',
+          model: 'Users',
           key: 'user_id'
         }
       },
       comp_id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         references: {
-          model: 'Company',
+          model: 'Companies',
           key: 'comp_id'
         }
       },
