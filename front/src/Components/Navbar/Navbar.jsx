@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./Navbar.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [scrollPos, setScrollPos] = useState(0);
   const [isHidden, setIsHidden] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const navMenuDiv = document.getElementById("nav-content");
@@ -13,18 +14,20 @@ export default function Navbar() {
     const check = (e) => {
       const target = e.target;
 
-      if (!checkParent(target, navMenuDiv)) {
-        if (checkParent(target, navMenu)) {
-          if (navMenuDiv.classList.contains("hidden")) {
-            navMenuDiv.classList.remove("hidden");
-            setScrollPos(11);
+      if (navMenuDiv && navMenu) {
+        if (!checkParent(target, navMenuDiv)) {
+          if (checkParent(target, navMenu)) {
+            if (navMenuDiv.classList.contains("hidden")) {
+              navMenuDiv.classList.remove("hidden");
+              setScrollPos(11);
+            } else {
+              navMenuDiv.classList.add("hidden");
+              setScrollPos(11);
+            }
           } else {
             navMenuDiv.classList.add("hidden");
-            setScrollPos(11);
+            setScrollPos(0);
           }
-        } else {
-          navMenuDiv.classList.add("hidden");
-          setScrollPos(0);
         }
       }
     };
@@ -74,6 +77,10 @@ export default function Navbar() {
   const activeColourClass = scrollPos > 10 ? "text-gray-800" : "text-white";
   const logoTitleClass = scrollPos > 10 ? "text-blue-500" : "text-white";
 
+  if (location.pathname === '/dashboard') {
+    return null; 
+  }
+  
   return (
     <nav id="header" className={`fixed w-full z-50 top-0 text-white ${headerClass} transition-main`}>
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">

@@ -21,6 +21,8 @@ import Tarifs from "./Pages/Tarifs/Tarifs";
 import Login from "./Pages/Login/Login";
 import Register from "./Pages/Register/Register";
 
+import Dashboard from "./Pages/Dashboard/Dashboard";
+
 import Page404 from "./Pages/Page404/Page404";
 
 import Footer from "./Components/Footer/Footer";
@@ -43,6 +45,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
 
         <Route path="*" element={<Page404 />} />
       </Routes>
