@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function Dashboard_status() {
-  const apiStatus = [
-    { name: 'API 1', status: 'Operational' },
-    { name: 'API 2', status: 'Down' },
-    { name: 'API 3', status: 'Maintenance' },
-  ];
+  const [apiStatus, setApiStatus] = useState([
+    { name: 'API 1', status: 'Unknown' },
+    { name: 'API 2', status: 'Unknown' },
+    { name: 'API 3', status: 'Unknown' },
+  ]);
 
-  const serverStatus = [
-    { name: 'Cloud', status: 'Operational' },
-    { name: 'Mail', status: 'Down' },
-    { name: 'BDD', status: 'Operational' },
-  ];
+  const [serverStatus, setServerStatus] = useState([
+    { name: 'Cloud', status: 'Unknown' },
+    { name: 'Mail', status: 'Unknown' },
+    { name: 'BDD', status: 'Unknown' },
+  ]);
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -19,7 +20,7 @@ export default function Dashboard_status() {
         return 'text-green-500';
       case 'Down':
         return 'text-red-500';
-      case 'Maintenance':
+      case 'Unknown':
         return 'text-yellow-500';
       default:
         return 'text-gray-500';

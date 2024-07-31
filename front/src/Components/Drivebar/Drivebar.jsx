@@ -16,13 +16,13 @@ export default function Drivebar() {
             <nav>
                 <ul>
                     <li className="mb-4">
-                        <Link to="#" className="flex items-center text-gray-700 hover:text-black">
+                        <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-black">
                             <DashboardIcon />
                             <span className="ml-2">Dashboard</span>
                         </Link>
                     </li>
                     <li className="mb-4">
-                        <Link to="#" className="flex items-center text-gray-700 hover:text-black">
+                        <Link to="/myfiles" className="flex items-center text-gray-700 hover:text-black">
                             <FolderIcon />
                             <span className="ml-2">Mes Fichiers</span>
                         </Link>
