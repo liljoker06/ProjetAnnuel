@@ -39,8 +39,8 @@
 }
 
 .custom-radio:checked {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 .custom-radio:checked::before {
@@ -74,8 +74,8 @@
 }
 
 .custom-checkbox:checked {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 .custom-checkbox:checked::before {
