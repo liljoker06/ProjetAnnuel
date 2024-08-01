@@ -43,11 +43,20 @@ export default function Myfiles() {
     };
 
     const applyFilters = (files) => {
+        // Vérifier si aucun filtre n'est appliqué
+        const noFiltersApplied = !filters.doc && !filters.sheet && !filters.slides;
+    
+        // Si aucun filtre n'est appliqué, retourner les fichiers tels quels
+        if (noFiltersApplied) {
+            return files;
+        }
+    
+        // Appliquer les filtres
         return files.filter(file => {
-            if (filters.doc && file.type !== 'doc') return false;
-            if (filters.sheet && file.type !== 'sheet') return false;
-            if (filters.slides && file.type !== 'slides') return false;
-            return true;
+            if (filters.doc && file.type === 'doc') return true;
+            if (filters.sheet && file.type === 'sheet') return true;
+            if (filters.slides && file.type === 'slides') return true;
+            return false;
         });
     };
 
