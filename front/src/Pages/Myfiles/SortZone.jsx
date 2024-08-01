@@ -2,6 +2,7 @@ import React from 'react';
 import { CSSTransition } from 'react-transition-group';
 import './SortFilterZone.css';
 
+import SortIcon from '@mui/icons-material/Sort';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
@@ -14,7 +15,7 @@ export default function SortZone({ isOpen, onClose, handleSortChange, sortField,
             unmountOnExit
         >
             <div className="bg-white p-4 rounded-lg shadow mb-4 text-gray-500">
-                <h3 className="text-lg font-semibold mb-4 text-gray-700">Trier par</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-700"><SortIcon /> Trier par</h3>
                 <div className="flex flex-row gap-20">
                     <div className="flex flex-col">
                         <label className="flex items-center mb-2">
