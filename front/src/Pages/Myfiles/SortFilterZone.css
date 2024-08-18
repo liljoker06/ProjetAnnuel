@@ -1,0 +1,92 @@
+/* transition css */
+
+.filter-zone-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.filter-zone-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.filter-zone-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.filter-zone-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+
+/* custom radio */
+
+.custom-radio {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.custom-radio:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.custom-radio:checked::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+/* custom checkbox */
+
+
+.custom-checkbox {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.custom-checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.custom-checkbox:checked::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
