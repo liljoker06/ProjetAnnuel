@@ -27,7 +27,7 @@ app.use('/api/invoices', invoiceRoute);
 app.use('/api/subscriptions', subscriptionRoute);
 app.use('/api/currentSubs', currentSubRoute);
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5555;
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
@@ -37,6 +37,10 @@ app.listen(PORT, async () => {
     console.log('Database connection has been established successfully.');
 
     // Synchroniser les modèles avec la base de données dans le bon ordre
+
+
+    // await sequelize.sync({ alter: true }); 
+
     await Company.sync({ alter: true });
     await Subscription.sync({ alter: true });
     await User.sync({ alter: true });

@@ -1,15 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
     const UserStorage = sequelize.define('UserStorage', {
       stor_id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         unique: true,
         allowNull: false,
       },
       user_id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         references: {
-          model: 'User',
+          model: 'Users',
           key: 'user_id'
         }
       },
