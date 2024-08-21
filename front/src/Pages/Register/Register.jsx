@@ -73,6 +73,21 @@ export default function Register() {
   //    Gestion des différents forms      //
   /****************************************/
 
+  const Auto = () => {
+    document.getElementById('email').value = 'test@gmail.com';
+    document.getElementById('phone').value = '0606060606';
+    document.getElementById('password').value = 'password';
+    document.getElementById('confirmPassword').value = 'password';
+    document.getElementById('nom').value = 'Doe';
+    document.getElementById('prenom').value = 'John';
+    document.getElementById('jour').value = '01';
+    document.getElementById('mois').value = '01';
+    document.getElementById('annee').value = '2000';
+    document.getElementById('adresse').value = '1 rue de la rue';
+    document.getElementById('cp').value = '75000';
+    document.getElementById('city').value = 'Paris';
+  }
+
   const nextStep = () => {
     if (currentStep < nbSteps) {
       setCurrentStep(currentStep + 1);
@@ -226,6 +241,9 @@ export default function Register() {
             <div className="flex items-center justify-between">
               <button disabled={loading} onClick={checkStepBasic} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
+              </button>
+              <button onClick={Auto} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                Dev
               </button>
             </div>
 
@@ -790,6 +808,7 @@ export default function Register() {
       setAdresse(adresse);
       setCodePostal(codePostal);
       setVille(ville);
+      console.log(email, phone, password, nom, prenom, `${jour}/${mois}/${annee}`, adresse, codePostal, ville);
 
       nextStep();
     }
