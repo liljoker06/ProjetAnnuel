@@ -7,6 +7,7 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
+import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 
 export default function Register() {
   const [progress, setProgress] = useState(14);       // En %
@@ -52,6 +53,7 @@ export default function Register() {
   /*case 3*/
   const [estEntrepriseExistante, setEstEntrepriseExistante] = useState(false);
   const [codeCompany, setCodeCompany] = useState('');
+  const [cityCompany, setCityCompany] = useState('');
   const [nomEntreprise, setNomEntreprise] = useState('');
   const [siret, setSiret] = useState('');
   const [adresseEntreprise, setAdresseEntreprise] = useState('');
@@ -942,10 +944,41 @@ export default function Register() {
     }
   }
 
-  const checkPayment = () => {
+  const checkPayment = async() => {
     setLoading(true);
-    nextStep();
+    const userData = {
+      email,
+      phone,
+      password,
+      nom,
+      prenom,
+      birth,
+      adresse,
+      codePostal,
+      ville,
+      nomEntreprise,
+      siret,
+      adresseEntreprise,
+      codePostalEntreprise,
+      cityCompany,
+      plan,
+      numCard,
+      nameCard,
+      dateCard,
+      cvvCard
+    };
 
+    try {
+      const result = await submitRegistration(userData);
+      if (result.success) {
+        nextStep(); 
+      } else {
+        setErrors(result.errors); 
+      }
+    } catch (error) {
+      setErrors({ api: 'Une erreur est survenue lors de la soumission.' });
+    }
+  
     setLoading(false);
   } 
 

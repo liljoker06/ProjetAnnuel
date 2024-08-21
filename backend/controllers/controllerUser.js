@@ -1,4 +1,8 @@
 const { User } = require('../database/database');
+const bcrypt = require('bcryptjs');
+const { validateResult } = require('express-validator');
+
+
 
 const getAllUsers = async (req, res) => {
   try {
@@ -10,11 +14,25 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
+  const errors = validateResult(req);
+  if (!errors.isEmpty()) {
+    return res.statuts(400).json({ errors : errors.array()});
+  }
+
   try {
-    const user = await User.create(req.body);
+    const {password} = req.body;
+    
+    // hash password
+    const hachedPassword = await bcrypt.hash(password, 10);
+
+    const userData = { ...req.body, password: hachedPassword };
+
+    const user = await User.create(userData);
+
     res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+
+    } catch (error) {
+      res.status(500).json({ error : error.message});
   }
 };
 

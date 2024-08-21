@@ -16,6 +16,8 @@ const currentSubRoute = require('./routes/currentSubRoute');
 const app = express();
 app.use(bodyParser.json());
 
+app.use(express.json());
+
 app.use('/api/companies', companyRoute);
 app.use('/api/users', userRoute);
 app.use('/api/userCompanies', userCompanyRoute);
