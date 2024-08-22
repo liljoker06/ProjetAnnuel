@@ -813,6 +813,7 @@ export default function Register() {
       setCodePostal(codePostal);
       setVille(ville);
       console.log(email, phone, password, nom, prenom, `${jour}/${mois}/${annee}`, adresse, codePostal, ville);
+
       try {
         console.log('Envoi de l\'email de vérification...');
         generateMailCode({ mailcode_email: email });
@@ -820,6 +821,7 @@ export default function Register() {
       } catch (error) {
         console.error('Erreur lors de l\'envoi de l\'email de vérification :', error);
       }
+
       nextStep();
     }
   };
