@@ -8,6 +8,7 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
+import { generateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Register() {
   const [progress, setProgress] = useState(14);       // En %
@@ -708,6 +709,7 @@ export default function Register() {
   const resendEmail = () => {
     if (canResend) {
       console.log('Renvoi de l\'email...');
+      // resendMailCode({ mailcode_email: email });
       setCanResend(false);
       setIsButtonDisabled(true); // Désactive le bouton
       let timer = 30;
@@ -811,6 +813,14 @@ export default function Register() {
       setCodePostal(codePostal);
       setVille(ville);
       console.log(email, phone, password, nom, prenom, `${jour}/${mois}/${annee}`, adresse, codePostal, ville);
+
+      try {
+        console.log('Envoi de l\'email de vérification...');
+        generateMailCode({ mailcode_email: email });
+        console.log('Email envoyé.');
+      } catch (error) {
+        console.error('Erreur lors de l\'envoi de l\'email de vérification :', error);
+      }
 
       nextStep();
     }
