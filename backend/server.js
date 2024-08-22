@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { sequelize, Company, Subscription, User, UserCompany, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile } = require('./database/database');
+const cors = require('cors');
+const { sequelize, Company, Subscription, User, UserCompany, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
 
 const companyRoute = require('./routes/companyRoute');
 const userRoute = require('./routes/userRoute');
@@ -12,10 +13,11 @@ const storageFileRoute = require('./routes/storageFileRoute');
 const invoiceRoute = require('./routes/invoiceRoute');
 const subscriptionRoute = require('./routes/subscriptionRoute');
 const currentSubRoute = require('./routes/currentSubRoute');
+const mailCodeRoute = require('./routes/mailCodeRoute');
 
 const app = express();
 app.use(bodyParser.json());
-
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/companies', companyRoute);
@@ -28,6 +30,7 @@ app.use('/api/storageFiles', storageFileRoute);
 app.use('/api/invoices', invoiceRoute);
 app.use('/api/subscriptions', subscriptionRoute);
 app.use('/api/currentSubs', currentSubRoute);
+app.use('/api/mailCodes', mailCodeRoute);
 
 const PORT = 5555;
 
@@ -53,6 +56,7 @@ app.listen(PORT, async () => {
     await File.sync({ alter: true });
     await UserStorage.sync({ alter: true });
     await StorageFile.sync({ alter: true });
+    await MailCode.sync({ alter: true });
 
     console.log('Database synced');
   } catch (error) {
