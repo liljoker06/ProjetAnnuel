@@ -3,12 +3,11 @@ import TitlePart from '../../Components/TitlePart/TitlePart';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 
-//
 import consoleLog from '../../Functions/Dev/consoleLog';
 
 import { checkEmail } from '../../Functions/FormInput/checkEmail';
 import { checkPasswd } from '../../Functions/FormInput/checkPasswd';
-import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
+// import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -171,10 +170,10 @@ export default function Login() {
               <button onClick={skipCase(1)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              {/* <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
 
-              </button>
+              </button> */}
             </div>
             {
               Object.values(errors).filter(error => error).length > 0 && (
@@ -238,10 +237,10 @@ export default function Login() {
               <button onClick={() => skipCase(CASE_LOGIN)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              {/* <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
 
-              </button>
+              </button> */}
             </div>
             {
               Object.values(errors).filter(error => error).length > 0 && (
@@ -425,24 +424,24 @@ export default function Login() {
     }
   };
 
-  const checkCodeEmail = () => {
-    setLoading(true);
-    const newErrors = {};
-    const codeMailResult = checkCodeMail(codeMail)
+  // const checkCodeEmail = () => {
+  //   setLoading(true);
+  //   const newErrors = {};
+  //   const codeMailResult = checkCodeMail(codeMail)
 
-    if (!codeMailResult.success) {
-      newErrors.codeMail = codeMailResult.error;
-      setErrors(newErrors);
-      setLoading(false);
-      return;
-    }
+  //   if (!codeMailResult.success) {
+  //     newErrors.codeMail = codeMailResult.error;
+  //     setErrors(newErrors);
+  //     setLoading(false);
+  //     return;
+  //   }
     
-    setLoading(false);
+  //   setLoading(false);
 
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      navigate('/'); 
-    }
-  };
+  //   if (Object.values(newErrors).filter(error => error).length === 0) {
+  //     navigate('/'); 
+  //   }
+  // };
 
 
 

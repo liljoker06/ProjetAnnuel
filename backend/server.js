@@ -62,4 +62,29 @@ app.listen(PORT, async () => {
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
+
+
+  // Vider les codes de validation expirés toutes les 1h
+  setInterval(async () => {
+      try {
+          const mailcodes = await MailCode.destroy({
+              where: {
+                  mailcode_expire: {
+                      [Op.lt]: new Date()
+                  }
+              }
+          });
+  
+          if (mailcodes > 0) {
+              console.log(`Les codes de validation expirés ont été supprimés: ${mailcodes} codes supprimés`);
+          } else {
+              console.log('Aucun code de validation expiré à supprimer');
+          }
+      } catch (error) {
+          console.error('Erreur lors de la suppression des codes de validation expirés:', error);
+      }
+  }, 3600000); // 3600000ms = 1h
+
+  
+
 });
