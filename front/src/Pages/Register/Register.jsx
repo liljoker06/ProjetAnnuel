@@ -8,7 +8,7 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
-import { generateMailCode } from '../../Functions/CallApi/CallMailCode';
+import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Register() {
   const [progress, setProgress] = useState(14);       // En %
@@ -77,7 +77,7 @@ export default function Register() {
   /****************************************/
 
   const Auto = () => {
-    document.getElementById('email').value = 'test@gmail.com';
+    document.getElementById('email').value = 'matisagr@gmail.com';
     document.getElementById('phone').value = '0606060606';
     document.getElementById('password').value = 'password';
     document.getElementById('confirmPassword').value = 'password';
@@ -313,7 +313,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              {loading ? 'Chargement...' : 'Confirmer'}
+                {loading ? 'Chargement...' : 'Confirmer'}
 
               </button>
             </div>
@@ -412,7 +412,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              {loading ? 'Chargement...' : 'Confirmer'}
+                {loading ? 'Chargement...' : 'Confirmer'}
               </button>
             </div>
             {
@@ -490,7 +490,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              {loading ? 'Chargement...' : 'Suivant'}
+                {loading ? 'Chargement...' : 'Suivant'}
 
               </button>
             </div>
@@ -551,7 +551,7 @@ export default function Register() {
                 Retour
               </button>
               <button onClick={checkStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              {loading ? 'Chargement...' : 'Suivant'}
+                {loading ? 'Chargement...' : 'Suivant'}
               </button>
             </div>
             {
@@ -635,7 +635,7 @@ export default function Register() {
               ) : (
                 <>
                   <button onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                  {loading ? 'Chargement...' : `S'abonner pour ${plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois`}
+                    {loading ? 'Chargement...' : `S'abonner pour ${plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois`}
                   </button>
                 </>
               )}
@@ -709,7 +709,7 @@ export default function Register() {
   const resendEmail = () => {
     if (canResend) {
       console.log('Renvoi de l\'email...');
-      // resendMailCode({ mailcode_email: email });
+      resendMailCode({ mailcode_email: email });
       setCanResend(false);
       setIsButtonDisabled(true); // Désactive le bouton
       let timer = 30;
@@ -826,25 +826,40 @@ export default function Register() {
     }
   };
 
-  const checkCodeEmail = () => {
-    setLoading(true);
-    console.log('Vérification du code de vérification...');
-    const newErrors = {};
-
-    // Vérification de la présence
-    const code = getFullCode();
-    console.log("code : " + code);
-    newErrors.codeMail = code.length !== 5 ? 'Code invalide.' : '';
-    console.log("codeMail : " + codeMail);
-
-    setErrors(newErrors); // Met à jour l'état des erreurs
-    setLoading(false); // Termine le chargement
-    console.log('Vérification terminée.');
-    console.log(newErrors);
-
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      nextStep();
-    }
+  const checkCodeEmail = async () => {
+      setLoading(true);
+      console.log('Vérification du code de vérification...');
+      const newErrors = {};
+  
+      // Vérification de la présence
+      const code = getFullCode();
+      console.log("code : " + code);
+      newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
+  
+      try {
+          const response = await validateMailCode({ mailcode_email: email, mailcode_code: code });
+          console.log('Réponse du serveur:', response);
+  
+          if (response.success) {
+              console.log('Code valide.');
+          } else {
+              newErrors.codeMail = response.data.error || 'Code invalide.';
+              console.log('Code invalide:', response.data.error);
+          }
+      } catch (error) {
+          console.error('Erreur lors de la validation du code:', error);
+          newErrors.codeMail = 'Erreur lors de la validation du code.';
+      } finally {
+          setErrors(newErrors); // Met à jour l'état des erreurs
+          setLoading(false); // Termine le chargement
+          console.log('Vérification terminée.');
+          console.log(newErrors);
+  
+          // Vérifie s'il n'y a pas d'erreurs avant de passer à l'étape suivante
+          if (Object.values(newErrors).filter(error => error).length === 0) {
+              nextStep();
+          }
+      }
   };
 
   const checkStepEntreprise = () => {
@@ -954,7 +969,7 @@ export default function Register() {
     }
   }
 
-  const checkPayment = async() => {
+  const checkPayment = async () => {
     setLoading(true);
     const userData = {
       email,
@@ -981,16 +996,16 @@ export default function Register() {
     try {
       const result = await submitRegistration(userData);
       if (result.success) {
-        nextStep(); 
+        nextStep();
       } else {
-        setErrors(result.errors); 
+        setErrors(result.errors);
       }
     } catch (error) {
       setErrors({ api: 'Une erreur est survenue lors de la soumission.' });
     }
-  
+
     setLoading(false);
-  } 
+  }
 
   /****************************************/
 

@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { MailCode } = require('../database/database');
+const { Op } = require('sequelize');
 
 // mailcode_email
 const generateMailCode = async (req, res) => {
@@ -43,7 +44,7 @@ const generateMailCode = async (req, res) => {
                 console.log('Email sent: ' + info.response);
             }
         });
- 
+
 
         res.status(201).json(mailcode);
     } catch (error) {
@@ -52,11 +53,13 @@ const generateMailCode = async (req, res) => {
 };
 
 // mailcode_email, mailcode_code
-// MANQUE QUAND SI LE CODE EST E
+// MANQUE QUAND SI LE CODE EST EXPIRE ALORS ON DOIT LE SUPPRIMER
 const validateMailCode = async (req, res) => {
     try {
+        console.log('Requête reçue:', req.body);
         const { mailcode_email, mailcode_code } = req.body;
 
+        console.log('Recherche du code de validation...');
         const mailcode = await MailCode.findOne({
             where: {
                 mailcode_email,
@@ -68,16 +71,22 @@ const validateMailCode = async (req, res) => {
             }
         });
 
+        // si le code de validation n'existe pas
         if (!mailcode) {
-            return res.status(400).json({ error: 'Invalid mail code' });
+            console.log('Code de validation invalide ou expiré.');
+            return res.status(400).json({ error: 'Code de validation invalide ou expiré' });
         }
 
+        // changer le status du code de validation
+        console.log('Code de validation trouvé:', mailcode);
         mailcode.mailcode_status = true;
         await mailcode.save();
-
-        res.status(200).json(mailcode);
+        console.log('Code de validation mis à jour et sauvegardé.');
+        console.log('Envoi de la réponse avec statut 200...');
+        return res.status(200).json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Erreur lors de la validation du code:', error);
+        return res.status(500).json({ error: error.message });
     }
 };
 
@@ -86,7 +95,7 @@ const resendMailCode = async (req, res) => {
     try {
         const { mailcode_email } = req.body;
 
-        const mailcode = await MailCode.delete({
+        const mailcode = await MailCode.destroy({
             where: {
                 mailcode_email,
                 mailcode_status: false,
@@ -96,6 +105,8 @@ const resendMailCode = async (req, res) => {
             }
         });
 
+        console.log("Le code a été supprimé");
+        console.log("génération d'un nouveau code");
         generateMailCode(req, res);
     }
     catch (error) {
