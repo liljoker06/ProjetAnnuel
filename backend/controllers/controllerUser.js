@@ -1,6 +1,6 @@
-const { User } = require('../database/database');
+const { User } = require('../database/models/modelUser');
 const bcrypt = require('bcryptjs');
-const { validateResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 
 
 
@@ -14,25 +14,25 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const errors = validateResult(req);
-  if (!errors.isEmpty()) {
-    return res.statuts(400).json({ errors : errors.array()});
+  const errors = validationResult(req);
+  if (!errors.isEmpty()){
+    return res.status(400).json({errors : errors.array()});
   }
 
   try {
     const {password} = req.body;
-    
-    // hash password
-    const hachedPassword = await bcrypt.hash(password, 10);
 
-    const userData = { ...req.body, password: hachedPassword };
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const userData = { ...req.body, user_passw: hashedPassword };
 
     const user = await User.create(userData);
 
     res.status(201).json(user);
-
-    } catch (error) {
-      res.status(500).json({ error : error.message});
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
