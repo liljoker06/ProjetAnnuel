@@ -7,6 +7,13 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
+
+import { checkStepBasic } from '../../Functions/FormInput/checkStepBasic';
+import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
+import { checkStepEntreprise } from '../../Functions/FormInput/checkStepEntreprise';
+import { checkStepForfait } from '../../Functions/FormInput/checkStepForfait';
+import { checkStepCard } from '../../Functions/FormInput/checkStepCard';
+
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
@@ -242,7 +249,7 @@ export default function Register() {
             </div>
 
             <div className="flex items-center justify-between">
-              <button disabled={loading} onClick={checkStepBasic} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckStepBasic} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
               </button>
               <button onClick={Auto} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
@@ -312,7 +319,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
 
               </button>
@@ -411,7 +418,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCkeckStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
               </button>
             </div>
@@ -489,7 +496,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCheckStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
 
               </button>
@@ -550,7 +557,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCheckStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
               </button>
             </div>
@@ -751,223 +758,118 @@ export default function Register() {
   //    Vérification des forms            //
   /****************************************/
 
-  const checkStepBasic = () => {
-    setLoading(true);
-    console.log('Vérification des champs...');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im;
-    const newErrors = {};
-
-    //Verifier champs vides
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const nom = document.getElementById('nom').value;
-    const prenom = document.getElementById('prenom').value;
-    const jour = document.getElementById('jour').value;
-    const mois = document.getElementById('mois').value;
-    const annee = document.getElementById('annee').value;
-    const adresse = document.getElementById('adresse').value;
-    const codePostal = document.getElementById('cp').value;
-    const ville = document.getElementById('city').value;
-
-    // Vérification de la présence
-    newErrors.email = !email ? 'Email requis.' : '';
-    newErrors.phone = !phone ? 'Téléphone requis.' : '';
-    newErrors.password = !password ? 'Mot de passe requis.' : '';
-    newErrors.confirmPassword = !confirmPassword ? 'Confirmation de mot de passe requis.' : '';
-    newErrors.nom = !nom ? 'Nom requis.' : '';
-    newErrors.prenom = !prenom ? 'Prénom requis.' : '';
-    newErrors.jour = !jour ? 'Jour de naissance requis.' : '';
-    newErrors.mois = !mois ? 'Mois de naissance requis.' : '';
-    newErrors.annee = !annee ? 'Année de naissance requise.' : '';
-    newErrors.adresse = !adresse ? 'Adresse requise.' : '';
-    newErrors.codePostal = !codePostal ? 'Code postal requis.' : '';
-    newErrors.ville = !ville ? 'Ville requise.' : '';
-
-    // Validation du contenu (seulement si le champ est rempli)
-    if (email && !emailRegex.test(email)) newErrors.email = 'Email invalide.';
-    if (phone && !phoneRegex.test(phone)) newErrors.phone = 'Numéro de téléphone invalide.';
-    if (password && password.length < 6) newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères.';
-    if (confirmPassword && password !== confirmPassword) newErrors.confirmPassword = 'Les mots de passe ne correspondent pas.';
-    if (jour && (jour < 1 || jour > 31)) newErrors.jour = 'Jour invalide.';
-    if (mois && (mois < 1 || mois > 12)) newErrors.mois = 'Mois invalide.';
-    if (annee && (annee < 1900 || annee > 2023)) newErrors.annee = 'Année invalide.';
-    if (codePostal && codePostal.length !== 5) newErrors.codePostal = 'Code postal invalide.';
-
-    setErrors(newErrors); // Met à jour l'état des erreurs
-    setLoading(false); // Termine le chargement
-    console.log('Vérification terminée.');
-    console.log(newErrors);
-
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      // Si aucune erreur n'est trouvée, enregistrer les données et passer à l'étape suivante
-      setEmail(email);
-      setPhone(phone);
-      setPassword(password);
-      setNom(nom);
-      setPrenom(prenom);
-      setBirth(`${jour}/${mois}/${annee}`);
-      setAdresse(adresse);
-      setCodePostal(codePostal);
-      setVille(ville);
-      console.log(email, phone, password, nom, prenom, `${jour}/${mois}/${annee}`, adresse, codePostal, ville);
-
-      try {
-        console.log('Envoi de l\'email de vérification...');
-        generateMailCode({ mailcode_email: email });
-        console.log('Email envoyé.');
-      } catch (error) {
-        console.error('Erreur lors de l\'envoi de l\'email de vérification :', error);
-      }
-
-      nextStep();
-    }
+  // Vérification des champs de l'étape 1
+  const handleCheckStepBasic = () => {
+    checkStepBasic({
+      setLoading,
+      setErrors,
+      setEmail,
+      setPhone,
+      setPassword,
+      setNom,
+      setPrenom,
+      setBirth,
+      setAdresse,
+      setCodePostal,
+      setVille,
+      generateMailCode,
+      nextStep
+    });
   };
 
-  const checkCodeEmail = async () => {
-      setLoading(true);
-      console.log('Vérification du code de vérification...');
-      const newErrors = {};
-  
-      // Vérification de la présence
-      const code = getFullCode();
-      console.log("code : " + code);
-      newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
-  
-      try {
-          const response = await validateMailCode({ mailcode_email: email, mailcode_code: code });
-          console.log('Réponse du serveur:', response);
-  
-          if (response.success) {
-              console.log('Code valide.');
-          } else {
-              newErrors.codeMail = response.data.error || 'Code invalide.';
-              console.log('Code invalide:', response.data.error);
-          }
-      } catch (error) {
-          console.error('Erreur lors de la validation du code:', error);
-          newErrors.codeMail = 'Erreur lors de la validation du code.';
-      } finally {
-          setErrors(newErrors); // Met à jour l'état des erreurs
-          setLoading(false); // Termine le chargement
-          console.log('Vérification terminée.');
-          console.log(newErrors);
-  
-          // Vérifie s'il n'y a pas d'erreurs avant de passer à l'étape suivante
-          if (Object.values(newErrors).filter(error => error).length === 0) {
-              nextStep();
-          }
-      }
+  // Vérification des champs de l'étape 2
+  const handleCheckCodeMail = () => {
+    checkCodeMail({
+      setLoading,
+      setErrors,
+      getFullCode,
+      validateMailCode,
+      email,
+      nextStep
+    });
   };
 
-  const checkStepEntreprise = () => {
-    setLoading(true);
-    console.log('Vérification des champs entreprise...');
-    const newErrors = {};
+  // Vérification des champs de l'étape 3
+  const handleCkeckStepEntreprise = () => {
+    checkStepEntreprise({
+      setLoading,
+      setErrors,
+      estEntrepriseExistante,
+      codeCompany,
+      nomEntreprise,
+      siret,
+      adresseEntreprise,
+      codePostalEntreprise,
+      cityCompany,
+      setCodeCompany,
+      setNomEntreprise,
+      setSiret,
+      setAdresseEntreprise,
+      setCodePostalEntreprise,
+      setCityCompany,
+      nextStep
+    });
+  };
 
-    if (estEntrepriseExistante) {
-      const codeCompany = document.getElementById('codeCompany').value;
-      newErrors.codeCompany = !codeCompany ? 'Code de l\'entreprise requis.' : '';
-      if (codeCompany && codeCompany.length !== 10) newErrors.codeCompany = 'Code de l\'entreprise invalide.';
-      setErrors(newErrors);
-      setLoading(false);
-      console.log(newErrors);
-      console.log('Vérification terminée.');
+  // Vérification des champs de l'étape 4
+  const handleCheckStepForfait = () => {
+    checkStepForfait({
+      setLoading,
+      setErrors,
+      setPlan,
+      nextStep
+    });
+  };
+    
+  // Vérification des champs de l'étape 5
+  const handleCheckStepCard = () => {
+    checkStepCard({
+      setLoading,
+      setErrors,
+      setNumCard,
+      setNameCard,
+      setDateCard,
+      setCvvCard,
+      numCard,
+      nameCard,
+      dateCard,
+      cvvCard,
+      nextStep
+    });
+  };
 
+  // const checkStepCard = () => {
+  //   setLoading(true);
+  //   console.log('Vérification du paiement...');
+  //   const newErrors = {};
 
+  //   const numCard = document.getElementById('numCard').value;
+  //   const nameCard = document.getElementById('nameCard').value;
+  //   const dateCard = document.getElementById('dateCard').value;
+  //   const cvvCard = document.getElementById('cvvCard').value;
 
-      if (Object.values(newErrors).filter(error => error).length === 0) {
-        setCodeCompany(codeCompany);
+  //   newErrors.numCard = !numCard ? 'Numéro de carte requis.' : '';
+  //   newErrors.nameCard = !nameCard ? 'Nom sur la carte requis.' : '';
+  //   newErrors.dateCard = !dateCard ? 'Date d\'expiration requise.' : '';
+  //   newErrors.cvvCard = !cvvCard ? 'CVV requis.' : '';
 
-        skipStep(6);
-        // nextStep();
+  //   if (numCard && numCard.length !== 16) newErrors.numCard = 'Numéro de carte invalide.';
+  //   if (dateCard && dateCard.length !== 5) newErrors.dateCard = 'Date d\'expiration invalide.';
+  //   if (cvvCard && cvvCard.length !== 3) newErrors.cvvCard = 'CVV invalide.';
 
-      }
+  //   setErrors(newErrors);
+  //   setLoading(false);
+  //   console.log(newErrors);
+  //   console.log('Vérification terminée.');
 
-    }
-    else {
-      const nomEntreprise = document.getElementById('nameCompany').value;
-      const siret = document.getElementById('SIRET').value;
-      const adresseEntreprise = document.getElementById('adresseCompany').value;
-      const codePostalEntreprise = document.getElementById('cpCompany').value;
-      const cityCompany = document.getElementById('cityCompany').value;
-
-      newErrors.nomEntreprise = !nomEntreprise ? 'Nom de l\'entreprise requis.' : '';
-      newErrors.siret = !siret ? 'SIRET requis.' : '';
-      newErrors.adresseEntreprise = !adresseEntreprise ? 'Adresse de l\'entreprise requise.' : '';
-      newErrors.codePostalEntreprise = !codePostalEntreprise ? 'Code postal de l\'entreprise requis.' : '';
-      newErrors.cityCompany = !cityCompany ? 'Ville de l\'entreprise requise.' : '';
-
-      if (siret && siret.length !== 14) newErrors.siret = 'SIRET invalide.';
-      if (codePostalEntreprise && codePostalEntreprise.length !== 5) newErrors.codePostalEntreprise = 'Code postal invalide.';
-
-      setErrors(newErrors);
-      setLoading(false);
-      console.log('Vérification terminée.');
-
-      if (Object.values(newErrors).filter(error => error).length === 0) {
-        setNomEntreprise(nomEntreprise);
-        setSiret(siret);
-        setAdresseEntreprise(adresseEntreprise);
-        setCodePostalEntreprise(codePostalEntreprise);
-        nextStep();
-      }
-    }
-  }
-
-  const checkStepForfait = () => {
-    setLoading(true);
-    console.log('Vérification du forfait...');
-    const newErrors = {};
-
-    const radioPlan = document.querySelector('input[name="radio-plan"]:checked');
-    newErrors.radioPlan = !radioPlan ? 'Forfait requis.' : '';
-
-    setErrors(newErrors);
-    setLoading(false);
-    console.log(newErrors);
-    console.log('Vérification terminée.');
-
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      setPlan(radioPlan.value);
-      nextStep();
-    }
-  }
-
-  const checkStepCard = () => {
-    setLoading(true);
-    console.log('Vérification du paiement...');
-    const newErrors = {};
-
-    const numCard = document.getElementById('numCard').value;
-    const nameCard = document.getElementById('nameCard').value;
-    const dateCard = document.getElementById('dateCard').value;
-    const cvvCard = document.getElementById('cvvCard').value;
-
-    newErrors.numCard = !numCard ? 'Numéro de carte requis.' : '';
-    newErrors.nameCard = !nameCard ? 'Nom sur la carte requis.' : '';
-    newErrors.dateCard = !dateCard ? 'Date d\'expiration requise.' : '';
-    newErrors.cvvCard = !cvvCard ? 'CVV requis.' : '';
-
-    if (numCard && numCard.length !== 16) newErrors.numCard = 'Numéro de carte invalide.';
-    if (dateCard && dateCard.length !== 5) newErrors.dateCard = 'Date d\'expiration invalide.';
-    if (cvvCard && cvvCard.length !== 3) newErrors.cvvCard = 'CVV invalide.';
-
-    setErrors(newErrors);
-    setLoading(false);
-    console.log(newErrors);
-    console.log('Vérification terminée.');
-
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      setNumCard(numCard);
-      setNameCard(nameCard);
-      setDateCard(dateCard);
-      setCvvCard(cvvCard);
-      nextStep();
-    }
-  }
+  //   if (Object.values(newErrors).filter(error => error).length === 0) {
+  //     setNumCard(numCard);
+  //     setNameCard(nameCard);
+  //     setDateCard(dateCard);
+  //     setCvvCard(cvvCard);
+  //     nextStep();
+  //   }
+  // }
 
   const checkPayment = async () => {
     setLoading(true);
