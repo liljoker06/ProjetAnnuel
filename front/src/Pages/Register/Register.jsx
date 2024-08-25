@@ -646,6 +646,15 @@ export default function Register() {
                   </button>
                 </>
               )}
+              {
+                Object.values(errors).filter(error => error).length > 0 && (
+                  <ul className='mt-5 p-2 bg-red-500 text-black rounded-lg' style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                    {Object.values(errors).map((error, index) => (
+                      error && <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                )
+              }
 
             </div>
           </>
@@ -820,7 +829,7 @@ export default function Register() {
       nextStep
     });
   };
-    
+
   // Vérification des champs de l'étape 5
   const handleCheckStepCard = () => {
     checkStepCard({
@@ -838,38 +847,37 @@ export default function Register() {
     });
   };
 
-  // const checkStepCard = () => {
-  //   setLoading(true);
-  //   console.log('Vérification du paiement...');
-  //   const newErrors = {};
-
-  //   const numCard = document.getElementById('numCard').value;
-  //   const nameCard = document.getElementById('nameCard').value;
-  //   const dateCard = document.getElementById('dateCard').value;
-  //   const cvvCard = document.getElementById('cvvCard').value;
-
-  //   newErrors.numCard = !numCard ? 'Numéro de carte requis.' : '';
-  //   newErrors.nameCard = !nameCard ? 'Nom sur la carte requis.' : '';
-  //   newErrors.dateCard = !dateCard ? 'Date d\'expiration requise.' : '';
-  //   newErrors.cvvCard = !cvvCard ? 'CVV requis.' : '';
-
-  //   if (numCard && numCard.length !== 16) newErrors.numCard = 'Numéro de carte invalide.';
-  //   if (dateCard && dateCard.length !== 5) newErrors.dateCard = 'Date d\'expiration invalide.';
-  //   if (cvvCard && cvvCard.length !== 3) newErrors.cvvCard = 'CVV invalide.';
-
-  //   setErrors(newErrors);
-  //   setLoading(false);
-  //   console.log(newErrors);
-  //   console.log('Vérification terminée.');
-
-  //   if (Object.values(newErrors).filter(error => error).length === 0) {
-  //     setNumCard(numCard);
-  //     setNameCard(nameCard);
-  //     setDateCard(dateCard);
-  //     setCvvCard(cvvCard);
-  //     nextStep();
-  //   }
-  // }
+  // Vérification des champs de l'étape 6
+  const handleChckStepPayment = () => {
+    const userData = {
+      email,
+      phone,
+      password,
+      nom,
+      prenom,
+      birth,
+      adresse,
+      codePostal,
+      ville,
+      nomEntreprise,
+      siret,
+      adresseEntreprise,
+      codePostalEntreprise,
+      cityCompany,
+      plan,
+      numCard,
+      nameCard,
+      dateCard,
+      cvvCard
+    };
+    checkPayment({
+      setLoading,
+      setErrors,
+      nextStep,
+      userData,
+      submitRegistration
+    });
+  }
 
   const checkPayment = async () => {
     setLoading(true);
