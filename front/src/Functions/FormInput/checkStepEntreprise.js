@@ -1,26 +1,23 @@
 import consoleLog from "../Dev/consoleLog";
 
-export const checkStepEntreprise = ({
+// Si l'entreprise n'existe pas
+export const checkStepEntreprise = async ({
     setLoading,
     setErrors,
-    estEntrepriseExistante,
-    setCodeCompany,
     setNomEntreprise,
     setSiret,
     setAdresseEntreprise,
     setCodePostalEntreprise,
     setCityCompany,
-    skipStep,
+    validateCompany,
     nextStep
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkStepEntreprise', 'white');
+    consoleLog('• [START] checkStepEntreprise', 'white');
     consoleLog('Vérification des champs entreprise...', 'cyan');
     const newErrors = {};
 
-    const fields = estEntrepriseExistante ? [
-        { id: 'codeCompany', label: 'Code de l\'entreprise', length: 10, required: true }
-    ] : [
+    const fields = [
         { id: 'nameCompany', label: 'Nom de l\'entreprise', required: true },
         { id: 'SIRET', label: 'SIRET', length: 14, required: true },
         { id: 'adresseCompany', label: 'Adresse de l\'entreprise', required: true },
@@ -48,6 +45,26 @@ export const checkStepEntreprise = ({
         }
     });
 
+    if (Object.values(newErrors).filter(error => error).length === 0) {
+        try {
+            const response = await validateCompany({ comp_name: values.nameCompany, comp_siret: values.SIRET });
+            consoleLog(`Validation de l'entreprise: ${values.nameCompany} - ${values.SIRET}`, 'cyan');
+            consoleLog('Réponse:', response.isValid, 'cyan');
+            if (!response.isValid) {
+                if (response.isName) {
+                    newErrors.nameCompany = 'Nom de l\'entreprise déjà utilisé';
+                } else if (response.isSiret) {
+                    newErrors.SIRET = 'SIRET déjà utilisé';
+                } else {
+                    newErrors.nameCompany = 'Erreur lors de la validation de l\'entreprise';
+                }
+            }
+        } catch (error) {
+            newErrors.nameCompany = 'FATAL Erreur lors de la validation de l\'entreprise';
+            consoleLog('FATAL Erreur lors de la validation de l\'entreprise: ' + error.message, 'red');
+        }
+    }
+
     setErrors(newErrors);
     setLoading(false);
     Object.keys(newErrors).forEach(key => {
@@ -58,19 +75,15 @@ export const checkStepEntreprise = ({
     consoleLog('Vérification terminée.', 'cyan');
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
-        if (estEntrepriseExistante) {
-            setCodeCompany(values.codeCompany);
-            skipStep(6);
-        } else {
-            setNomEntreprise(values.nameCompany);
-            setSiret(values.SIRET);
-            setAdresseEntreprise(values.adresseCompany);
-            setCodePostalEntreprise(values.cpCompany);
-            setCityCompany(values.cityCompany);
-            consoleLog('• Fin de checkStepEntreprise', 'white');
-            nextStep();
-        }
+        setNomEntreprise(values.nameCompany);
+        setSiret(values.SIRET);
+        setAdresseEntreprise(values.adresseCompany);
+        setCodePostalEntreprise(values.cpCompany);
+        setCityCompany(values.cityCompany);
+        consoleLog('• [END] checkStepEntreprise', 'white');
+        nextStep();
     } else {
-        consoleLog('• Fin de checkStepEntreprise', 'white');
+        consoleLog('• [END] checkStepEntreprise', 'white');
     }
 };
+

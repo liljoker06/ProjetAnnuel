@@ -1,6 +1,6 @@
 import consoleLog from '../Dev/consoleLog';
 
-export const checkStepBasic = ({
+export const checkStepBasic = async ({
     setLoading,         // Fonction pour activer/désactiver le chargement
     setErrors,          // Fonction pour définir les erreurs
     setEmail,           // Fonction pour définir l'email
@@ -12,11 +12,12 @@ export const checkStepBasic = ({
     setAdresse,         // Fonction pour définir l'adresse
     setCodePostal,      // Fonction pour définir le code postal
     setVille,           // Fonction pour définir la ville
+    validateUserEmail,  // Fonction pour vérifier si l'email est valide
     generateMailCode,   // Fonction pour envoyer le code de vérification
     nextStep            // Fonction pour passer à l'étape suivante
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkStepBasic', 'white');
+    consoleLog('• [START] checkStepBasic', 'white');
     consoleLog('Vérification des champs...', 'cyan');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,28 +74,48 @@ export const checkStepBasic = ({
     });
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
-        setEmail(values.email);
-        setPhone(values.phone);
-        setPassword(values.password);
-        setNom(values.nom);
-        setPrenom(values.prenom);
-        setBirth(`${values.jour}/${values.mois}/${values.annee}`);
-        setAdresse(values.adresse);
-        setCodePostal(values.cp);
-        setVille(values.city);
-        consoleLog(`${values.email} ${values.phone} ${values.password} ${values.nom} ${values.prenom} ${values.jour}/${values.mois}/${values.annee} ${values.adresse} ${values.cp} ${values.city}`, 'cyan');
-
+        setLoading(true);
         try {
-            consoleLog('Envoi de l\'email de vérification...', 'cyan');
-            generateMailCode({ mailcode_email: values.email });
-            consoleLog('Email de vérification envoyé à ' + values.email, 'green');
+            const isEmailValid = await validateUserEmail({ user_email: values.email });
+            consoleLog(`Validation de l'email: ${values.email}`, 'cyan');
+            if (!isEmailValid) {
+                newErrors.email = 'Email déjà utilisé.';
+                consoleLog('Email déjà utilisé.', 'red');
+            }
         } catch (error) {
-            consoleLog('Erreur lors de l\'envoi de l\'email de vérification:' + error, 'red');
+            newErrors.email = 'Erreur lors de la validation de l\'email.';
+            consoleLog('Erreur lors de la validation de l\'email.', 'red');
         }
 
-        consoleLog('• Fin de checkStepBasic', 'white');
-        nextStep();
+        setErrors(newErrors);
+
+        if (Object.values(newErrors).filter(error => error).length === 0) {
+            setEmail(values.email);
+            setPhone(values.phone);
+            setPassword(values.password);
+            setNom(values.nom);
+            setPrenom(values.prenom);
+            setBirth(`${values.jour}/${values.mois}/${values.annee}`);
+            setAdresse(values.adresse);
+            setCodePostal(values.cp);
+            setVille(values.city);
+            consoleLog(`${values.email} ${values.phone} ${values.password} ${values.nom} ${values.prenom} ${values.jour}/${values.mois}/${values.annee} ${values.adresse} ${values.cp} ${values.city}`, 'cyan');
+
+            try {
+                consoleLog('Envoi de l\'email de vérification...', 'cyan');
+                generateMailCode({ mailcode_email: values.email });
+                consoleLog('Email de vérification envoyé à ' + values.email, 'green');
+            } catch (error) {
+                consoleLog('Erreur lors de l\'envoi de l\'email de vérification:' + error, 'red');
+            }
+
+            consoleLog('• [END] checkStepBasic', 'white');
+            nextStep();
+        } else {
+            consoleLog('• [END] checkStepBasic', 'white');
+        }
+        setLoading(false);
     } else {
-        consoleLog('• Fin de checkStepBasic', 'white');
+        consoleLog('• [END] checkStepBasic', 'white');
     }
 };

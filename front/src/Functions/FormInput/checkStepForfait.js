@@ -7,13 +7,17 @@ export const checkStepForfait = ({
     nextStep
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkStepForfait', 'white');
+    consoleLog('• [START] checkStepForfait', 'white');
     consoleLog('Vérification du forfait...', 'cyan');
     const newErrors = {};
 
     const radioPlan = document.querySelector('input[name="radio-plan"]:checked');
-    consoleLog('radioPlan : '+ radioPlan.value, 'cyan');
-    newErrors.radioPlan = !radioPlan ? 'Forfait requis.' : '';
+    if (radioPlan) {
+        consoleLog('Forfait : ' + radioPlan.value, 'cyan');
+        newErrors.radioPlan = '';
+    } else {
+        newErrors.radioPlan = 'Forfait requis.';
+    }
 
     setErrors(newErrors);
     setLoading(false);
@@ -26,9 +30,9 @@ export const checkStepForfait = ({
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
         setPlan(radioPlan.value);
-        consoleLog('• Fin de checkStepForfait', 'white');
+        consoleLog('• [END] checkStepForfait', 'white');
         nextStep();
     } else {
-        consoleLog('• Fin de checkStepForfait', 'white');
+        consoleLog('• [END] checkStepForfait', 'white');
     }
 };

@@ -1,28 +1,20 @@
 import consoleLog from "../Dev/consoleLog";
 
-export const checkStepCard = ({
+// Si l'entreprise existe
+export const checkCodeEntreprise = async ({
     setLoading,
     setErrors,
-    setNumCard,
-    setNameCard,
-    setDateCard,
-    setCvvCard,
-    numCard,
-    nameCard,
-    dateCard,
-    cvvCard,
-    nextStep
+    setCodeCompany,
+    validateCompanyCode,
+    skipStep
 }) => {
     setLoading(true);
-    consoleLog('• [START] checkStepCard', 'white');
-    consoleLog('Vérification des champs carte...', 'cyan');
-    const newErrors = {};    
+    consoleLog('• [START] checkCodeEntreprise', 'white');
+    consoleLog('Vérification du code entreprise...', 'cyan');
+    const newErrors = {};
 
     const fields = [
-        { id: 'numCard', label: 'Numéro de carte', length: 19, required: true },
-        { id: 'nameCard', label: 'Nom du titulaire', required: true },
-        { id: 'dateCard', label: 'Date d\'expiration', length: 5, required: true },
-        { id: 'cvvCard', label: 'Cryptogramme visuel', length: 3, required: true }
+        { id: 'codeCompany', label: 'Code de l\'entreprise', length: 10, required: true }
     ];
 
     const values = {};
@@ -45,6 +37,18 @@ export const checkStepCard = ({
         }
     });
 
+    if (Object.keys(newErrors).length === 0) {
+        try {
+            const isValid = await validateCompanyCode({ comp_code: values.codeCompany });
+            consoleLog(`Code de l'entreprise: ${values.codeCompany}`, 'cyan');
+            if (!isValid) {
+                newErrors.codeCompany = 'Code de l\'entreprise invalide.';
+            }
+        } catch (error) {
+            newErrors.codeCompany = 'Erreur lors de la validation du code de l\'entreprise.';
+        }
+    }
+
     setErrors(newErrors);
     setLoading(false);
     Object.keys(newErrors).forEach(key => {
@@ -55,13 +59,10 @@ export const checkStepCard = ({
     consoleLog('Vérification terminée.', 'cyan');
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
-        setNumCard(values.numCard.replace(/\s+/g, ''));
-        setNameCard(values.nameCard);
-        setDateCard(values.dateCard);
-        setCvvCard(values.cvvCard);
-        consoleLog('• [END] checkStepCard', 'white');
-        nextStep();
+        setCodeCompany(values.codeCompany);
+        consoleLog('• [END] checkCodeEntreprise', 'white');
+        skipStep(6);
     } else {
-        consoleLog('• [END] checkStepCard', 'white');
+        consoleLog('• [END] checkCodeEntreprise', 'white');
     }
 };

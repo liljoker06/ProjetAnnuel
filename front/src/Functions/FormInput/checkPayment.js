@@ -8,13 +8,13 @@ export const checkPayment = async ({
     submitRegistration
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkPayment', 'white');
+    consoleLog('• [START] checkPayment', 'white');
 
     try {
         const result = await submitRegistration(userData);
         if (result.success) {
             consoleLog('• Utilisateur enregistré', 'green');
-            consoleLog('• Fin de checkPayment', 'white');
+            consoleLog('• [END] checkPayment', 'white');
             nextStep();
         } else {
             consoleLog('• Erreur lors de l\'enregistrement', 'red');
@@ -28,7 +28,7 @@ export const checkPayment = async ({
             consoleLog(newErrors[key], 'red');
         }
     });
-    consoleLog('• Fin de checkPayment', 'white');
+    consoleLog('• [END] checkPayment', 'white');
 
     setLoading(false);
 };
