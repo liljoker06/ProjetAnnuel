@@ -5,7 +5,7 @@ export const validateCompany = async (data) => {
     try {
         const response = await axios.post('http://localhost:5555/api/companies/validate', data);
 
-        return response.data.isValid;
+        return response.data;
     } catch (error) {
         return false;
     }

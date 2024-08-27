@@ -13,3 +13,6 @@ export const submitRegistration = async (data) => {
         }
     }
 };
+
+
+
