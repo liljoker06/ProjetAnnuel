@@ -32,7 +32,7 @@ const validateCompany = async (req, res) => {
     if (companyByName) {
       consoleLog(`Nom de l'entreprise déjà utilisé: ${req.body.comp_name}`, 'red');
     } else {
-      consoleLog(`Nom de l'entreprise valide: ${req.body.comp_name}`, 'green');
+      consoleLog(`Nom de l'entreprise valide: \t${req.body.comp_name}`, 'green');
     }
 
     // Vérification si le SIRET de l'entreprise existe déjà
@@ -40,25 +40,22 @@ const validateCompany = async (req, res) => {
       where: { comp_siret: req.body.comp_siret }
     });
     if (companyBySiret) {
-      consoleLog(`SIRET déjà utilisé: ${req.body.comp_siret}`, 'red');
+      consoleLog(`SIRET déjà utilisé: \t\t${req.body.comp_siret}`, 'red');
     } else {
-      consoleLog(`SIRET valide: ${req.body.comp_siret}`, 'green');
+      consoleLog(`SIRET valide: \t\t\t${req.body.comp_siret}`, 'green');
     }
 
     // Renvoie de la réponse
     if (companyByName) {
-      consoleLog(`Nom de l'entreprise déjà utilisé: ${req.body.comp_name}`, 'red');
       res.status(200).json({ isValid: false, isName: true });
     } else if (companyBySiret) {
-      consoleLog(`SIRET déjà utilisé: ${req.body.comp_siret}`, 'red');
       res.status(200).json({ isValid: false, isSiret: true });
     } else {
-      consoleLog(`Entreprise valide: ${req.body.comp_name} - ${req.body.comp_siret}`, 'green');
       res.status(200).json({ isValid: true });
     }
 
   } catch (error) {
-    consoleLog(`Erreur lors de la validation de l'entreprise: ${error.message}`, 'red');
+    consoleLog(`Erreur lors de la validation de l'entreprise: \t\t${error.message}`, 'red');
     res.status(500).json({ error: error.message });
   }
 
