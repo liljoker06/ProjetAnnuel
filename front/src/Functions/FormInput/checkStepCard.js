@@ -14,7 +14,7 @@ export const checkStepCard = ({
     nextStep
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkStepCard', 'white');
+    consoleLog('• [START] checkStepCard', 'white');
     consoleLog('Vérification des champs carte...', 'cyan');
     const newErrors = {};
 
@@ -59,9 +59,9 @@ export const checkStepCard = ({
         setNameCard(values.nameCard);
         setDateCard(values.dateCard);
         setCvvCard(values.cvvCard);
-        consoleLog('• Fin de checkStepCard', 'white');
+        consoleLog('• [END] checkStepCard', 'white');
         nextStep();
     } else {
-        consoleLog('• Fin de checkStepCard', 'white');
+        consoleLog('• [END] checkStepCard', 'white');
     }
 };
