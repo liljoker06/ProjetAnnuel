@@ -16,7 +16,7 @@ export const checkStepBasic = ({
     nextStep            // Fonction pour passer à l'étape suivante
 }) => {
     setLoading(true);
-    consoleLog('• Début de checkStepBasic', 'white');
+    consoleLog('• [START] checkStepBasic', 'white');
     consoleLog('Vérification des champs...', 'cyan');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,9 +92,9 @@ export const checkStepBasic = ({
             consoleLog('Erreur lors de l\'envoi de l\'email de vérification:' + error, 'red');
         }
 
-        consoleLog('• Fin de checkStepBasic', 'white');
+        consoleLog('• [END] checkStepBasic', 'white');
         nextStep();
     } else {
-        consoleLog('• Fin de checkStepBasic', 'white');
+        consoleLog('• [END] checkStepBasic', 'white');
     }
 };

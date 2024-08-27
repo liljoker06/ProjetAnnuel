@@ -9,18 +9,18 @@ export const checkCodeMail = async ({
     nextStep
 }) => {
     setLoading(true);
-    consoleLog('Début de checkCodeMail', 'cyan');
-    consoleLog('Vérification du code de vérification...', 'blue');
+    consoleLog('• [START] checkCodeMail', 'white');
+    consoleLog('Vérification du code de vérification...', 'cyan');
     const newErrors = {};
 
     // Vérification de la présence
     const code = getFullCode();
-    consoleLog('Code : ' + code, 'blue');
+    consoleLog('Code : ' + code, 'cyan');
     newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
 
     try {
         const response = await validateMailCode({ mailcode_email: email, mailcode_code: code });
-        consoleLog('Réponse du serveur: ' + response.success, 'blue');
+        consoleLog('Réponse du serveur: ' + response.success, 'cyan');
 
         if (response.success) {
             consoleLog('Code valide.', 'green');
@@ -34,16 +34,16 @@ export const checkCodeMail = async ({
     } finally {
         setErrors(newErrors); // Met à jour l'état des erreurs
         setLoading(false); // Termine le chargement
-        consoleLog('Verification terminée.', 'blue');
-        if (newErrors.codeMail) consoleLog('Erreurs:' + newErrors.codeMail, 'red');
+        consoleLog('Verification terminée.', 'cyan');
+        if (newErrors.codeMail) consoleLog('Erreurs: ' + newErrors.codeMail, 'red');
         
 
         // Vérifie s'il n'y a pas d'erreurs avant de passer à l'étape suivante
         if (Object.values(newErrors).filter(error => error).length === 0) {
-            consoleLog('Fin de checkCodeMail', 'cyan');
+            consoleLog('• [END] checkCodeMail', 'white');
             nextStep();
         } else {
-            consoleLog('Fin de checkCodeMail', 'cyan');
+            consoleLog('• [END] checkCodeMail', 'white');
         }
     }
 };

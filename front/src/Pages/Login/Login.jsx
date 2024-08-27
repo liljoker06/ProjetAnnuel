@@ -364,7 +364,7 @@ export default function Login() {
 
   const checkEmailPasswordForget = () => {
     setLoading(true);
-    consoleLog('START : checkEmailPasswordForget', "cyan");
+    consoleLog('[START] - checkEmailPasswordForget', "cyan");
     consoleLog('Vérification des informations de connexion...', 'blue');
     const email = document.getElementById('email').value;
     const emailResult = checkEmail(email, setLoading);
@@ -387,7 +387,7 @@ export default function Login() {
 
   const checkLogin = () => {
     setLoading(true);
-    consoleLog('START : checkLogin', "cyan");
+    consoleLog('[START] checkLogin', "cyan");
     consoleLog('Vérification des informations de connexion...', 'blue');
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
