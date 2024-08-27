@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import TitlePart from '../../Components/TitlePart/TitlePart';
 import ProgressBar from "@ramonak/react-progress-bar";
 import { NavLink } from "react-router-dom";
+import consoleLog from '../../Functions/Dev/consoleLog';
 
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
@@ -739,12 +740,15 @@ export default function Register() {
 
   const resendEmail = () => {
     if (canResend) {
-      console.log('Renvoi de l\'email...');
+      consoleLog('• [START] resendEmail', 'white');
+      setCodeMail(['', '', '', '', '']);
+      consoleLog('Renvoi de l\'email...', 'cyan');
       resendMailCode({ mailcode_email: email });
       setCanResend(false);
       setIsButtonDisabled(true); // Désactive le bouton
       let timer = 30;
       setCountdown(timer);
+      consoleLog('• [END] resendEmail', 'white');
       const interval = setInterval(() => {
         timer -= 1;
         setCountdown(timer);

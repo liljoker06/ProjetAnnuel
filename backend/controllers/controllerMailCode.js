@@ -1,15 +1,19 @@
 const nodemailer = require('nodemailer');
 const { MailCode } = require('../database/database');
 const { Op } = require('sequelize');
+const consoleLog = require('../consoleLog');
 
 // mailcode_email
 const generateMailCode = async (req, res) => {
+    consoleLog('• [START] controllers/controllerMailCode/generateMailCode', 'cyan');
     try {
         const { mailcode_email } = req.body;
 
         const mailcode_code = Math.floor(10000 + Math.random() * 90000).toString();
+        consoleLog('Génération du nouveau code : \t\t' + mailcode_code, 'green');
 
         const mailcode_expire = new Date(Date.now() + 5 * 60 * 1000);
+        consoleLog('Génération de la date d\'expiration : \t' + mailcode_expire, 'green');
 
         const mailcode = await MailCode.create({
             mailcode_email,
@@ -37,29 +41,42 @@ const generateMailCode = async (req, res) => {
             text: `Votre code de vérification est : ${mailcode_code}`
         };
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
+        // Fonction pour envoyer le mail et retourner une promesse
+        const sendMail = (mailOptions) => {
+            return new Promise((resolve, reject) => {
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        consoleLog('Erreur lors de l\'envoi du mail : \t\t' + error, 'red');
+                        reject(error);
+                    } else {
+                        consoleLog('Mail envoyé à : \t\t\t' + mailcode_email + ' (' + info.response + ')', 'green');
+                        resolve(info);
+                    }
+                });
+            });
+        };
 
+        // Attendre que le mail soit envoyé
+        await sendMail(mailOptions);
 
         res.status(201).json(mailcode);
     } catch (error) {
         res.status(500).json({ error: error.message });
+        consoleLog('Erreur lors de la génération du code : \t\t' + error, 'red');
     }
+    
+    consoleLog('• [END] controllers/controllerMailCode/generateMailCode', 'cyan');
 };
 
 // mailcode_email, mailcode_code
 // MANQUE QUAND SI LE CODE EST EXPIRE ALORS ON DOIT LE SUPPRIMER
 const validateMailCode = async (req, res) => {
+    consoleLog('• [START] controllers/controllerMailCode/validateMailCode', 'cyan');
     try {
-        console.log('Requête reçue:', req.body);
         const { mailcode_email, mailcode_code } = req.body;
+        consoleLog('Email de validation : \t\t' + mailcode_email, 'green');
+        consoleLog('Code de validation : \t\t' + mailcode_code, 'green');
 
-        console.log('Recherche du code de validation...');
         const mailcode = await MailCode.findOne({
             where: {
                 mailcode_email,
@@ -73,25 +90,28 @@ const validateMailCode = async (req, res) => {
 
         // si le code de validation n'existe pas
         if (!mailcode) {
-            console.log('Code de validation invalide ou expiré.');
-            return res.status(400).json({ error: 'Code de validation invalide ou expiré' });
+            consoleLog('Code de validation introuvable, expiré ou déjà validé.', 'red');
+            return res.status(400).json({ error: 'Code de validation introuvable, expiré ou déjà validé' });
         }
 
         // changer le status du code de validation
-        console.log('Code de validation trouvé:', mailcode);
+        consoleLog('Correspondance trouvée.', 'green');
         mailcode.mailcode_status = true;
         await mailcode.save();
-        console.log('Code de validation mis à jour et sauvegardé.');
-        console.log('Envoi de la réponse avec statut 200...');
+        consoleLog('• [END] controllers/controllerMailCode/validateMailCode', 'cyan');
         return res.status(200).json({ success: true });
     } catch (error) {
-        console.error('Erreur lors de la validation du code:', error);
+        consoleLog('• [END] controllers/controllerMailCode/validateMailCode', 'cyan');
+        consoleLog('Erreur lors de la validation du code : \t\t' + error, 'red');
         return res.status(500).json({ error: error.message });
     }
+
 };
 
 // mailcode_email
 const resendMailCode = async (req, res) => {
+    consoleLog('• [START] controllers/controllerMailCode/resendMailCode', 'cyan');
+
     try {
         const { mailcode_email } = req.body;
 
@@ -105,13 +125,18 @@ const resendMailCode = async (req, res) => {
             }
         });
 
-        console.log("Le code a été supprimé");
-        console.log("génération d'un nouveau code");
-        generateMailCode(req, res);
+        if (mailcode) {
+            consoleLog('Ancien code supprimé.', 'green');
+        }
+
+        consoleLog('Génération d\'un nouveau code.', 'green');
+        await generateMailCode(req, res);
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
+
+    consoleLog('• [END] controllers/controllerMailCode/resendMailCode', 'cyan');
 }
 
 module.exports = {
