@@ -16,6 +16,7 @@ import { checkStepForfait } from '../../Functions/FormInput/checkStepForfait';
 import { checkStepCard } from '../../Functions/FormInput/checkStepCard';
 
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
+import { validateUserEmail } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 import { validateCompany, validateCompanyCode } from '../../Functions/CallApi/CallCompany';
 
@@ -795,6 +796,7 @@ export default function Register() {
       setAdresse,
       setCodePostal,
       setVille,
+      validateUserEmail,
       generateMailCode,
       nextStep
     });
