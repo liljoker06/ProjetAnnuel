@@ -1,4 +1,6 @@
 const { Company } = require('../database/database');
+const { Op } = require('sequelize');
+const consoleLog = require('../consoleLog');
 
 const getAllCompanies = async (req, res) => {
   try {
@@ -18,7 +20,71 @@ const createCompany = async (req, res) => {
   }
 };
 
+const validateCompany = async (req, res) => {
+
+  consoleLog(`• [START] controllers/controllerCompany/validateCompany`, 'cyan');
+  try {
+
+    // Vérification si le nom de l'entreprise existe déjà
+    const companyByName = await Company.findOne({
+      where: { comp_name: req.body.comp_name }
+    });
+    if (companyByName) {
+      consoleLog(`Nom de l'entreprise déjà utilisé: ${req.body.comp_name}`, 'red');
+    } else {
+      consoleLog(`Nom de l'entreprise valide: ${req.body.comp_name}`, 'green');
+    }
+
+    // Vérification si le SIRET de l'entreprise existe déjà
+    const companyBySiret = await Company.findOne({
+      where: { comp_siret: req.body.comp_siret }
+    });
+    if (companyBySiret) {
+      consoleLog(`SIRET déjà utilisé: ${req.body.comp_siret}`, 'red');
+    } else {
+      consoleLog(`SIRET valide: ${req.body.comp_siret}`, 'green');
+    }
+
+    // Renvoie de la réponse
+    if (companyByName) {
+      consoleLog(`Nom de l'entreprise déjà utilisé: ${req.body.comp_name}`, 'red');
+      res.status(200).json({ isValid: false, isName: true });
+    } else if (companyBySiret) {
+      consoleLog(`SIRET déjà utilisé: ${req.body.comp_siret}`, 'red');
+      res.status(200).json({ isValid: false, isSiret: true });
+    } else {
+      consoleLog(`Entreprise valide: ${req.body.comp_name} - ${req.body.comp_siret}`, 'green');
+      res.status(200).json({ isValid: true });
+    }
+
+  } catch (error) {
+    consoleLog(`Erreur lors de la validation de l'entreprise: ${error.message}`, 'red');
+    res.status(500).json({ error: error.message });
+  }
+
+  consoleLog(`• [END] controllers/controllerCompany/validateCompany`, 'cyan');
+};
+
+const validateCompanyCode = async (req, res) => {
+  try {
+    const company = await Company.findOne({
+      where: {
+        comp_code: req.body.comp_code,
+      },
+    });
+    if (company) {
+      res.status(200).json({ isValid: true });
+    } else {
+      res.status(200).json({ isValid: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllCompanies,
   createCompany,
+  validateCompany,
+  validateCompanyCode,
 };
