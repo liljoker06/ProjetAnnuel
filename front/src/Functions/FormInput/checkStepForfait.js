@@ -12,8 +12,12 @@ export const checkStepForfait = ({
     const newErrors = {};
 
     const radioPlan = document.querySelector('input[name="radio-plan"]:checked');
-    consoleLog('radioPlan : '+ radioPlan.value, 'cyan');
-    newErrors.radioPlan = !radioPlan ? 'Forfait requis.' : '';
+    if (radioPlan) {
+        consoleLog('Forfait : ' + radioPlan.value, 'cyan');
+        newErrors.radioPlan = '';
+    } else {
+        newErrors.radioPlan = 'Forfait requis.';
+    }
 
     setErrors(newErrors);
     setLoading(false);

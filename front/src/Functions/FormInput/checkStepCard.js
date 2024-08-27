@@ -16,10 +16,10 @@ export const checkStepCard = ({
     setLoading(true);
     consoleLog('• [START] checkStepCard', 'white');
     consoleLog('Vérification des champs carte...', 'cyan');
-    const newErrors = {};
+    const newErrors = {};    
 
     const fields = [
-        { id: 'numCard', label: 'Numéro de carte', length: 16, required: true },
+        { id: 'numCard', label: 'Numéro de carte', length: 19, required: true },
         { id: 'nameCard', label: 'Nom du titulaire', required: true },
         { id: 'dateCard', label: 'Date d\'expiration', length: 5, required: true },
         { id: 'cvvCard', label: 'Cryptogramme visuel', length: 3, required: true }
@@ -55,7 +55,7 @@ export const checkStepCard = ({
     consoleLog('Vérification terminée.', 'cyan');
 
     if (Object.values(newErrors).filter(error => error).length === 0) {
-        setNumCard(values.numCard);
+        setNumCard(values.numCard.replace(/\s+/g, ''));
         setNameCard(values.nameCard);
         setDateCard(values.dateCard);
         setCvvCard(values.cvvCard);

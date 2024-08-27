@@ -303,7 +303,7 @@ export default function Register() {
                     value={value}
                     onChange={(e) => handleChangeCodeMail(index, e.target.value, e)}
                     onKeyDown={(e) => handleChangeCodeMail(index, e.target.value, e)}
-                    onInput={(e) => {e.target.value = e.target.value.replace(/[^0-9]/g, '');}}
+                    onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                     placeholder="0"
                   />
                 ))}
@@ -540,7 +540,7 @@ export default function Register() {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cb">
                 Numéro de la carte
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="numCard" type="number" placeholder="0000 0000 0000 0000" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="numCard" type="text" placeholder="0000 0000 0000 0000" onInput={(e) => { let value = e.target.value.replace(/\D/g, ''); value = value.match(/.{1,4}/g)?.join(' ') || ''; e.target.value = value.slice(0, 19); }} />
             </div>
 
             {/* Nom */}
@@ -559,13 +559,13 @@ export default function Register() {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dateCard">
                   Date d'expiration
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="dateCard" type="text" placeholder="MM/AA" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="dateCard" type="text" placeholder="MM/AA" onInput={(e) => {let value = e.target.value.replace(/\D/g, ''); if (value.length > 2) { value = value.slice(0, 2) + '/' + value.slice(2, 4);} e.target.value = value.slice(0, 5);}} />
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cvvCard">
                   CVV
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cvvCard" type="number" placeholder="000" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cvvCard" type="number" placeholder="000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 3)}/>
               </div>
             </div>
 
@@ -879,7 +879,7 @@ export default function Register() {
   };
 
   // Vérification des champs de l'étape 6
-  const handleChckStepPayment = () => {
+  const handleCheckStepPayment = () => {
     const userData = {
       email,
       phone,
