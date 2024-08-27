@@ -4,7 +4,9 @@ const companyController =  require ('../controllers/contollerCompany');
 
 
 router.get('/', companyController.getAllCompanies);
-router.post('/' , companyController.createCompany);
+router.post('/create' , companyController.createCompany);
+router.post('/validateCode', companyController.validateCompanyCode);
+router.post('/validate', companyController.validateCompany);
 
 module.exports = router;
 
