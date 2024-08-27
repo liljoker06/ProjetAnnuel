@@ -63,21 +63,27 @@ const validateCompany = async (req, res) => {
 };
 
 const validateCompanyCode = async (req, res) => {
+  consoleLog(`• [START] controllers/controllerCompany/validateCompanyCode`, 'cyan');
   try {
     const company = await Company.findOne({
       where: {
         comp_code: req.body.comp_code,
       },
     });
+
     if (company) {
+      consoleLog(`Code de l'entreprise valide: \t${req.body.comp_code}`, 'green');
       res.status(200).json({ isValid: true });
     } else {
+      consoleLog(`Code de l'entreprise inconnu: \t${req.body.comp_code}`, 'red');
       res.status(200).json({ isValid: false });
     }
   } catch (error) {
+    consoleLog(`Erreur lors de la validation du code de l'entreprise: \t${error.message}`, 'red');
     res.status(500).json({ error: error.message });
   }
-}
+  consoleLog(`• [END] controllers/controllerCompany/validateCompanyCode`, 'cyan');
+};
 
 module.exports = {
   getAllCompanies,

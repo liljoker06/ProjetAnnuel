@@ -11,11 +11,13 @@ import CardPrice from '../../Components/CardPrice/CardPrice';
 import { checkStepBasic } from '../../Functions/FormInput/checkStepBasic';
 import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
 import { checkStepEntreprise } from '../../Functions/FormInput/checkStepEntreprise';
+import { checkCodeEntreprise } from '../../Functions/FormInput/checkCodeEntreprise';
 import { checkStepForfait } from '../../Functions/FormInput/checkStepForfait';
 import { checkStepCard } from '../../Functions/FormInput/checkStepCard';
 
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
+import { validateCompany, validateCompanyCode } from '../../Functions/CallApi/CallCompany';
 
 export default function Register() {
   const [progress, setProgress] = useState(14);       // En %
@@ -98,6 +100,14 @@ export default function Register() {
     document.getElementById('city').value = 'Paris';
   }
 
+  const AutoCompany = () => {
+    document.getElementById('nameCompany').value = 'Entreprise';
+    document.getElementById('SIRET').value = '12345678901234';
+    document.getElementById('adresseCompany').value = '1 rue de la rue';
+    document.getElementById('cpCompany').value = '75000';
+    document.getElementById('cityCompany').value = 'Paris';
+  }
+
   const nextStep = () => {
     if (currentStep < nbSteps) {
       setCurrentStep(currentStep + 1);
@@ -164,7 +174,7 @@ export default function Register() {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
                 Téléphone
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="phone" type="tel" placeholder="+33" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="phone" type="tel" placeholder="+33" maxLength={12} />
             </div>
 
             {/* Mot de passe */}
@@ -206,19 +216,19 @@ export default function Register() {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="jour">
                   Jour
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="jour" type="number" placeholder="JJ" min="1" max="31" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="jour" type="number" placeholder="JJ" min="1" max="31" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 2)} />
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="mois">
                   Mois
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="mois" type="number" placeholder="MM" min="1" max="12" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="mois" type="number" placeholder="MM" min="1" max="12" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 2)} />
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="annee">
                   Année
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="annee" type="number" placeholder="AAAA" min="1900" max="2023" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="annee" type="number" placeholder="AAAA" min="1900" max="2023" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 4)} />
               </div>
             </div>
 
@@ -291,6 +301,7 @@ export default function Register() {
                     value={value}
                     onChange={(e) => handleChangeCodeMail(index, e.target.value, e)}
                     onKeyDown={(e) => handleChangeCodeMail(index, e.target.value, e)}
+                    onInput={(e) => {e.target.value = e.target.value.replace(/[^0-9]/g, '');}}
                     placeholder="0"
                   />
                 ))}
@@ -364,7 +375,7 @@ export default function Register() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="codeCompany">
                       Code de l'entreprise
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000" />
+                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 10)} />
                   </div>
                 </>
               ) : (
@@ -382,7 +393,7 @@ export default function Register() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="SIRET">
                       SIRET
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="SIRET" type="number" placeholder="000 000 000 00000" />
+                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="SIRET" type="number" placeholder="000 000 000 00000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 14)} />
                   </div>
 
                   <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
@@ -401,7 +412,7 @@ export default function Register() {
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cpCompany">
                         Code Postale
                       </label>
-                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" />
+                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 5)} />
                     </div>
                     <div className="flex-1">
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cityCompany">
@@ -420,6 +431,9 @@ export default function Register() {
               </button>
               <button onClick={handleCkeckStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
+              </button>
+              <button onClick={AutoCompany} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                Dev
               </button>
             </div>
             {
@@ -800,24 +814,35 @@ export default function Register() {
 
   // Vérification des champs de l'étape 3
   const handleCkeckStepEntreprise = () => {
-    checkStepEntreprise({
-      setLoading,
-      setErrors,
-      estEntrepriseExistante,
-      codeCompany,
-      nomEntreprise,
-      siret,
-      adresseEntreprise,
-      codePostalEntreprise,
-      cityCompany,
-      setCodeCompany,
-      setNomEntreprise,
-      setSiret,
-      setAdresseEntreprise,
-      setCodePostalEntreprise,
-      setCityCompany,
-      nextStep
-    });
+    if (estEntrepriseExistante) {
+      checkCodeEntreprise({
+        setLoading,
+        setErrors,
+        codeCompany,
+        setCodeCompany,
+        validateCompanyCode,
+        skipStep
+      });
+    } else {
+      checkStepEntreprise({
+        setLoading,
+        setErrors,
+        codeCompany,
+        nomEntreprise,
+        siret,
+        adresseEntreprise,
+        codePostalEntreprise,
+        cityCompany,
+        setCodeCompany,
+        setNomEntreprise,
+        setSiret,
+        setAdresseEntreprise,
+        setCodePostalEntreprise,
+        setCityCompany,
+        validateCompany,
+        nextStep
+      });
+    }
   };
 
   // Vérification des champs de l'étape 4
