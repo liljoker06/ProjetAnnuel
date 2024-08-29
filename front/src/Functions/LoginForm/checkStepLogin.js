@@ -3,9 +3,9 @@ import consoleLog from '../Dev/consoleLog';
 export const checkStepLogin = async ({
     setEmail,           // Fonction pour définir l'email
     setPassword,        // Fonction pour définir le mot de passe
-    validateUserEmail,  // Fonction pour vérifier si l'email est valide
+    validateUser,       // Fonction pour vérifier si l'utilisateur existe
     generateMailCode,   // Fonction pour envoyer le code de vérification
-    nextStep,           // Fonction pour passer à l'étape suivante
+    nextCase,           // Fonction pour passer à l'étape suivante
     setLoading,         // Fonction pour définir l'état de chargement
     setErrors           // Fonction pour définir les erreurs
 }) => {
@@ -46,17 +46,17 @@ export const checkStepLogin = async ({
     if (Object.values(newErrors).filter(error => error).length === 0) {
         setLoading(true);
         try {
-            const isEmailValid = await validateUserEmail({ user_email: values.email });
-            consoleLog(`Validation de l'email: ${values.email}`, 'cyan');
-            if (!isEmailValid) {
-                newErrors.email = 'Email déjà utilisé.';
-                consoleLog('Email déjà utilisé.', 'red');
+            const isValidUser = await validateUser({ user_email: values.email, user_passw: values.password });
+            consoleLog(`Validation de l'utilisateur: ${values.email}`, 'cyan');
+            consoleLog(`Utilisateur ${isValidUser ? 'valide' : 'invalide'}.`, isValidUser ? 'green' : 'red');
+            if (!isValidUser) {
+                newErrors.email = 'Email ou mot de passe incorrect.';
+                consoleLog('Email ou mot de passe incorrect.', 'red');
             }
         } catch (error) {
-            newErrors.email = 'Erreur lors de la validation de l\'email.';
-            consoleLog('Erreur lors de la validation de l\'email.', 'red');
+            newErrors.email = 'Erreur lors de la validation de l\'utilisateur.';
+            consoleLog('Erreur lors de la validation de l\'utilisateur.', 'red');
         }
-
         setErrors(newErrors);
 
         if (Object.values(newErrors).filter(error => error).length === 0) {
@@ -68,12 +68,13 @@ export const checkStepLogin = async ({
                 consoleLog('Envoi de l\'email de vérification...', 'cyan');
                 generateMailCode({ mailcode_email: values.email });
                 consoleLog('Email de vérification envoyé à ' + values.email, 'green');
+
+                nextCase();
             } catch (error) {
                 consoleLog('Erreur lors de l\'envoi de l\'email de vérification:' + error, 'red');
             }
 
             consoleLog('• [END] checkStepLogin', 'white');
-            nextStep();
         } else {
             consoleLog('• [END] checkStepLogin', 'white');
         }
