@@ -937,10 +937,10 @@ export default function Register() {
       codePostalEntreprise,
       cityCompany,
       plan,
-      numCard,
-      nameCard,
-      dateCard,
-      cvvCard
+      // numCard,
+      // nameCard,
+      // dateCard,
+      // cvvCard
     };
 
     try {

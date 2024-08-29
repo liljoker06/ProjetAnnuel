@@ -10,4 +10,5 @@ router.post('/validateEmail', userController.validateUserEmail);
 router.post('/validateUser', userController.validateUser);
 
 
+
 module.exports = router;
