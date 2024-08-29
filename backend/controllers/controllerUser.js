@@ -41,21 +41,17 @@ const createUser = async (req, res) => {
       user_email: email,
       user_passw: hashedPassword,
       user_phone: phone,
-      user_addr: adresse,
+      user_addre: adresse,
       user_posta: codePostal,
       user_city: ville,
       user_date: birth
     };
 
     consoleLog('Enregistrement de l\'utilisateur dans la base de données...', 'green');
-    
-    // Enregistrement de l'utilisateur dans la base de données
     const user = await User.create(userData);
 
-    // Log après création de l'utilisateur
     consoleLog(`Utilisateur créé: \t${user.user_id}`, 'green');
 
-    // Vérification que l'utilisateur a bien été créé et récupération de l'ID
     if (!user || !user.user_id) {
       console.error('Erreur: L\'utilisateur n\'a pas été créé correctement', 'color: red');
       return res.status(500).json({ error: 'Erreur lors de la création de l\'utilisateur.' });
@@ -66,8 +62,6 @@ const createUser = async (req, res) => {
     consoleLog('Création ou recherche de l\'entreprise...', 'green');
     const company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
 
-    consoleLog('Création de l\'entreprise en cours...', 'green');
-    consoleLog(`Entreprise créée: \t${company.comp_id}`, 'green');
     if (!company || !company.comp_id) {
       console.error('Erreur: L\'entreprise n\'a pas été créée correctement', 'color: red');
       return res.status(500).json({ error: 'Erreur lors de la création de l\'entreprise.' });
@@ -89,6 +83,16 @@ const createUser = async (req, res) => {
 
     consoleLog(`Abonnement enregistré avec succès, ID: ${subscription.subs_id}`, 'green');
 
+    // Mise à jour de l'utilisateur avec l'ID de l'abonnement
+    const [affectedRows] = await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
+    
+    if (affectedRows === 0) {
+      console.error('Erreur: La mise à jour de l\'ID de l\'abonnement dans l\'utilisateur a échoué', 'color: red');
+      return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur avec l\'ID de l\'abonnement.' });
+    }
+    
+    consoleLog(`Mise à jour de l'utilisateur avec l'ID de l'abonnement: ${subscription.subs_id}`, 'green');
+
     consoleLog('Création de l\'abonnement courant...', 'green');
     await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
     consoleLog('Abonnement courant enregistré avec succès', 'green');
@@ -99,6 +103,7 @@ const createUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
