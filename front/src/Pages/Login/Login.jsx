@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 import consoleLog from '../../Functions/Dev/consoleLog';
 
-import { checkEmail } from '../../Functions/FormInput/checkEmail';
-import { checkPasswd } from '../../Functions/FormInput/checkPasswd';
-// import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
+import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
+import { checkCodeMail } from '../../Functions/RegisterForm/checkCodeMail';
+
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -361,6 +362,18 @@ export default function Login() {
   //    Vérification des forms            //
   /****************************************/
 
+  const handleCheckLogin = () => {
+    checkStepLogin({
+      setEmail,
+      setPassword,
+      setLoading,
+      setErrors
+    });
+  };
+
+
+
+
 
   const checkEmailPasswordForget = () => {
     setLoading(true);
@@ -423,25 +436,6 @@ export default function Login() {
       consoleLog('END : checkLogin', "cyan");
     }
   };
-
-  // const checkCodeEmail = () => {
-  //   setLoading(true);
-  //   const newErrors = {};
-  //   const codeMailResult = checkCodeMail(codeMail)
-
-  //   if (!codeMailResult.success) {
-  //     newErrors.codeMail = codeMailResult.error;
-  //     setErrors(newErrors);
-  //     setLoading(false);
-  //     return;
-  //   }
-    
-  //   setLoading(false);
-
-  //   if (Object.values(newErrors).filter(error => error).length === 0) {
-  //     navigate('/'); 
-  //   }
-  // };
 
 
 

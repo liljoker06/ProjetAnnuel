@@ -9,12 +9,12 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
 
-import { checkStepBasic } from '../../Functions/FormInput/checkStepBasic';
-import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
-import { checkStepEntreprise } from '../../Functions/FormInput/checkStepEntreprise';
-import { checkCodeEntreprise } from '../../Functions/FormInput/checkCodeEntreprise';
-import { checkStepForfait } from '../../Functions/FormInput/checkStepForfait';
-import { checkStepCard } from '../../Functions/FormInput/checkStepCard';
+import { checkStepBasic } from '../../Functions/RegisterForm/checkStepBasic';
+import { checkCodeMail } from '../../Functions/RegisterForm/checkCodeMail';
+import { checkStepEntreprise } from '../../Functions/RegisterForm/checkStepEntreprise';
+import { checkCodeEntreprise } from '../../Functions/RegisterForm/checkCodeEntreprise';
+import { checkStepForfait } from '../../Functions/RegisterForm/checkStepForfait';
+import { checkStepCard } from '../../Functions/RegisterForm/checkStepCard';
 
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 import { validateUserEmail } from '../../Functions/CallApi/CallUser';
