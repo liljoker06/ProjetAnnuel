@@ -9,12 +9,21 @@ const getAllSubscriptions = async (req, res) => {
   }
 };
 
-const createSubscription = async (req, res) => {
+const createSubscription = async (req, res, internal = false) => {
   try {
     const subscription = await Subscription.create(req.body);
-    res.status(201).json(subscription);
+
+    if (!internal) {
+      res.status(201).json(subscription);
+    } else {
+      return subscription;
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
   }
 };
 

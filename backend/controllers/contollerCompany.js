@@ -13,12 +13,38 @@ const getAllCompanies = async (req, res) => {
 
 const createCompany = async (req, res) => {
   try {
-    const company = await Company.create(req.body);
+    const { comp_name, comp_siret, comp_addre, comp_posta, comp_city } = req.body;
+
+    // Vérification si le SIRET de l'entreprise existe déjà
+    const existingCompany = await Company.findOne({
+      where: { comp_siret }
+    });
+
+    if (existingCompany) {
+      // L'entreprise existe déjà avec le même SIRET
+      const message = 'L\'entreprise existe déjà avec le même SIRET.';
+      consoleLog(message, 'red');
+      return res.status(400).json({ error: message });
+    }
+
+    // Création de l'entreprise si elle n'existe pas
+    const companyData = {
+      comp_name,
+      comp_siret,
+      comp_addre,
+      comp_posta,
+      comp_city
+    };
+
+    const company = await Company.create(companyData);
+    consoleLog('Entreprise créée avec succès', 'green');
     res.status(201).json(company);
   } catch (error) {
+    consoleLog(`Erreur lors de la création de l'entreprise: ${error.message}`, 'red');
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const validateCompany = async (req, res) => {
 
