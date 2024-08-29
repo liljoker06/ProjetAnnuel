@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 import consoleLog from '../../Functions/Dev/consoleLog';
 
-import { checkEmail } from '../../Functions/FormInput/checkEmail';
-import { checkPasswd } from '../../Functions/FormInput/checkPasswd';
-// import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
+import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
+import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
+
+import { validateUser, connectUser } from '../../Functions/CallApi/CallUser';
+import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,9 +43,17 @@ export default function Login() {
   //    Gestion des différents forms      //
   /****************************************/
 
+  const nextCase = () => {
+    if (currentCase < nbCases) {
+      setCurrentCase(currentCase + 1);
+      consoleLog(`passage à Case : ${currentCase + 1}`, 'cyan');
+      window.scrollTo(0, 0);
+    }
+  };
+
   const skipCase = (Case) => {
+    consoleLog(`passage à Case : ${Case}`, 'cyan');
     if (Case <= nbCases) {
-      consoleLog('Passage à la case : ' + Case);
       setCurrentCase(Case);
       window.scrollTo(0, 0);
     }
@@ -67,6 +77,7 @@ export default function Login() {
 
   const renderCase = () => {
     switch (currentCase) {
+      // Informations de connexion
       case 1:
         return (
           <>
@@ -103,7 +114,7 @@ export default function Login() {
               >
                 Mot de passe oublié ?
               </button>
-              <button disabled={loading} onClick={checkLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Continuer'}
               </button>
             </div>
@@ -119,10 +130,11 @@ export default function Login() {
             }
           </>
         );
+      // Code de vérification par mail
       case 2:
         return (
           <>
-            <div className="mb-4 text-2xl font-bold text-gray-800">Vérification de connexoin</div>
+            <div className="mb-4 text-2xl font-bold text-gray-800">Vérification de connexinn</div>
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             <span className="text-gray-700 text-sm font-bold mb-2">Un code de vérification vous a été envoyé par mail à l'adresse suivante : </span> <span className="text-blue-500 text-sm font-bold mb-2"> {email} </span>
@@ -142,6 +154,7 @@ export default function Login() {
                     value={value}
                     onChange={(e) => handleChangeCodeMail(index, e.target.value, e)}
                     onKeyDown={(e) => handleChangeCodeMail(index, e.target.value, e)}
+                    onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                     placeholder="0"
                   />
                 ))}
@@ -167,13 +180,12 @@ export default function Login() {
             </div>
 
             <div className="flex items-center justify-between">
-              <button onClick={skipCase(1)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={() => skipCase(CASE_LOGIN)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              {/* <button onClick={checkCodeEmail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
-
-              </button> */}
+              </button>
             </div>
             {
               Object.values(errors).filter(error => error).length > 0 && (
@@ -186,6 +198,7 @@ export default function Login() {
             }
           </>
         );
+      // Oubli du mot de passe avec email dans le form
       case 3:
         return (
           <>
@@ -209,6 +222,7 @@ export default function Login() {
                     value={value}
                     onChange={(e) => handleChangeCodeMail(index, e.target.value, e)}
                     onKeyDown={(e) => handleChangeCodeMail(index, e.target.value, e)}
+                    onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                     placeholder="0"
                   />
                 ))}
@@ -253,6 +267,7 @@ export default function Login() {
             }
           </>
         );
+      // Oubli du mot de passe sans email dans le form
       case 4:
         return (
           <>
@@ -276,7 +291,7 @@ export default function Login() {
               <button onClick={() => skipCase(CASE_LOGIN)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={checkEmailPasswordForget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button onClick={handleCheckEmailPasswordForget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
               </button>
             </div>
@@ -338,6 +353,8 @@ export default function Login() {
     }
   };
 
+  const getFullCode = () => codeMail.join('');
+
   const resendEmail = () => {
     if (canResend) {
       console.log('Renvoi de l\'email...');
@@ -361,85 +378,101 @@ export default function Login() {
   //    Vérification des forms            //
   /****************************************/
 
-
-  const checkEmailPasswordForget = () => {
-    setLoading(true);
-    consoleLog('[START] - checkEmailPasswordForget', "cyan");
-    consoleLog('Vérification des informations de connexion...', 'blue');
-    const email = document.getElementById('email').value;
-    const emailResult = checkEmail(email, setLoading);
-    const newErrors = {};
-
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error;
-    }
-
-    setErrors(newErrors);
-    setLoading(false);
-
-    if (Object.values(newErrors).filter(error => error).length === 0) {
-      setEmail(document.getElementById('email').value);
-      skipCase(CASE_PASSWDFORGET);
-      consoleLog('END : checkEmailPasswordForget', "cyan");
-    }
-
+  const handleCheckLogin = () => {
+    checkStepLogin({
+      setEmail,
+      setPassword,
+      validateUser,
+      generateMailCode,
+      nextCase,
+      setLoading,
+      setErrors
+    });
   };
 
-  const checkLogin = () => {
-    setLoading(true);
-    consoleLog('[START] checkLogin', "cyan");
-    consoleLog('Vérification des informations de connexion...', 'blue');
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const newErrors = {};
-
-    // Appel des fonctions modifiées sans setErrors
-    const emailResult = checkEmail(email, setLoading);
-    const passwordResult = checkPasswd(password, setLoading);
-
-    // Mise à jour de newErrors basée sur les résultats
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error;
+  const handleCheckCodeMail = () => {
+    try {
+      checkCodeMail({
+        setLoading,
+        setErrors,
+        getFullCode,
+        validateMailCode,
+        email,
+        nextCase
+      });
+      connectUser({
+        email,
+        password
+      });
     }
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error;
-    }
-
-    // Vérification s'il y a des erreurs
-    if (!emailResult.success || !passwordResult.success) {
-      setLoading(false);
-      setErrors(newErrors);
-      return;
-    }
-
-    setLoading(false);
-    consoleLog('Vérification terminée.', 'blue');
-    console.log(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      setEmail(email);
-      setPassword(password);
-      skipCase(CASE_EMAIL);
-      consoleLog('END : checkLogin', "cyan");
+    catch (error) {
+      console.log(error);
     }
   };
 
-  // const checkCodeEmail = () => {
+  const handleCheckEmailPasswordForget = () => {
+  };
+
+
+  // const checkEmailPasswordForget = () => {
   //   setLoading(true);
+  //   consoleLog('[START] - checkEmailPasswordForget', "cyan");
+  //   consoleLog('Vérification des informations de connexion...', 'blue');
+  //   const email = document.getElementById('email').value;
+  //   const emailResult = checkEmail(email, setLoading);
   //   const newErrors = {};
-  //   const codeMailResult = checkCodeMail(codeMail)
 
-  //   if (!codeMailResult.success) {
-  //     newErrors.codeMail = codeMailResult.error;
-  //     setErrors(newErrors);
-  //     setLoading(false);
-  //     return;
+  //   if (!emailResult.success) {
+  //     newErrors.email = emailResult.error;
   //   }
-    
+
+  //   setErrors(newErrors);
   //   setLoading(false);
 
   //   if (Object.values(newErrors).filter(error => error).length === 0) {
-  //     navigate('/'); 
+  //     setEmail(document.getElementById('email').value);
+  //     skipCase(CASE_PASSWDFORGET);
+  //     consoleLog('END : checkEmailPasswordForget', "cyan");
+  //   }
+
+  // };
+
+  // const checkLogin = () => {
+  //   setLoading(true);
+  //   consoleLog('[START] checkLogin', "cyan");
+  //   consoleLog('Vérification des informations de connexion...', 'blue');
+  //   const email = document.getElementById('email').value;
+  //   const password = document.getElementById('password').value;
+  //   const newErrors = {};
+
+  //   // Appel des fonctions modifiées sans setErrors
+  //   const emailResult = checkEmail(email, setLoading);
+  //   const passwordResult = checkPasswd(password, setLoading);
+
+  //   // Mise à jour de newErrors basée sur les résultats
+  //   if (!emailResult.success) {
+  //     newErrors.email = emailResult.error;
+  //   }
+  //   if (!passwordResult.success) {
+  //     newErrors.password = passwordResult.error;
+  //   }
+
+  //   // Vérification s'il y a des erreurs
+  //   if (!emailResult.success || !passwordResult.success) {
+  //     setLoading(false);
+  //     setErrors(newErrors);
+  //     return;
+  //   }
+
+  //   setLoading(false);
+  //   consoleLog('Vérification terminée.', 'blue');
+  //   console.log(newErrors);
+
+  //   if (Object.keys(newErrors).length === 0) {
+  //     setEmail(email);
+  //     setPassword(password);
+  //     skipCase(CASE_EMAIL);
+  //     consoleLog('END : checkLogin', "cyan");
   //   }
   // };
 
@@ -460,6 +493,7 @@ export default function Login() {
         <TitlePart title="Connexion" />
         <div className="w-full max-w-md mt-5 mb-5 mx-auto form-container pb-12">
           <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+
             {renderCaseTransition()}
 
           </form>

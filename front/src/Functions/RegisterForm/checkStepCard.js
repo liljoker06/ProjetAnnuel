@@ -7,10 +7,6 @@ export const checkStepCard = ({
     setNameCard,
     setDateCard,
     setCvvCard,
-    numCard,
-    nameCard,
-    dateCard,
-    cvvCard,
     nextStep
 }) => {
     setLoading(true);
@@ -44,6 +40,21 @@ export const checkStepCard = ({
             consoleLog(`${field.label} valide.`, 'green');
         }
     });
+
+    // pas sécurisé car date prise sur la machine client
+    const dateCardValue = values.dateCard;
+    if (dateCardValue) {
+        const [month, year] = dateCardValue.split('/');
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear() % 100; 
+        const currentMonth = currentDate.getMonth() + 1; 
+    
+        if (parseInt(month, 10) > 12 || parseInt(month, 10) <= 0) {
+            newErrors.dateCard = 'Mois invalide. Le mois doit être compris entre 01 et 12.';
+        } else if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+            newErrors.dateCard = 'Date de validité dépassée.';
+        }
+    }
 
     setErrors(newErrors);
     setLoading(false);

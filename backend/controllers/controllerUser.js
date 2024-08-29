@@ -60,8 +60,45 @@ const validateUserEmail = async (req, res) => {
   consoleLog(`• [END] controllers/controllerUser/validateUserEmail`, 'cyan');
 }
 
+const validateUser = async (req, res) => {
+  consoleLog(`• [START] controllers/controllerUser/validateUser`, 'cyan');
+  try {
+    const { user_email, user_passw } = req.body;
+    const user = await User.findOne({ where: { user_email } });
+
+    if (user) {
+      // utilisation de bcrypt pour comparer les mots de passe qui sont hashés
+      // const isValid = await bcrypt.compare(user_passw, user.user_passw);
+      const isValid = user_passw === user.user_passw;
+      if (isValid) {
+        consoleLog(`Utilisateur valide: \t${user_email}`, 'green');
+        consoleLog(`Mot de passe valide: \t${user_passw}`, 'green');
+        consoleLog('Correspondance trouvée.', 'green');
+        res.status(200).json({ isValid: true });
+        consoleLog(`• [END] controllers/controllerUser/validateUser`, 'cyan');
+        return;
+      } else {
+        consoleLog(`Utilisateur valide: \t${user_email}`, 'green');
+        consoleLog(`Mot de passe invalide: \t${user_passw}`, 'red');
+      }
+    } else {
+      consoleLog(`Utilisateur invalide: \t${user_email}`, 'red');
+      consoleLog(`Mot de passe invalide: \t${user_passw}`, 'red');
+    }
+
+    res.status(200).json({ isValid: false });
+  } catch (error) {
+    consoleLog(`Erreur lors de la validation de l'utilisateur: \t${error.message}`, 'red');
+    res.status(500).json({ error: error.message });
+    consoleLog(`• [END] controllers/controllerUser/validateUser`, 'cyan');
+  }
+
+  consoleLog(`• [END] controllers/controllerUser/validateUser`, 'cyan');
+};
+
 module.exports = {
   getAllUsers,
   createUser,
-  validateUserEmail
+  validateUserEmail,
+  validateUser
 };

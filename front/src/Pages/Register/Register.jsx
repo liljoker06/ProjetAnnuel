@@ -9,12 +9,12 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import './Register.css';
 import CardPrice from '../../Components/CardPrice/CardPrice';
 
-import { checkStepBasic } from '../../Functions/FormInput/checkStepBasic';
-import { checkCodeMail } from '../../Functions/FormInput/checkCodeMail';
-import { checkStepEntreprise } from '../../Functions/FormInput/checkStepEntreprise';
-import { checkCodeEntreprise } from '../../Functions/FormInput/checkCodeEntreprise';
-import { checkStepForfait } from '../../Functions/FormInput/checkStepForfait';
-import { checkStepCard } from '../../Functions/FormInput/checkStepCard';
+import { checkStepBasic } from '../../Functions/RegisterForm/checkStepBasic';
+import { checkCodeMail } from '../../Functions/RegisterForm/checkCodeMail';
+import { checkStepEntreprise } from '../../Functions/RegisterForm/checkStepEntreprise';
+import { checkCodeEntreprise } from '../../Functions/RegisterForm/checkCodeEntreprise';
+import { checkStepForfait } from '../../Functions/RegisterForm/checkStepForfait';
+import { checkStepCard } from '../../Functions/RegisterForm/checkStepCard';
 
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 import { validateUserEmail } from '../../Functions/CallApi/CallUser';
@@ -157,6 +157,7 @@ export default function Register() {
 
   const renderStep = () => {
     switch (currentStep) {
+      // Informations personnelles
       case 1:
         return (
           <>
@@ -280,6 +281,7 @@ export default function Register() {
             }
           </>
         );
+      // Vérification de l'email
       case 2:
         return (
           <>
@@ -348,6 +350,7 @@ export default function Register() {
             }
           </>
         );
+      // Informations entreprise
       case 3:
         return (
           <>
@@ -449,6 +452,7 @@ export default function Register() {
             }
           </>
         );
+      // Choix du forfait
       case 4:
         return (
           <>
@@ -528,6 +532,7 @@ export default function Register() {
             }
           </>
         );
+      // Paiement
       case 5:
         return (
           <>
@@ -559,13 +564,13 @@ export default function Register() {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dateCard">
                   Date d'expiration
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="dateCard" type="text" placeholder="MM/AA" onInput={(e) => {let value = e.target.value.replace(/\D/g, ''); if (value.length > 2) { value = value.slice(0, 2) + '/' + value.slice(2, 4);} e.target.value = value.slice(0, 5);}} />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="dateCard" type="text" placeholder="MM/AA" onInput={(e) => { let value = e.target.value.replace(/\D/g, ''); if (value.length > 2) { value = value.slice(0, 2) + '/' + value.slice(2, 4); } e.target.value = value.slice(0, 5); }} />
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cvvCard">
                   CVV
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cvvCard" type="number" placeholder="000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 3)}/>
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cvvCard" type="number" placeholder="000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 3)} />
               </div>
             </div>
 
@@ -588,6 +593,7 @@ export default function Register() {
             }
           </>
         );
+      // Confirmation
       case 6:
         return (
           <>
@@ -675,6 +681,7 @@ export default function Register() {
             </div>
           </>
         );
+      // Succès
       case 7:
         return (
           <>
@@ -707,6 +714,7 @@ export default function Register() {
             )}
           </>
         );
+      // Erreur
       default:
         return <div>Un problème est survenu recharger la page</div>;
     }
@@ -822,6 +830,7 @@ export default function Register() {
   const handleCkeckStepEntreprise = () => {
     if (estEntrepriseExistante) {
       checkCodeEntreprise({
+        STEP_CONFIRMATION,
         setLoading,
         setErrors,
         codeCompany,

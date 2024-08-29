@@ -2,6 +2,7 @@ import consoleLog from "../Dev/consoleLog";
 
 // Si l'entreprise existe
 export const checkCodeEntreprise = async ({
+    STEP_CONFIRMATION,
     setLoading,
     setErrors,
     setCodeCompany,
@@ -61,7 +62,7 @@ export const checkCodeEntreprise = async ({
     if (Object.values(newErrors).filter(error => error).length === 0) {
         setCodeCompany(values.codeCompany);
         consoleLog('• [END] checkCodeEntreprise', 'white');
-        skipStep(6);
+        skipStep(STEP_CONFIRMATION);
     } else {
         consoleLog('• [END] checkCodeEntreprise', 'white');
     }

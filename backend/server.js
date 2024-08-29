@@ -56,7 +56,7 @@ const insertForDev = async () => {
         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
     ];
     const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'test@gmail.com', user_passw: 'test', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+        { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: 'test', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
     ];
 
     for (const company of defaultCompanies) {
@@ -83,18 +83,20 @@ app.listen(PORT, async () => {
         await sequelize.authenticate();
         console.log('Database connection has been established successfully.');
 
-        // await sequelize.sync({ alter: true }); 
-        await Company.sync({ alter: true });
-        await Subscription.sync({ alter: true });
-        await User.sync({ alter: true });
-        await UserCompany.sync({ alter: true });
-        await Logs.sync({ alter: true });
-        await CurrentSub.sync({ alter: true });
-        await Invoice.sync({ alter: true });
-        await File.sync({ alter: true });
-        await UserStorage.sync({ alter: true });
-        await StorageFile.sync({ alter: true });
-        await MailCode.sync({ alter: true });
+        // reset la base de données à chaque démarrage avec force: true
+        await sequelize.sync({ alter: true, force: true });
+
+        // await Company.sync({ alter: true, force: true });
+        // await Subscription.sync({ alter: true, force: true });
+        // await User.sync({ alter: true, force: true });
+        // await UserCompany.sync({ alter: true, force: true });
+        // await Logs.sync({ alter: true, force: true });
+        // await CurrentSub.sync({ alter: true, force: true });
+        // await Invoice.sync({ alter: true, force: true });
+        // await File.sync({ alter: true, force: true });
+        // await UserStorage.sync({ alter: true, force: true });
+        // await StorageFile.sync({ alter: true, force: true });
+        // await MailCode.sync({ alter: true, force: true });
 
         // Insertion des données
         await insertDefaultSubscriptions();
