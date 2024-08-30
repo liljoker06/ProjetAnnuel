@@ -56,7 +56,7 @@ const insertForDev = async () => {
         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
     ];
     const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: 'test', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+        { user_fname: 'test', user_lname: 'test', user_email: 'lahrimialadin06@gmail.com', user_passw: 'test', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
     ];
 
     for (const company of defaultCompanies) {
