@@ -1,12 +1,13 @@
 const { User } = require('../database/database');
 
-
 const bcrypt = require('bcryptjs');
+const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
 const consoleLog = require('../consoleLog');
 
-const { createCompany, createUserCompany } = require('./controllerUserCompany');
-const { createSubscription } = require('./controllerSubscription');
+const { createCompany } = require('./controllerCompany');
+const { createUserCompany } = require('./controllerUserCompany');
+const { getSubscriptionByName } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 
 
@@ -19,22 +20,45 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-
 const createUser = async (req, res) => {
-  consoleLog('Débute la création de l\'utilisateur', 'green; font-size: 40px;');
+  consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.error('Erreur de validation des données', 'color: red');
+    consoleLog('Erreur de validation aucune données à traiter', 'red');
     return res.status(400).json({ errors: errors.array() });
   }
 
   try {
     const { password, nom, prenom, email, phone, birth, adresse, codePostal, ville, nomEntreprise, siret, adresseEntreprise, codePostalEntreprise, cityCompany, plan } = req.body;
 
-    consoleLog('Hachage de mot de passe en cours...', 'green');
-    const hashedPassword = await bcrypt.hash(password, 10);
-    consoleLog('Hachage de mot de passe réussi!', 'green');
+    let hashedPassword;
+    let formattedBirth;
+    let user;
+    let company;
+    let userCompany;
+    let subscription;
+    let currentSub;
 
+    // Hashage du mot de passe
+    try {
+      hashedPassword = await bcrypt.hash(password, 10);
+      consoleLog('Mot de passe hashé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors du hashage du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Formatage de la date de naissance
+    try {
+      const parsedBirth = parse(birth, 'dd/MM/yyyy', new Date());
+      formattedBirth = format(parsedBirth, 'yyyy-MM-dd');
+      consoleLog('Date de naissance formatée avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors du formatage de la date de naissance', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+    
+    // Implémentation des données utilisateur
     const userData = {
       user_fname: prenom,
       user_lname: nom,
@@ -44,68 +68,71 @@ const createUser = async (req, res) => {
       user_addre: adresse,
       user_posta: codePostal,
       user_city: ville,
-      user_date: birth
+      user_date: formattedBirth,
     };
 
-    consoleLog('Enregistrement de l\'utilisateur dans la base de données...', 'green');
-    const user = await User.create(userData);
-
-    consoleLog(`Utilisateur créé: \t${user.user_id}`, 'green');
-
-    if (!user || !user.user_id) {
-      console.error('Erreur: L\'utilisateur n\'a pas été créé correctement', 'color: red');
-      return res.status(500).json({ error: 'Erreur lors de la création de l\'utilisateur.' });
+    // Création de l'utilisateur
+    try {
+      user = await User.create(userData);
+      consoleLog(`Utilisateur créé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
     }
 
-    consoleLog(`Utilisateur enregistré avec succès, ID: ${user.user_id}`, 'green');
-
-    consoleLog('Création ou recherche de l\'entreprise...', 'green');
-    const company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
-
-    if (!company || !company.comp_id) {
-      console.error('Erreur: L\'entreprise n\'a pas été créée correctement', 'color: red');
-      return res.status(500).json({ error: 'Erreur lors de la création de l\'entreprise.' });
+    // Création de l'entreprise
+    try {
+      company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
+      consoleLog(`Entreprise créée : \t\t${company.comp_id} - ${company.comp_name}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
     }
 
-    consoleLog(`Entreprise enregistrée avec succès, ID: ${company.comp_id}`, 'green');
-
-    consoleLog('Création de la relation utilisateur-entreprise...', 'green');
-    await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
-    consoleLog('Relation utilisateur-entreprise enregistrée avec succès', 'green');
-
-    consoleLog('Création de l\'abonnement...', 'green');
-    const subscription = await createSubscription({ body: { subs_name: plan } }, res, true);
-
-    if (!subscription || !subscription.subs_id) {
-      console.error('Erreur: L\'abonnement n\'a pas été créé correctement', 'color: red');
-      return res.status(500).json({ error: 'Erreur lors de la création de l\'abonnement.' });
+    // Création de la liaison utilisateur-entreprise
+    try {
+      userCompany = await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
+      consoleLog(`Liaison user-company créé : \t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la relation utilisateur-entreprise : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
     }
 
-    consoleLog(`Abonnement enregistré avec succès, ID: ${subscription.subs_id}`, 'green');
-
-    // Mise à jour de l'utilisateur avec l'ID de l'abonnement
-    const [affectedRows] = await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
-    
-    if (affectedRows === 0) {
-      console.error('Erreur: La mise à jour de l\'ID de l\'abonnement dans l\'utilisateur a échoué', 'color: red');
-      return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur avec l\'ID de l\'abonnement.' });
+    // Attribution de l'abonnement à l'utilisateur
+    try {
+      subscription = await getSubscriptionByName(plan);
+      user = await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
+      consoleLog(`Abonnement ajouté : \t\t${email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'attribution de l\'abonnement à l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
     }
-    
-    consoleLog(`Mise à jour de l'utilisateur avec l'ID de l'abonnement: ${subscription.subs_id}`, 'green');
 
-    consoleLog('Création de l\'abonnement courant...', 'green');
-    await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
-    consoleLog('Abonnement courant enregistré avec succès', 'green');
+    // Création de la liaison abonnement-utilisateur
+    try {
+      currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
+      consoleLog(`Liaison user-currentSub créé : \t${email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la liaison abonnement-utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
+    consoleLog('[END] controllers/controllerUser/createUser', 'cyan');
     res.status(201).json({ user, company, subscription });
   } catch (error) {
-    console.error('Erreur lors de la création de l\'utilisateur:', 'color: red', error.message);
+    consoleLog('Erreur FATAL lors de la création de l\'utilisateur : ' + error.message, 'red');
+    consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
     res.status(500).json({ error: error.message });
   }
 };
 
 
-
+/*******************************************************/
 
 
 const validateUserEmail = async (req, res) => {

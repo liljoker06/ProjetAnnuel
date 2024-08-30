@@ -20,9 +20,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
-    user_role: DataTypes.ENUM('client', 'superadmin'),
-    user_date: DataTypes.DATE,
-    user_valid: DataTypes.BOOLEAN,
+    user_role: 
+    {
+      type : DataTypes.ENUM('client', 'admin'),
+      defaultValue: 'client',
+    },
+    user_date: DataTypes.DATEONLY,
+    user_valid: 
+    {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     user_subid: {
       type: DataTypes.INTEGER,
       references: {
