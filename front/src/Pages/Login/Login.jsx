@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TitlePart from '../../Components/TitlePart/TitlePart';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import consoleLog from '../../Functions/Dev/consoleLog';
 
 import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
 import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
 
-import { validateUser, connectUser } from '../../Functions/CallApi/CallUser';
+import { validateUser, loginUser } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Login() {
@@ -33,11 +33,25 @@ export default function Login() {
   /*case 1*/
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
   /*case 2*/
   const [codeMail, setCodeMail] = useState(Array(5).fill(''));
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef(codeMail.map(() => React.createRef()));
+
+  /****************************************/
+  //    Outils pour les champs forms      //
+  /****************************************/
+
+  const handleKeyPress = (event) => {
+    if (event.getModifierState('CapsLock')) {
+      setIsCapsLockOn(true);
+    } else {
+      setIsCapsLockOn(false);
+    }
+  };
+
 
   /****************************************/
   //    Gestion des différents forms      //
@@ -85,7 +99,13 @@ export default function Login() {
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              <NavLink
+                to="/register"
+                className={`text-blue-500 text-sm font-bold mb-5 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'} flex justify-center items-center`}
+              >
+                Vous n'avez pas de compte ?
+              </NavLink>
+              <label className="block text-gray-700 text-sm font-bold mb-2 mt-5" htmlFor="email">
                 Adresse e-mail
               </label>
               <input
@@ -104,7 +124,11 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder="••••••••••••"
+                onKeyDown={handleKeyPress}
               />
+              {isCapsLockOn && (
+                <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
+              )}
             </div>
             <div className="flex items-center justify-between">
               <button
@@ -134,7 +158,7 @@ export default function Login() {
       case 2:
         return (
           <>
-            <div className="mb-4 text-2xl font-bold text-gray-800">Vérification de connexinn</div>
+            <div className="mb-4 text-2xl font-bold text-gray-800">Vérification de connexion</div>
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             <span className="text-gray-700 text-sm font-bold mb-2">Un code de vérification vous a été envoyé par mail à l'adresse suivante : </span> <span className="text-blue-500 text-sm font-bold mb-2"> {email} </span>
@@ -390,9 +414,9 @@ export default function Login() {
     });
   };
 
-  const handleCheckCodeMail = () => {
+  const handleCheckCodeMail = async () => {
     try {
-      checkCodeMail({
+      await checkCodeMail({
         setLoading,
         setErrors,
         getFullCode,
@@ -400,7 +424,7 @@ export default function Login() {
         email,
         nextCase
       });
-      connectUser({
+      await loginUser({
         email,
         password
       });
