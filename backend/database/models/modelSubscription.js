@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     subs_name: DataTypes.STRING,
     subs_stora: DataTypes.INTEGER,
     subs_price: DataTypes.FLOAT,
+    subs_nbuser: DataTypes.INTEGER,
   }, {});
 
   Subscription.associate = function(models) {

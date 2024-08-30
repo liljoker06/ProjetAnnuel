@@ -4,13 +4,13 @@ import CardPrice from '../CardPrice/CardPrice'
 
 export default function Prices() {
     return (
-        <section class="bg-gray-100 py-8">
-            <div class="container mx-auto px-2 pt-4 pb-12 text-gray-800">
+        <section className="bg-gray-100 py-8">
+            <div className="container mx-auto px-2 pt-4 pb-12 text-gray-800">
 
                 <TitlePart title="Tarifs" />
 
 
-                <div class="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
+                <div className="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
 
                     <CardPrice
                         title="Basique"
