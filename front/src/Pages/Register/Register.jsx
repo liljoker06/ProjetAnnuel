@@ -110,6 +110,13 @@ export default function Register() {
     document.getElementById('cityCompany').value = 'Paris';
   }
 
+  const AutoCard = () => {
+    document.getElementById('numCard').value = '1234 5678 9012 3456';
+    document.getElementById('nameCard').value = 'DOE John';
+    document.getElementById('dateCard').value = '12/34';
+    document.getElementById('cvvCard').value = '123';
+  }
+
   const nextStep = () => {
     if (currentStep < nbSteps) {
       setCurrentStep(currentStep + 1);
@@ -498,15 +505,15 @@ export default function Register() {
             <div className="flex flex-col sm:flex-row justify-center pt-6 my-12 sm:my-4">
               <div className="radio-input">
                 <label>
-                  <input type="radio" id="BasicPlan" name="radio-plan" value="BasicPlan" />
+                  <input type="radio" id="BasicPlan" name="radio-plan" value="Basique" />
                   <span>Basique</span>
                 </label>
                 <label>
-                  <input type="radio" id="ProPlan" name="radio-plan" value="ProPlan" />
+                  <input type="radio" id="ProPlan" name="radio-plan" value="Pro" />
                   <span>Pro</span>
                 </label>
                 <label>
-                  <input type="radio" id="BusinessPlan" name="radio-plan" value="BusinessPlan" />
+                  <input type="radio" id="BusinessPlan" name="radio-plan" value="Business" />
                   <span>Business</span>
                 </label>
                 <span className="selection"></span>
@@ -580,6 +587,9 @@ export default function Register() {
               </button>
               <button onClick={handleCheckStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
+              </button>
+              <button onClick={AutoCard} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                Dev
               </button>
             </div>
             {
