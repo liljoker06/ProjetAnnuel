@@ -9,6 +9,7 @@ const { createCompany } = require('./controllerCompany');
 const { createUserCompany } = require('./controllerUserCompany');
 const { getSubscriptionByName } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
+const { createInvoice } = require('./controllerInvoice');
 
 
 const getAllUsers = async (req, res) => {
@@ -57,7 +58,7 @@ const createUser = async (req, res) => {
       consoleLog('Erreur lors du formatage de la date de naissance', 'red');
       return res.status(500).json({ error: error.message });
     }
-    
+
     // Implémentation des données utilisateur
     const userData = {
       user_fname: prenom,
@@ -104,8 +105,8 @@ const createUser = async (req, res) => {
     // Attribution de l'abonnement à l'utilisateur
     try {
       subscription = await getSubscriptionByName(plan);
-      user = await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
-      consoleLog(`Abonnement ajouté : \t\t${email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
+      await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
+      consoleLog(`Abonnement ajouté : \t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de l\'attribution de l\'abonnement à l\'utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -115,19 +116,38 @@ const createUser = async (req, res) => {
     // Création de la liaison abonnement-utilisateur
     try {
       currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
-      consoleLog(`Liaison user-currentSub créé : \t${email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
+      consoleLog(`Liaison user-currentSub créé : \t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la liaison abonnement-utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
       return res.status(500).json({ error: error.message });
     }
 
-    consoleLog('[END] controllers/controllerUser/createUser', 'cyan');
-    res.status(201).json({ user, company, subscription });
+    // Création de la facture
+    try {
+      const invoiceData = {
+        invo_userid: user.user_id,
+        invo_compid: company.comp_id,
+        invo_subsid: subscription.subs_id,
+        invo_cursid: currentSub.curs_id,
+        invo_tva: 20
+      };
+      const invoice = await createInvoice(invoiceData);
+      consoleLog(`Facture créée : \t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Si tout est réussi, renvoyer une réponse de succès
+    consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+    return res.status(201).json({ message: 'Utilisateur créé avec succès', user });
+
   } catch (error) {
     consoleLog('Erreur FATAL lors de la création de l\'utilisateur : ' + error.message, 'red');
     consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -166,8 +186,8 @@ const validateUser = async (req, res) => {
 
     if (user) {
       // utilisation de bcrypt pour comparer les mots de passe qui sont hashés
-      // const isValid = await bcrypt.compare(user_passw, user.user_passw);
-      const isValid = user_passw === user.user_passw;
+      const isValid = await bcrypt.compare(user_passw, user.user_passw);
+      // const isValid = user_passw === user.user_passw;
       if (isValid) {
         consoleLog(`Utilisateur valide: \t${user_email}`, 'green');
         consoleLog(`Mot de passe valide: \t${user_passw}`, 'green');
