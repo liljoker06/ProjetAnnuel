@@ -151,6 +151,50 @@ const createUser = async (req, res) => {
   }
 };
 
+// FAIRE UNE GESTION DE TOKEN DANS UN COOKIE
+const loginUser = async (req, res) => {
+  consoleLog('• [START] controllers/controllerUser/conectUser', 'cyan');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    consoleLog('Erreur de validation aucune données à traiter', 'red');
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { password, email } = req.body;
+
+    let user;
+    let hashedPassword;
+
+    // Récupération de l'utilisateur
+    try {
+      user = await User.findOne({ where: { user_email: email } });
+      consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la récupération de l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Vérification du mot de passe
+    try {
+      hashedPassword = await bcrypt.compare(password, user.user_passw);
+      consoleLog('Mot de passe vérifié avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la vérification du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    return res.status(200).json({ message: 'Utilisateur connecté avec succès', user });
+
+  } catch (error) {
+    consoleLog('Erreur FATAL lors de la connexion de l\'utilisateur : ' + error.message, 'red');
+    consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 
 /*******************************************************/
 
@@ -217,6 +261,7 @@ const validateUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   createUser,
+  loginUser,
   validateUserEmail,
   validateUser
 };

@@ -50,6 +50,7 @@ export default function Register() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [birth, setBirth] = useState('');
@@ -81,11 +82,18 @@ export default function Register() {
   const [cvvCard, setCvvCard] = useState('');
 
 
-
-
   /****************************************/
-  //    Gestion des différents forms      //
+  //    Outils pour les champs forms      //
   /****************************************/
+
+  const handleKeyPress = (event) => {
+    if (event.getModifierState('CapsLock')) {
+      setIsCapsLockOn(true);
+    } else {
+      setIsCapsLockOn(false);
+    }
+  };
+
 
   const Auto = () => {
     document.getElementById('email').value = 'matisagr@gmail.com';
@@ -116,6 +124,10 @@ export default function Register() {
     document.getElementById('dateCard').value = '12/34';
     document.getElementById('cvvCard').value = '123';
   }
+
+  /****************************************/
+  //    Gestion des différents forms      //
+  /****************************************/
 
   const nextStep = () => {
     if (currentStep < nbSteps) {
@@ -192,13 +204,20 @@ export default function Register() {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 Mot de passe
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="••••••••••••" autoComplete="new-password" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="••••••••••••" autoComplete="new-password" onKeyDown={handleKeyPress} />
+              {isCapsLockOn && (
+                <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
+              )}
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
                 Confirmer le mot de passe
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:shadow-outline" id="confirmPassword" type="password" placeholder="••••••••••••" autoComplete="new-password" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline" id="confirmPassword" type="password" placeholder="••••••••••••" autoComplete="new-password" onKeyDown={handleKeyPress} />
+              {isCapsLockOn && (
+                <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
+              )}
+
             </div>
 
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
