@@ -104,12 +104,6 @@ export default function Login() {
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             <div className="mb-4">
-              <NavLink
-                to="/register"
-                className={`text-blue-500 text-sm font-bold mb-5 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'} flex justify-center items-center`}
-              >
-                Vous n'avez pas de compte ?
-              </NavLink>
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-5" htmlFor="email">
                 Adresse e-mail
               </label>
