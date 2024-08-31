@@ -3,6 +3,113 @@ const { MailCode } = require('../database/database');
 const { Op } = require('sequelize');
 const consoleLog = require('../consoleLog');
 
+const transporter = nodemailer.createTransport({
+    host: 'mail.vitruvecloud.fr',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'noreply@vitruvecloud.fr',
+        pass: 'xB2!Y_8H9G2znTq'
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
+// Fonction pour récupérer les informations de l'IP
+const fetchIpData = async (ip) => {
+    try {
+        const url = `http://ip-api.com/json/${ip}?fields=status,message,continent,country,countryCode,regionName,city,zip`;
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'success') {
+                return data;
+            } else {
+                throw new Error(data.message);
+            }
+        } else {
+            consoleLog('Erreur de requête à l\'API IP', 'red');
+            return null;
+        }
+    } catch (error) {
+        consoleLog(`\tErreur lors de la récupération des informations de l'IP : ${error}`, 'red');
+        return null;
+    }
+};
+
+// Fonction pour envoyer le mail et retourner une promesse
+const sendMail = (email, mailContent, mailSubject) => {
+    mailOptions = {
+        from: 'noreply@vitruvecloud.fr',
+        to: email,
+        subject: mailSubject,
+        html: mailContent
+    };
+
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                consoleLog(`Erreur lors de l'envoi du mail : ${error}`, 'red');
+                reject(error);
+            } else {
+                consoleLog(`Mail envoyé à : \t\t\t${email} (${info.response})`, 'green');
+                resolve(info);
+            }
+        });
+    });
+};
+
+// Style du mail
+const mailStyle = `
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #007BFF;
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333333;
+        }
+        .verification-code {
+            display: block;
+            background-color: #e7f1ff;
+            color: #007BFF;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-decoration: none;
+        }
+        .email-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-top: 1px solid #dddddd;
+        }
+`;
+
+/************************************/
+
 // mailcode_email
 const generateMailCode = async (req, res) => {
     consoleLog('• [START] controllers/controllerMailCode/generateMailCode', 'cyan');
@@ -21,51 +128,54 @@ const generateMailCode = async (req, res) => {
             mailcode_expire
         });
 
-        const transporter = nodemailer.createTransport({
-            host: 'mail.vitruvecloud.fr',
-            port: 587,
-            secure: false,
-            auth: {
-                user: 'noreply@vitruvecloud.fr',
-                pass: 'xB2!Y_8H9G2znTq'
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
+        // préparer le contenu du mail
+        const mailContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code de vérification</title>
+    <style>
+        ${mailStyle}
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Vitruve Cloud<br>Code de vérification</h1>
+        </div>
+        <div class="email-body">
+        <img src="https://i.imgur.com/VcWX3qk.png" alt="Vitruve Cloud" style="display: block; margin: 0 auto; width: 100px;">
+            <p>Bonjour,</p>
+            <p>Voici votre code de vérification pour compléter votre opération sur Vitruve Cloud :</p>
+            <div class="verification-code">
+                ${mailcode_code}
+            </div>
+            <p>Veuillez entrer ce code dans l'application pour confirmer votre identité.</p>
+            <p>Si vous n'avez pas demandé ce code, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+        </div>
+        <div class="email-footer">
+        <a href="https://vitruvecloud.fr" style="color: #007BFF; text-decoration: none;">Vitruve Cloud</a>
+            <p>&copy; 2024 VitruveCloud. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>
 
-        const mailOptions = {
-            from: 'noreply@vitruvecloud.fr',
-            to: mailcode_email,
-            subject: 'Code de vérification - Vitruve Cloud',
-            text: `Votre code de vérification est : ${mailcode_code}`
-        };
+        `;
+        const mailSubject = `[${mailcode_code}] Code de vérification - Vitruve Cloud`;
+        await sendMail(mailcode_email, mailContent, mailSubject);
 
-        // Fonction pour envoyer le mail et retourner une promesse
-        const sendMail = (mailOptions) => {
-            return new Promise((resolve, reject) => {
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        consoleLog('Erreur lors de l\'envoi du mail : \t\t' + error, 'red');
-                        reject(error);
-                    } else {
-                        consoleLog('Mail envoyé à : \t\t\t' + mailcode_email + ' (' + info.response + ')', 'green');
-                        resolve(info);
-                    }
-                });
-            });
-        };
-
-        // Attendre que le mail soit envoyé
-        await sendMail(mailOptions);
-
+        consoleLog('• [END] controllers/controllerMailCode/generateMailCode', 'cyan');
         res.status(201).json(mailcode);
+
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
         consoleLog('Erreur lors de la génération du code : \t\t' + error, 'red');
+        consoleLog('• [END] controllers/controllerMailCode/generateMailCode', 'cyan');
+        res.status(500).json({ error: error.message });
     }
-    
-    consoleLog('• [END] controllers/controllerMailCode/generateMailCode', 'cyan');
 };
 
 // mailcode_email, mailcode_code
@@ -91,6 +201,7 @@ const validateMailCode = async (req, res) => {
         // si le code de validation n'existe pas
         if (!mailcode) {
             consoleLog('Code de validation introuvable, expiré ou déjà validé.', 'red');
+            consoleLog('• [END] controllers/controllerMailCode/validateMailCode', 'cyan');
             return res.status(400).json({ error: 'Code de validation introuvable, expiré ou déjà validé' });
         }
 
@@ -139,8 +250,85 @@ const resendMailCode = async (req, res) => {
     consoleLog('• [END] controllers/controllerMailCode/resendMailCode', 'cyan');
 }
 
+/************************************/
+
+// user, ip
+const connexionMail = async (user, ip = null) => {
+
+    consoleLog('\t• [START] controllers/controllerMailCode/connexionMail', 'cyan');
+
+    try {
+        // info de l'utilisateur
+        let ipData = null;
+        consoleLog(`\tEmail de l'utilisateur : \t${user.user_email}`, 'green');
+
+        // récupérer les informations de l'ip
+        try {
+            consoleLog('\tIP de l\'utilisateur : \t\t' + ip, 'green');
+            ipData = await fetchIpData(ip);
+            if (!ipData) {
+                consoleLog('\tAucune information trouvée sur l\'IP.', 'red');
+            } else {
+                consoleLog('\tInformations de l\'IP récupérées.', 'green');
+            }
+        } catch (error) {
+            consoleLog(`\tErreur lors de la récupération de l\'IP : ${error}`, 'red');
+        }
+
+        // envoyer un mail à l'utilisateur
+        try {
+            const mailContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion à Vitruve Cloud</title>
+    <style>
+        ${mailStyle}
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Vitruve Cloud<br>Connexion</h1>
+        </div>
+        <div class="email-body">
+        <img src="https://i.imgur.com/VcWX3qk.png" alt="Vitruve Cloud" style="display: block; margin: 0 auto; width: 100px;">
+            <p>Bonjour ${user.user_fname} ${user.user_lname},</p>
+            <p>Vous vous êtes connecté à Vitruve Cloud depuis l'adresse IP ${ip} (${ipData ? ipData.city + ', ' + ipData.regionName + ', ' + ipData.country : 'Localhost'}).</p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, veuillez contacter notre équipe de support ou réinitialiser votre mot de passe.</p>
+            <h4><a href="https://vitruvecloud.fr/resetpasswd">Réinitialiser mon mot de passe</a></h4>
+            <p>Si vous êtes bien à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+            <h2><a href="https://vitruvecloud.fr" class="verification-code">Vitruve Cloud</a></h2>
+        </div>
+        <div class="email-footer">
+        <a href="https://vitruvecloud.fr" style="color: #007BFF; text-decoration: none;">Vitruve Cloud</a>
+            <p>&copy; 2024 VitruveCloud. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>
+            `;
+
+            // Attendre que le mail soit envoyé
+            await sendMail(user.user_email, mailContent, 'Connexion à Vitruve Cloud');
+            consoleLog('\t• [END] controllers/controllerMailCode/connectionMail', 'cyan');
+        } catch (error) {
+            consoleLog(`Erreur lors de l'envoi du mail de connexion : ${error}`, 'red');
+            consoleLog('\t• [END] controllers/controllerMailCode/connexionMail', 'cyan');
+        }
+
+    } catch (error) {
+        consoleLog('\t• [END] controllers/controllerMailCode/connexionMail', 'cyan');
+    }
+
+}
+
+
 module.exports = {
     generateMailCode,
     validateMailCode,
-    resendMailCode
+    resendMailCode,
+    connexionMail
 };

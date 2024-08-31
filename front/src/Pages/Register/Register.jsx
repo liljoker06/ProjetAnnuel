@@ -50,6 +50,7 @@ export default function Register() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [birth, setBirth] = useState('');
@@ -81,11 +82,18 @@ export default function Register() {
   const [cvvCard, setCvvCard] = useState('');
 
 
-
-
   /****************************************/
-  //    Gestion des différents forms      //
+  //    Outils pour les champs forms      //
   /****************************************/
+
+  const handleKeyPress = (event) => {
+    if (event.getModifierState('CapsLock')) {
+      setIsCapsLockOn(true);
+    } else {
+      setIsCapsLockOn(false);
+    }
+  };
+
 
   const Auto = () => {
     document.getElementById('email').value = 'matisagr@gmail.com';
@@ -109,6 +117,17 @@ export default function Register() {
     document.getElementById('cpCompany').value = '75000';
     document.getElementById('cityCompany').value = 'Paris';
   }
+
+  const AutoCard = () => {
+    document.getElementById('numCard').value = '1234 5678 9012 3456';
+    document.getElementById('nameCard').value = 'DOE John';
+    document.getElementById('dateCard').value = '12/34';
+    document.getElementById('cvvCard').value = '123';
+  }
+
+  /****************************************/
+  //    Gestion des différents forms      //
+  /****************************************/
 
   const nextStep = () => {
     if (currentStep < nbSteps) {
@@ -185,13 +204,20 @@ export default function Register() {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 Mot de passe
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="••••••••••••" autoComplete="new-password" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="••••••••••••" autoComplete="new-password" onKeyDown={handleKeyPress} />
+              {isCapsLockOn && (
+                <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
+              )}
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
                 Confirmer le mot de passe
               </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:shadow-outline" id="confirmPassword" type="password" placeholder="••••••••••••" autoComplete="new-password" />
+              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline" id="confirmPassword" type="password" placeholder="••••••••••••" autoComplete="new-password" onKeyDown={handleKeyPress} />
+              {isCapsLockOn && (
+                <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
+              )}
+
             </div>
 
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
@@ -498,15 +524,15 @@ export default function Register() {
             <div className="flex flex-col sm:flex-row justify-center pt-6 my-12 sm:my-4">
               <div className="radio-input">
                 <label>
-                  <input type="radio" id="BasicPlan" name="radio-plan" value="BasicPlan" />
+                  <input type="radio" id="BasicPlan" name="radio-plan" value="Basique" />
                   <span>Basique</span>
                 </label>
                 <label>
-                  <input type="radio" id="ProPlan" name="radio-plan" value="ProPlan" />
+                  <input type="radio" id="ProPlan" name="radio-plan" value="Pro" />
                   <span>Pro</span>
                 </label>
                 <label>
-                  <input type="radio" id="BusinessPlan" name="radio-plan" value="BusinessPlan" />
+                  <input type="radio" id="BusinessPlan" name="radio-plan" value="Business" />
                   <span>Business</span>
                 </label>
                 <span className="selection"></span>
@@ -580,6 +606,9 @@ export default function Register() {
               </button>
               <button onClick={handleCheckStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
+              </button>
+              <button onClick={AutoCard} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                Dev
               </button>
             </div>
             {

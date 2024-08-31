@@ -11,14 +11,41 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
-const createCompany = async (req, res) => {
+const createCompany = async (req, res, internal = false) => {
   try {
-    const company = await Company.create(req.body);
-    res.status(201).json(company);
+    const { comp_name, comp_siret, comp_addre, comp_posta, comp_city } = req.body;
+
+    // Check if the company already exists by SIRET
+    let company = await Company.findOne({ where: { comp_siret } });
+
+    if (!company) {
+      // Create company if it does not exist
+      const companyData = {
+        comp_name,
+        comp_siret,
+        comp_addre,
+        comp_posta,
+        comp_city
+      };
+
+      company = await Company.create(companyData);
+    }
+
+    if (!internal) {
+      res.status(201).json(company);
+    } else {
+      return company;
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
   }
 };
+
+/*******************************/
 
 const validateCompany = async (req, res) => {
 

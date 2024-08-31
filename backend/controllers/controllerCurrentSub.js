@@ -9,15 +9,35 @@ const getAllCurrentSubs = async (req, res) => {
   }
 };
 
-const createCurrentSub = async (req, res) => {
+const createCurrentSub = async (req, res, internal = false) => {
   try {
-    const currentSub = await CurrentSub.create(req.body);
-    res.status(201).json(currentSub);
+    const { curs_userid, curs_subsid } = req.body;
+    const curs_start = new Date();
+    const curs_end = new Date(curs_start);
+    curs_end.setMonth(curs_end.getMonth() + 1);
+
+    const currentSubData = {
+      curs_userid,
+      curs_subsid,
+      curs_start,
+      curs_end
+    };
+
+    const currentSub = await CurrentSub.create(currentSubData);
+
+    if (!internal) {
+      res.status(201).json(currentSub);
+    } else {
+      return currentSub;
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
   }
 };
-
 module.exports = {
   getAllCurrentSubs,
   createCurrentSub,

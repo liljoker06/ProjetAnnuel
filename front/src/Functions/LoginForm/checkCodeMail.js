@@ -5,8 +5,9 @@ export const checkCodeMail = async ({
     setErrors,
     getFullCode,
     validateMailCode,
-    connectUser,
     email,
+    password,
+    loginUser,
 }) => {
     setLoading(true);
     consoleLog('• [START] checkCodeMail', 'white');
@@ -25,17 +26,15 @@ export const checkCodeMail = async ({
         if (response.success) {
             consoleLog('Code valide.', 'green');
 
+            // Connexion de l'utilisateur
+            const loginResponse = await loginUser({ email, password });
 
-            // FAIRE LA CONNEXION
-            const connected = await connectUser({ user_email: email, user_passw: code });
-            if (connected) {
-                consoleLog('Utilisateur connecté.', 'green');
+            if (loginResponse.success) {
+                consoleLog('Connexion réussie.', 'green');
             } else {
-                consoleLog('Erreur lors de la connexion.', 'red');
-                newErrors.codeMail = 'Erreur lors de la connexion.';
+                newErrors.codeMail = loginResponse.error || 'Erreur lors de la connexion.';
+                consoleLog('Erreur lors de la connexion: ' + newErrors.codeMail, 'red');
             }
-
-
         } else {
             newErrors.codeMail = response.data.error || 'Code invalide.';
             consoleLog('Code invalide.', 'red');
@@ -48,6 +47,7 @@ export const checkCodeMail = async ({
         setLoading(false); // Termine le chargement
         consoleLog('Verification terminée.', 'cyan');
         if (newErrors.codeMail) consoleLog('Erreurs: ' + newErrors.codeMail, 'red');
+        consoleLog('• [END] checkCodeMail', 'white');
     }
 
 };

@@ -1,14 +1,16 @@
 const { User } = require('../database/database');
 
-const { Company } = require('../database/database');
-const { Subscription } = require('../database/models/modelSubscription');
-const { UserCompany } = require('../database/models/modelUserCompany');
-const { CurrentSub } = require('../database/models/modelCurrentSub');
-
 const bcrypt = require('bcryptjs');
+const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
 const consoleLog = require('../consoleLog');
 
+const { createCompany } = require('./controllerCompany');
+const { createUserCompany } = require('./controllerUserCompany');
+const { getSubscriptionByName } = require('./controllerSubscription');
+const { createCurrentSub } = require('./controllerCurrentSub');
+const { createInvoice } = require('./controllerInvoice');
+const { connexionMail } = require('./controllerMailCode');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -19,82 +21,204 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getUserByMail = async (email) => {
+  try {
+      const user = await User.findOne({ where: { user_email: email } });
+      return user;
+  } catch (error) {
+      throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
+  }
+};
+
 
 const createUser = async (req, res) => {
-  console.log('cc fdp');
+  consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    consoleLog('Erreur de validation aucune données à traiter', 'red');
     return res.status(400).json({ errors: errors.array() });
   }
 
   try {
-
     const { password, nom, prenom, email, phone, birth, adresse, codePostal, ville, nomEntreprise, siret, adresseEntreprise, codePostalEntreprise, cityCompany, plan } = req.body;
 
-    console.log('cc fdp2');
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    let hashedPassword;
+    let formattedBirth;
+    let user;
+    let company;
+    let userCompany;
+    let subscription;
+    let currentSub;
 
-    console.log('cc fdp3');
-    // Create user object
+    // Hashage du mot de passe
+    try {
+      hashedPassword = await bcrypt.hash(password, 10);
+      consoleLog('Mot de passe hashé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors du hashage du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Formatage de la date de naissance
+    try {
+      const parsedBirth = parse(birth, 'dd/MM/yyyy', new Date());
+      formattedBirth = format(parsedBirth, 'yyyy-MM-dd');
+      consoleLog('Date de naissance formatée avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors du formatage de la date de naissance', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Implémentation des données utilisateur
     const userData = {
       user_fname: prenom,
       user_lname: nom,
       user_email: email,
       user_passw: hashedPassword,
       user_phone: phone,
-      user_addr: adresse,
+      user_addre: adresse,
       user_posta: codePostal,
       user_city: ville,
-      user_date: birth
+      user_date: formattedBirth,
     };
 
-    console.log('cc fdp4');
-    // Save user to database
-    const user = await User.create(userData);
+    // Création de l'utilisateur
+    try {
+      user = await User.create(userData);
+      consoleLog(`Utilisateur créé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    console.log('cc fdp5');
-    // Assuming you have models for companies and subscriptions, handle them accordingly
+    // Création de l'entreprise
+    try {
+      company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
+      consoleLog(`Entreprise créée : \t\t${company.comp_id} - ${company.comp_name}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    // Create company object
-    const companyData = {
-      comp_name: nomEntreprise,
-      comp_siret: siret,
-      comp_addre: adresseEntreprise,
-      comp_posta: codePostalEntreprise,
-      comp_city: cityCompany
-    };
+    // Création de la liaison utilisateur-entreprise
+    try {
+      userCompany = await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
+      consoleLog(`Liaison user-company créé : \t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la relation utilisateur-entreprise : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    const company = await Company.create(companyData);
+    // Attribution de l'abonnement à l'utilisateur
+    try {
+      subscription = await getSubscriptionByName(plan);
+      await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
+      consoleLog(`Abonnement ajouté : \t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'attribution de l\'abonnement à l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    // Create user-company relationship
-    await UserCompany.create({
-      user_id: user.id,
-      comp_id: company.id
-    });
+    // Création de la liaison abonnement-utilisateur
+    try {
+      currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
+      consoleLog(`Liaison user-currentSub créé : \t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la liaison abonnement-utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    // Create subscription object
-    const subscriptionData = {
-      subs_name: plan,
-      // Include other fields related to subscriptions if needed
-    };
+    // Création de la facture
+    try {
+      const invoiceData = {
+        invo_userid: user.user_id,
+        invo_compid: company.comp_id,
+        invo_subsid: subscription.subs_id,
+        invo_cursid: currentSub.curs_id,
+        invo_tva: 20
+      };
+      const invoice = await createInvoice(invoiceData);
+      consoleLog(`Facture créée : \t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
 
-    const subscription = await Subscription.create(subscriptionData);
+    // Si tout est réussi, renvoyer une réponse de succès
+    consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+    return res.status(201).json({ message: 'Utilisateur créé avec succès', user });
 
-    // Create current subscription for the user
-    await CurrentSub.create({
-      curs_userid: user.id,
-      curs_subsid: subscription.id,
-      curs_start: new Date(), // Set appropriate start date
-      curs_end: null // Set end date if available
-    });
-
-    res.status(201).json({ user, company, subscription });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    consoleLog('Erreur FATAL lors de la création de l\'utilisateur : ' + error.message, 'red');
+    consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+    return res.status(500).json({ error: error.message });
   }
 };
 
+// FAIRE UNE GESTION DE TOKEN DANS UN COOKIE
+const loginUser = async (req, res) => {
+  consoleLog('• [START] controllers/controllerUser/loginUser', 'cyan');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    consoleLog('Erreur de validation aucune données à traiter', 'red');
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { password, email } = req.body;
+
+    let user;
+    let hashedPassword;
+
+    // Récupération de l'utilisateur
+    try {
+      user = await User.findOne({ where: { user_email: email } });
+      consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la récupération de l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Vérification du mot de passe
+    try {
+      hashedPassword = await bcrypt.compare(password, user.user_passw);
+      consoleLog('Mot de passe vérifié avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la vérification du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Envoi du mail de connexion
+    try {
+      await connexionMail(user, req.ip);
+      consoleLog('Mail de connexion envoyé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'envoi du mail de connexion', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Envoyer le token de connexion
+
+
+    consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
+    return res.status(200).json({ message: 'Utilisateur connecté avec succès', user });
+
+  } catch (error) {
+    consoleLog('Erreur FATAL lors de la connexion de l\'utilisateur : ' + error.message, 'red');
+    consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+
+/*******************************************************/
 
 
 const validateUserEmail = async (req, res) => {
@@ -128,8 +252,8 @@ const validateUser = async (req, res) => {
 
     if (user) {
       // utilisation de bcrypt pour comparer les mots de passe qui sont hashés
-      // const isValid = await bcrypt.compare(user_passw, user.user_passw);
-      const isValid = user_passw === user.user_passw;
+      const isValid = await bcrypt.compare(user_passw, user.user_passw);
+      // const isValid = user_passw === user.user_passw;
       if (isValid) {
         consoleLog(`Utilisateur valide: \t${user_email}`, 'green');
         consoleLog(`Mot de passe valide: \t${user_passw}`, 'green');
@@ -158,7 +282,9 @@ const validateUser = async (req, res) => {
 
 module.exports = {
   getAllUsers,
+  getUserByMail,
   createUser,
+  loginUser,
   validateUserEmail,
   validateUser
 };
