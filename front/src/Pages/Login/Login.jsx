@@ -42,6 +42,11 @@ export default function Login() {
   /****************************************/
   //    Gestion des différents forms      //
   /****************************************/
+  const newUser = () => {
+    navigate('/register');
+  };
+
+
 
   const nextCase = () => {
     if (currentCase < nbCases) {
@@ -106,13 +111,22 @@ export default function Login() {
                 placeholder="••••••••••••"
               />
             </div>
-            <div className="flex items-center justify-between">
-              <button
+            <div className='mb-6'>
+            <button
                 onClick={forgetPassword}
                 className={`text-blue-500 text-sm font-bold mb-2 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'}`}
                 type="button"
               >
                 Mot de passe oublié ?
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={newUser}
+                className={`text-blue-500 text-sm font-bold mb-2 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'}`}
+                type="button"
+              >
+                Créer un compte
               </button>
               <button disabled={loading} onClick={handleCheckLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Continuer'}
