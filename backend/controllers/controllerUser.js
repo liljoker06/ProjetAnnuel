@@ -7,10 +7,10 @@ const consoleLog = require('../consoleLog');
 
 const { createCompany } = require('./controllerCompany');
 const { createUserCompany } = require('./controllerUserCompany');
-const { getSubscriptionByName } = require('./controllerSubscription');
+const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
-const { connexionMail } = require('./controllerMailCode');
+const { connexionMail, welcomeMail } = require('./controllerMailCode');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -85,7 +85,7 @@ const createUser = async (req, res) => {
     // Création de l'utilisateur
     try {
       user = await User.create(userData);
-      consoleLog(`Utilisateur créé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+      consoleLog(`Utilisateur créé : \t\t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -95,7 +95,7 @@ const createUser = async (req, res) => {
     // Création de l'entreprise
     try {
       company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
-      consoleLog(`Entreprise créée : \t\t${company.comp_id} - ${company.comp_name}`, 'green');
+      consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -105,7 +105,7 @@ const createUser = async (req, res) => {
     // Création de la liaison utilisateur-entreprise
     try {
       userCompany = await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
-      consoleLog(`Liaison user-company créé : \t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
+      consoleLog(`Liaison user-company créé : \t\t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la relation utilisateur-entreprise : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -116,7 +116,7 @@ const createUser = async (req, res) => {
     try {
       subscription = await getSubscriptionByName(plan);
       await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
-      consoleLog(`Abonnement ajouté : \t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
+      consoleLog(`Abonnement ajouté : \t\t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de l\'attribution de l\'abonnement à l\'utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -126,7 +126,7 @@ const createUser = async (req, res) => {
     // Création de la liaison abonnement-utilisateur
     try {
       currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
-      consoleLog(`Liaison user-currentSub créé : \t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
+      consoleLog(`Liaison user-currentSub créé : \t\t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la liaison abonnement-utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -143,10 +143,19 @@ const createUser = async (req, res) => {
         invo_tva: 20
       };
       const invoice = await createInvoice(invoiceData);
-      consoleLog(`Facture créée : \t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
+      consoleLog(`Facture créée : \t\t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Envoi du mail de bienvenue
+    try {
+      await welcomeMail(user, subscription);
+      consoleLog('Mail de bienvenue envoyé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
       return res.status(500).json({ error: error.message });
     }
 
