@@ -1,5 +1,6 @@
 const { User } = require('../database/database');
 
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
@@ -7,9 +8,13 @@ const consoleLog = require('../consoleLog');
 
 const { createCompany } = require('./controllerCompany');
 const { createUserCompany } = require('./controllerUserCompany');
-const { getSubscriptionByName } = require('./controllerSubscription');
+const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
+const { connexionMail, welcomeMail } = require('./controllerMailCode');
+
+
+
 
 
 const getAllUsers = async (req, res) => {
@@ -20,6 +25,16 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getUserByMail = async (email) => {
+  try {
+      const user = await User.findOne({ where: { user_email: email } });
+      return user;
+  } catch (error) {
+      throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
+  }
+};
+
 
 const createUser = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
@@ -75,7 +90,7 @@ const createUser = async (req, res) => {
     // Création de l'utilisateur
     try {
       user = await User.create(userData);
-      consoleLog(`Utilisateur créé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+      consoleLog(`Utilisateur créé : \t\t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -85,7 +100,7 @@ const createUser = async (req, res) => {
     // Création de l'entreprise
     try {
       company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
-      consoleLog(`Entreprise créée : \t\t${company.comp_id} - ${company.comp_name}`, 'green');
+      consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -95,7 +110,7 @@ const createUser = async (req, res) => {
     // Création de la liaison utilisateur-entreprise
     try {
       userCompany = await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
-      consoleLog(`Liaison user-company créé : \t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
+      consoleLog(`Liaison user-company créé : \t\t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la relation utilisateur-entreprise : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -106,7 +121,7 @@ const createUser = async (req, res) => {
     try {
       subscription = await getSubscriptionByName(plan);
       await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
-      consoleLog(`Abonnement ajouté : \t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
+      consoleLog(`Abonnement ajouté : \t\t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de l\'attribution de l\'abonnement à l\'utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -116,7 +131,7 @@ const createUser = async (req, res) => {
     // Création de la liaison abonnement-utilisateur
     try {
       currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
-      consoleLog(`Liaison user-currentSub créé : \t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
+      consoleLog(`Liaison user-currentSub créé : \t\t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la liaison abonnement-utilisateur : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
@@ -133,10 +148,19 @@ const createUser = async (req, res) => {
         invo_tva: 20
       };
       const invoice = await createInvoice(invoiceData);
-      consoleLog(`Facture créée : \t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
+      consoleLog(`Facture créée : \t\t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Envoi du mail de bienvenue
+    try {
+      await welcomeMail(user, subscription);
+      consoleLog('Mail de bienvenue envoyé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
       return res.status(500).json({ error: error.message });
     }
 
@@ -153,7 +177,7 @@ const createUser = async (req, res) => {
 
 // FAIRE UNE GESTION DE TOKEN DANS UN COOKIE
 const loginUser = async (req, res) => {
-  consoleLog('• [START] controllers/controllerUser/conectUser', 'cyan');
+  consoleLog('• [START] controllers/controllerUser/loginUser', 'cyan');
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     consoleLog('Erreur de validation aucune données à traiter', 'red');
@@ -169,31 +193,67 @@ const loginUser = async (req, res) => {
     // Récupération de l'utilisateur
     try {
       user = await User.findOne({ where: { user_email: email } });
+      if (!user) {
+        consoleLog('Utilisateur non trouvé', 'red');
+        return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      }
       consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la récupération de l\'utilisateur : ' + error.message, 'red');
-      consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+      consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
       return res.status(500).json({ error: error.message });
     }
 
     // Vérification du mot de passe
     try {
-      hashedPassword = await bcrypt.compare(password, user.user_passw);
+      const isPasswordValid = await bcrypt.compare(password, user.user_passw);
+      if (!isPasswordValid) {
+        consoleLog('Mot de passe incorrect', 'red');
+        return res.status(401).json({ message: 'Mot de passe incorrect' });
+      }
       consoleLog('Mot de passe vérifié avec succès', 'green');
     } catch (error) {
       consoleLog('Erreur lors de la vérification du mot de passe', 'red');
       return res.status(500).json({ error: error.message });
     }
 
-    consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
-    return res.status(200).json({ message: 'Utilisateur connecté avec succès', user });
+
+    // Génération du jeton JWT
+    const token = jwt.sign(
+      { userId: user.user_id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' } 
+    );
+
+    // Définir le cookie avec le jeton JWT
+    res.cookie('token', token, {
+      httpOnly: true, 
+      //secure: true, //Utilisez true en production pour envoyer le cookie uniquement via HTTPS
+      sameSite: 'strict', // Aide à prévenir les attaques CSRF
+      maxAge: 3600000 // Durée de vie du cookie (1 heure en millisecondes)
+    });
+    // Envoi du mail de connexion
+    try {
+      await connexionMail(user, req.ip);
+      consoleLog('Mail de connexion envoyé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de l\'envoi du mail de connexion', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Envoyer le token de connexion
+
+
+ consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    return res.status(200).json({ message: 'Utilisateur connecté avec succès', success: true, token });
+
 
   } catch (error) {
     consoleLog('Erreur FATAL lors de la connexion de l\'utilisateur : ' + error.message, 'red');
-    consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 
 /*******************************************************/
@@ -260,6 +320,7 @@ const validateUser = async (req, res) => {
 
 module.exports = {
   getAllUsers,
+  getUserByMail,
   createUser,
   loginUser,
   validateUserEmail,

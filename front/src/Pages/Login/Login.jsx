@@ -8,6 +8,7 @@ import consoleLog from '../../Functions/Dev/consoleLog';
 import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
 import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
 
+// import { loginUser } from '../../Functions/CallApi/CallLogin';
 import { validateUser, loginUser } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
@@ -56,6 +57,11 @@ export default function Login() {
   /****************************************/
   //    Gestion des différents forms      //
   /****************************************/
+  const newUser = () => {
+    navigate('/register');
+  };
+
+
 
   const nextCase = () => {
     if (currentCase < nbCases) {
@@ -99,12 +105,6 @@ export default function Login() {
             <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
             <div className="mb-4">
-              <NavLink
-                to="/register"
-                className={`text-blue-500 text-sm font-bold mb-5 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'} flex justify-center items-center`}
-              >
-                Vous n'avez pas de compte ?
-              </NavLink>
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-5" htmlFor="email">
                 Adresse e-mail
               </label>
@@ -130,13 +130,22 @@ export default function Login() {
                 <p className="text-red-500 text-xs italic">Attention : la touche majuscule est activée !</p>
               )}
             </div>
-            <div className="flex items-center justify-between">
+            <div className='mb-6'>
               <button
                 onClick={forgetPassword}
                 className={`text-blue-500 text-sm font-bold mb-2 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'}`}
                 type="button"
               >
                 Mot de passe oublié ?
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={newUser}
+                className={`text-blue-500 text-sm font-bold mb-2 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'}`}
+                type="button"
+              >
+                Créer un compte
               </button>
               <button disabled={loading} onClick={handleCheckLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Continuer'}
@@ -415,23 +424,15 @@ export default function Login() {
   };
 
   const handleCheckCodeMail = async () => {
-    try {
-      await checkCodeMail({
-        setLoading,
-        setErrors,
-        getFullCode,
-        validateMailCode,
-        email,
-        nextCase
-      });
-      await loginUser({
-        email,
-        password
-      });
-    }
-    catch (error) {
-      console.log(error);
-    }
+    checkCodeMail({
+      setLoading,
+      setErrors,
+      getFullCode,
+      validateMailCode,
+      email,
+      password,
+      loginUser
+    });
   };
 
   const handleCheckEmailPasswordForget = () => {

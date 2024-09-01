@@ -25,7 +25,8 @@ const createCompany = async (req, res, internal = false) => {
         comp_siret,
         comp_addre,
         comp_posta,
-        comp_city
+        comp_city,
+        comp_code : Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')
       };
 
       company = await Company.create(companyData);
