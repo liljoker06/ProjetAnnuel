@@ -430,7 +430,9 @@ export default function Login() {
         getFullCode,
         validateMailCode,
         email,
-        nextCase
+        password,
+        loginUser,
+        navigate
       });
       await loginUser({
         email,
