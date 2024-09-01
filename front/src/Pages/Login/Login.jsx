@@ -8,6 +8,7 @@ import consoleLog from '../../Functions/Dev/consoleLog';
 import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
 import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
 
+// import { loginUser } from '../../Functions/CallApi/CallLogin';
 import { validateUser, loginUser } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
@@ -130,7 +131,7 @@ export default function Login() {
               )}
             </div>
             <div className='mb-6'>
-            <button
+              <button
                 onClick={forgetPassword}
                 className={`text-blue-500 text-sm font-bold mb-2 ${isButtonDisabled ? 'text-gray-500' : 'text-blue-500'}`}
                 type="button"
@@ -423,25 +424,15 @@ export default function Login() {
   };
 
   const handleCheckCodeMail = async () => {
-    try {
-      await checkCodeMail({
-        setLoading,
-        setErrors,
-        getFullCode,
-        validateMailCode,
-        email,
-        password,
-        loginUser,
-        navigate
-      });
-      await loginUser({
-        email,
-        password
-      });
-    }
-    catch (error) {
-      console.log(error);
-    }
+    checkCodeMail({
+      setLoading,
+      setErrors,
+      getFullCode,
+      validateMailCode,
+      email,
+      password,
+      loginUser
+    });
   };
 
   const handleCheckEmailPasswordForget = () => {

@@ -18,3 +18,21 @@ body {
 .transition-main {
     transition: all 0.5s;
 }
+
+/* scroll bar blue */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e90ff;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #1e90ff;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}

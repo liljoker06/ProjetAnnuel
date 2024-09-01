@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// connexion de l'utilisateur
+
 
 export const loginUser = async (data) => {
     try {
@@ -13,6 +13,7 @@ export const loginUser = async (data) => {
         return { error: error.response ? error.response.data : error.message };
     }
 };
+
 
 // check si l'email existe
 export const validateUserEmail = async (data) => {

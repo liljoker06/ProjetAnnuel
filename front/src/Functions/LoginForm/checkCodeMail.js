@@ -8,7 +8,9 @@ export const checkCodeMail = async ({
     validateMailCode,
     email,
     password,
+
     navigate,
+
     loginUser,
 }) => {
     setLoading(true);
@@ -27,6 +29,7 @@ export const checkCodeMail = async ({
 
         if (response.success) {
             consoleLog('Code valide.', 'green');
+
 
             const loginResponse = await loginUser({ email, password});
 
@@ -52,6 +55,7 @@ export const checkCodeMail = async ({
         setLoading(false); // Termine le chargement
         consoleLog('Verification terminée.', 'cyan');
         if (newErrors.codeMail) consoleLog('Erreurs: ' + newErrors.codeMail, 'red');
+        consoleLog('• [END] checkCodeMail', 'white');
     }
 
 };
