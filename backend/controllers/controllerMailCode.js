@@ -396,11 +396,66 @@ const welcomeMail = async (user, subscription) => {
     }
 }
 
+const welcomeMail2 = async (user, subscription) => {
+    try {
+        const mailContent = `
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Bienvenue à Vitruve Cloud</title>
+            <style>
+                ${mailStyle}
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    <h1>Vitruve Cloud<br>Bienvenue ${user.user_fname} ${user.user_lname}</h1>
+                </div>
+                <div class="email-body">
+                <a href="https://vitruvecloud.fr"><img src="https://i.imgur.com/VcWX3qk.png" alt="Vitruve Cloud" style="display: block; margin: 0 auto; width: 100px;"></a>
+                    <p>Bienvenue ${user.user_fname} ${user.user_lname},</p>
+                    <p>Nous sommes ravis de vous accueillir sur Vitruve Cloud.</p>
+                    <p>Vous pouvez dès à présent profiter de nos services en vous connectant à votre compte.</p>
+                    <h2><a href="https://vitruvecloud.fr" class="verification-code">Se connecter</a></h2>
+                    <p>Votre facture sera disponible dans votre espace client.</p>
+                    <table>
+                        <tr>
+                            <th>Abonnement de votre entreprise</th>
+                            <td>${subscription.subs_name}</td>
+                        </tr>
+                        <tr>
+                            <th>Votre stockage alloué</th>
+                            <td>${subscription.subs_stora} Go</td>
+                        </tr>
+                    </table>
+                    <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter notre équipe de support.</p>
+                </div>
+                <div class="email-footer">
+                <a href="https://vitruvecloud.fr" style="color: #007BFF; text-decoration: none;">Vitruve Cloud</a>
+                    <p>&copy; 2024 VitruveCloud. Tous droits réservés.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        // Attendre que le mail soit envoyé
+        await sendMail(user.user_email, mailContent, 'Bienvenue à Vitruve Cloud');
+    }
+    catch (error) {
+        consoleLog(`Erreur lors de l'envoi du mail de bienvenue : ${error}`, 'red');
+    }
+}
+
 
 module.exports = {
     generateMailCode,
     validateMailCode,
     resendMailCode,
     connexionMail,
-    welcomeMail
+    welcomeMail,
+    welcomeMail2
 };

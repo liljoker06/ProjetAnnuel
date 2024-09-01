@@ -687,7 +687,7 @@ export default function Register() {
                 Retour
               </button>
               {estEntrepriseExistante ? (
-                <button onClick={nextStep} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                <button onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                   Rejoindre
                 </button>
               ) : (
@@ -960,12 +960,13 @@ export default function Register() {
       adresse,
       codePostal,
       ville,
-      nomEntreprise,
-      siret,
-      adresseEntreprise,
-      codePostalEntreprise,
-      cityCompany,
-      plan,
+      nomEntreprise : nomEntreprise || null,
+      siret: siret || null,
+      adresseEntreprise: adresseEntreprise || null,
+      codePostalEntreprise: codePostalEntreprise || null,
+      cityCompany: cityCompany || null,
+      plan: plan || null,
+      codeEntreprise: codeCompany || null,
       // numCard,
       // nameCard,
       // dateCard,

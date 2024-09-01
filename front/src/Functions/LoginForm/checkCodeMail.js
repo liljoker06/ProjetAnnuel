@@ -8,9 +8,7 @@ export const checkCodeMail = async ({
     validateMailCode,
     email,
     password,
-
     navigate,
-
     loginUser,
 }) => {
     setLoading(true);
@@ -37,7 +35,6 @@ export const checkCodeMail = async ({
 
             if (loginResponse.success) {
                 consoleLog('Connexion réussie.', 'green');
-                // Rediriger vers la page de connexion
                 navigate('/dashboard');
             }else {
                 setErrors(loginResponse.errors || { general: 'Erreur de connexion.' });
