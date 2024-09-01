@@ -8,8 +8,8 @@ import consoleLog from '../../Functions/Dev/consoleLog';
 import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
 import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
 
-// import { loginUser } from '../../Functions/CallApi/CallLogin';
-import { validateUser, loginUser } from '../../Functions/CallApi/CallUser';
+import { loginUser } from '../../Functions/CallApi/CallLogin';
+import { validateUser } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Login() {
