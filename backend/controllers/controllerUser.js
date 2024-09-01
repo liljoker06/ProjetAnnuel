@@ -7,11 +7,11 @@ const { validationResult } = require('express-validator');
 const consoleLog = require('../consoleLog');
 
 const { createCompany } = require('./controllerCompany');
-const { createUserCompany } = require('./controllerUserCompany');
+const { createUserCompany, getCompanyByCode } = require('./controllerUserCompany');
 const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
-const { connexionMail, welcomeMail } = require('./controllerMailCode');
+const { connexionMail, welcomeMail, welcomeMail2 } = require('./controllerMailCode');
 
 
 
@@ -28,10 +28,10 @@ const getAllUsers = async (req, res) => {
 
 const getUserByMail = async (email) => {
   try {
-      const user = await User.findOne({ where: { user_email: email } });
-      return user;
+    const user = await User.findOne({ where: { user_email: email } });
+    return user;
   } catch (error) {
-      throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
+    throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
   }
 };
 
@@ -45,7 +45,24 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { password, nom, prenom, email, phone, birth, adresse, codePostal, ville, nomEntreprise, siret, adresseEntreprise, codePostalEntreprise, cityCompany, plan } = req.body;
+    const { password, nom, prenom, email, phone, birth, adresse, codePostal, ville, nomEntreprise = null, siret = null, adresseEntreprise = null, codePostalEntreprise = null, cityCompany = null, plan = null, codeEntreprise = null } = req.body;
+
+    consoleLog('affichage des données', 'cyan');
+    consoleLog('Nom: ' + nom, 'cyan');
+    consoleLog('Prénom: ' + prenom, 'cyan');
+    consoleLog('Email: ' + email, 'cyan');
+    consoleLog('Téléphone: ' + phone, 'cyan');
+    consoleLog('Date de naissance: ' + birth, 'cyan');
+    consoleLog('Adresse: ' + adresse, 'cyan');
+    consoleLog('Code postal: ' + codePostal, 'cyan');
+    consoleLog('Ville: ' + ville, 'cyan');
+    consoleLog('Nom de l\'entreprise: ' + nomEntreprise, 'cyan');
+    consoleLog('Siret: ' + siret, 'cyan');
+    consoleLog('Adresse de l\'entreprise: ' + adresseEntreprise, 'cyan');
+    consoleLog('Code postal de l\'entreprise: ' + codePostalEntreprise, 'cyan');
+    consoleLog('Ville de l\'entreprise: ' + cityCompany, 'cyan');
+    consoleLog('Plan: ' + plan, 'cyan');
+    consoleLog('Code de l\'entreprise: ' + codeEntreprise, 'cyan');
 
     let hashedPassword;
     let formattedBirth;
@@ -54,6 +71,7 @@ const createUser = async (req, res) => {
     let userCompany;
     let subscription;
     let currentSub;
+    let companySub;
 
     // Hashage du mot de passe
     try {
@@ -87,24 +105,62 @@ const createUser = async (req, res) => {
       user_date: formattedBirth,
     };
 
+    consoleLog('Données utilisateur avant création : ' + JSON.stringify(userData), 'cyan');
+
     // Création de l'utilisateur
     try {
       user = await User.create(userData);
       consoleLog(`Utilisateur créé : \t\t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'utilisateur : ' + error.message, 'red');
+      if (error.errors) {
+        error.errors.forEach(err => {
+          consoleLog(`Validation error: ${err.message}`, 'red');
+        });
+      }
       consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
       return res.status(500).json({ error: error.message });
     }
 
-    // Création de l'entreprise
-    try {
-      company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany } }, res, true);
-      consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
-    } catch (error) {
-      consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
-      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
-      return res.status(500).json({ error: error.message });
+    // Création/Liaison de l'entreprise
+    if (codeEntreprise) {
+
+      try {
+        try {
+          company = await getCompanyByCode(codeEntreprise);
+          consoleLog(`Entreprise trouvée : \t\t\t${company.comp_id} - ${company.comp_name} - (Code: ${company.comp_code})`, 'green');
+        } catch (error) {
+          consoleLog('Erreur lors de la récupération de l\'entreprise : ' + error.message, 'red');
+          consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+          return res.status(500).json({ error: error.message });
+        }
+        try {
+          companySub = await getSubscriptionById(company.comp_subsid);
+          consoleLog(`Abonnement trouvé : \t\t\t${companySub.subs_id} - ${companySub.subs_name}`, 'green');
+        } catch (error) {
+          consoleLog('Erreur lors de la récupération de l\'abonnement de l\'entreprise : ' + error.message, 'red');
+          consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+          return res.status(500).json({ error: error.message });
+        }
+
+      } catch (error) {
+        consoleLog('Erreur lors de la récupération de l\'entreprise ou de son abonnement : ' + error.message, 'red');
+        consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+        return res.status(500).json({ error: error.message });
+      }
+
+    } else {
+
+      try {
+        subscription = await getSubscriptionByName(plan);
+        company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany, comp_subsid: subscription.subs_id } }, res, true);
+        consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
+      } catch (error) {
+        consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
+        consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+        return res.status(500).json({ error: error.message });
+      }
+
     }
 
     // Création de la liaison utilisateur-entreprise
@@ -119,7 +175,9 @@ const createUser = async (req, res) => {
 
     // Attribution de l'abonnement à l'utilisateur
     try {
-      subscription = await getSubscriptionByName(plan);
+      if (companySub) {
+        subscription = companySub;
+      }
       await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
       consoleLog(`Abonnement ajouté : \t\t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
     } catch (error) {
@@ -138,30 +196,43 @@ const createUser = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    // Création de la facture
-    try {
-      const invoiceData = {
-        invo_userid: user.user_id,
-        invo_compid: company.comp_id,
-        invo_subsid: subscription.subs_id,
-        invo_cursid: currentSub.curs_id,
-        invo_tva: 20
-      };
-      const invoice = await createInvoice(invoiceData);
-      consoleLog(`Facture créée : \t\t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
-    } catch (error) {
-      consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
-      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
-      return res.status(500).json({ error: error.message });
-    }
+    // Création de la facture et/ou envoi du mail de bienvenue
+    if (!codeEntreprise) {
+      // Création de la facture
+      try {
+        const invoiceData = {
+          invo_userid: user.user_id,
+          invo_compid: company.comp_id,
+          invo_subsid: subscription.subs_id,
+          invo_cursid: currentSub.curs_id,
+          invo_tva: 20
+        };
+        const invoice = await createInvoice(invoiceData);
+        consoleLog(`Facture créée : \t\t\t${invoice.invo_id} - ${subscription.subs_name} - ${user.user_email}`, 'green');
+      } catch (error) {
+        consoleLog('Erreur lors de la création de la facture : ' + error.message, 'red');
+        consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+        return res.status(500).json({ error: error.message });
+      }
 
-    // Envoi du mail de bienvenue
-    try {
-      await welcomeMail(user, subscription);
-      consoleLog('Mail de bienvenue envoyé avec succès', 'green');
-    } catch (error) {
-      consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
-      return res.status(500).json({ error: error.message });
+      // Envoi du mail de bienvenue
+      try {
+        await welcomeMail(user, subscription);
+        consoleLog('Mail de bienvenue envoyé avec succès', 'green');
+      } catch (error) {
+        consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
+        return res.status(500).json({ error: error.message });
+      }
+
+    } else {
+      // Envoi du mail de bienvenue2
+      try {
+        await welcomeMail2(user, subscription);
+        consoleLog('Mail de bienvenue2 envoyé avec succès', 'green');
+      } catch (error) {
+        consoleLog('Erreur lors de l\'envoi du mail de bienvenue2', 'red');
+        return res.status(500).json({ error: error.message });
+      }
     }
 
     // Si tout est réussi, renvoyer une réponse de succès
@@ -220,14 +291,14 @@ const loginUser = async (req, res) => {
 
     // Génération du jeton JWT
     const token = jwt.sign(
-      { userId: user.user_id }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' } 
+      { userId: user.user_id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
     );
 
     // Définir le cookie avec le jeton JWT
     res.cookie('token', token, {
-      httpOnly: true, 
+      httpOnly: true,
       //secure: true, //Utilisez true en production pour envoyer le cookie uniquement via HTTPS
       sameSite: 'strict', // Aide à prévenir les attaques CSRF
       maxAge: 3600000 // Durée de vie du cookie (1 heure en millisecondes)
@@ -244,7 +315,7 @@ const loginUser = async (req, res) => {
     // Envoyer le token de connexion
 
 
- consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
     return res.status(200).json({ message: 'Utilisateur connecté avec succès', success: true, token });
 
 
