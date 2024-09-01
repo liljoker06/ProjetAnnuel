@@ -431,6 +431,7 @@ export default function Login() {
       validateMailCode,
       email,
       password,
+      navigate,
       loginUser
     });
   };
