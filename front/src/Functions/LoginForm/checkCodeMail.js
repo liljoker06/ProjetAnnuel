@@ -1,3 +1,4 @@
+
 import consoleLog from '../Dev/consoleLog';
 
 export const checkCodeMail = async ({
@@ -7,6 +8,9 @@ export const checkCodeMail = async ({
     validateMailCode,
     email,
     password,
+
+    navigate,
+
     loginUser,
 }) => {
     setLoading(true);
@@ -26,15 +30,19 @@ export const checkCodeMail = async ({
         if (response.success) {
             consoleLog('Code valide.', 'green');
 
-            // Connexion de l'utilisateur
-            const loginResponse = await loginUser({ email, password });
+
+            const loginResponse = await loginUser({ email, password});
+
+            console.log('Réponse du serveur:', loginResponse);
 
             if (loginResponse.success) {
                 consoleLog('Connexion réussie.', 'green');
-            } else {
-                newErrors.codeMail = loginResponse.error || 'Erreur lors de la connexion.';
-                consoleLog('Erreur lors de la connexion: ' + newErrors.codeMail, 'red');
+                // Rediriger vers la page de connexion
+                navigate('/dashboard');
+            }else {
+                setErrors(loginResponse.errors || { general: 'Erreur de connexion.' });
             }
+
         } else {
             newErrors.codeMail = response.data.error || 'Code invalide.';
             consoleLog('Code invalide.', 'red');

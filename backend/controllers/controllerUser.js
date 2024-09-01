@@ -1,5 +1,6 @@
 const { User } = require('../database/database');
 
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
@@ -11,6 +12,10 @@ const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubs
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
 const { connexionMail, welcomeMail } = require('./controllerMailCode');
+
+
+
+
 
 const getAllUsers = async (req, res) => {
   try {
@@ -188,6 +193,10 @@ const loginUser = async (req, res) => {
     // Récupération de l'utilisateur
     try {
       user = await User.findOne({ where: { user_email: email } });
+      if (!user) {
+        consoleLog('Utilisateur non trouvé', 'red');
+        return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      }
       consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la récupération de l\'utilisateur : ' + error.message, 'red');
@@ -197,13 +206,32 @@ const loginUser = async (req, res) => {
 
     // Vérification du mot de passe
     try {
-      hashedPassword = await bcrypt.compare(password, user.user_passw);
+      const isPasswordValid = await bcrypt.compare(password, user.user_passw);
+      if (!isPasswordValid) {
+        consoleLog('Mot de passe incorrect', 'red');
+        return res.status(401).json({ message: 'Mot de passe incorrect' });
+      }
       consoleLog('Mot de passe vérifié avec succès', 'green');
     } catch (error) {
       consoleLog('Erreur lors de la vérification du mot de passe', 'red');
       return res.status(500).json({ error: error.message });
     }
 
+
+    // Génération du jeton JWT
+    const token = jwt.sign(
+      { userId: user.user_id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' } 
+    );
+
+    // Définir le cookie avec le jeton JWT
+    res.cookie('token', token, {
+      httpOnly: true, 
+      //secure: true, //Utilisez true en production pour envoyer le cookie uniquement via HTTPS
+      sameSite: 'strict', // Aide à prévenir les attaques CSRF
+      maxAge: 3600000 // Durée de vie du cookie (1 heure en millisecondes)
+    });
     // Envoi du mail de connexion
     try {
       await connexionMail(user, req.ip);
@@ -216,15 +244,16 @@ const loginUser = async (req, res) => {
     // Envoyer le token de connexion
 
 
-    consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
-    return res.status(200).json({ message: 'Utilisateur connecté avec succès', user });
+ consoleLog('• [END] controllers/controllerUser/conectUser', 'cyan');
+    return res.status(200).json({ message: 'Utilisateur connecté avec succès', success: true, token });
+
 
   } catch (error) {
     consoleLog('Erreur FATAL lors de la connexion de l\'utilisateur : ' + error.message, 'red');
     consoleLog('• [END] controllers/controllerUser/loginUser', 'cyan');
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 
 /*******************************************************/
