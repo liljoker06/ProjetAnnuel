@@ -1,12 +1,25 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
 import Setting from '@mui/icons-material/Settings';
 import Account from '@mui/icons-material/AccountCircle';
+import Logout from '@mui/icons-material/Logout';
+
+import Cookies from 'js-cookie';
 
 export default function Drivebar() {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+
+        // Déconnexion
+        Cookies.remove('token', { path: '/' });
+
+        navigate('/');
+    }
+
     return (
         <aside className="w-64 bg-white p-6 shadow">
             <div className="mb-8 flex flex-col items-center">
@@ -40,7 +53,12 @@ export default function Drivebar() {
                             <span className="ml-2">Mon Compte</span>
                         </Link>
                     </li>
-                    
+                    <li className="mb-4">
+                        <button onClick={handleLogout} className="flex items-center text-gray-700 hover:text-black">
+                            <Logout/>
+                            <span className="ml-2">Déconnexion</span>
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </aside>

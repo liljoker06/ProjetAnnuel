@@ -429,6 +429,7 @@ export default function Login() {
       setErrors,
       getFullCode,
       validateMailCode,
+      navigate,
       email,
       password,
       loginUser
