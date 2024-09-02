@@ -9,16 +9,6 @@ const getAllUserCompanies = async (req, res) => {
   }
 };
 
-const getCompanyByCode = async (codeEntreprise) => {
-  try {
-    const company = await Company.findOne({ where: { comp_code: codeEntreprise } });
-    return company;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
-
 const createUserCompany = async (req, res, internal = false) => {
   try {
     const { user_id, comp_id } = req.body;
@@ -54,6 +44,5 @@ const createUserCompany = async (req, res, internal = false) => {
 
 module.exports = {
   getAllUserCompanies,
-  getCompanyByCode,
   createUserCompany,
 };

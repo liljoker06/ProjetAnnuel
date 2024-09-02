@@ -1,5 +1,17 @@
 import axios from "axios";
 
+
+// get company by code 
+export const getCompanyByCode = async (data) => {
+    try {
+        const response = await axios.post('http://localhost:5555/api/companies/getByCode', data);
+
+        return response.data;
+    } catch (error) {
+        return false;
+    }
+}
+
 // check si l'entreprise existe
 export const validateCompany = async (data) => {
     try {

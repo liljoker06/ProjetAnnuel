@@ -6,8 +6,8 @@ const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
 const consoleLog = require('../consoleLog');
 
-const { createCompany } = require('./controllerCompany');
-const { createUserCompany, getCompanyByCode } = require('./controllerUserCompany');
+const { createCompany, getCompanyByCode } = require('./controllerCompany');
+const { createUserCompany } = require('./controllerUserCompany');
 const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
@@ -127,8 +127,8 @@ const createUser = async (req, res) => {
 
       try {
         try {
-          company = await getCompanyByCode(codeEntreprise);
-          consoleLog(`Entreprise trouvée : \t\t\t${company.comp_id} - ${company.comp_name} - (Code: ${company.comp_code})`, 'green');
+        company = await getCompanyByCode({ codeEntreprise: values.codeCompany }, true);
+        consoleLog(`Entreprise trouvée : \t\t\t${company.comp_id} - ${company.comp_name} - (Code: ${company.comp_code})`, 'green');
         } catch (error) {
           consoleLog('Erreur lors de la récupération de l\'entreprise : ' + error.message, 'red');
           consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');

@@ -7,6 +7,12 @@ export const checkCodeEntreprise = async ({
     setErrors,
     setCodeCompany,
     validateCompanyCode,
+    getCompanyByCode,
+    setCodeExistCompanyName,
+    setCodeExistCompanySiret,
+    setCodeExistCompanyAdresse,
+    setCodeExistCompanyCodePostal,
+    setCodeExistCompanyCity,
     skipStep
 }) => {
     setLoading(true);
@@ -47,6 +53,25 @@ export const checkCodeEntreprise = async ({
             }
         } catch (error) {
             newErrors.codeCompany = 'Erreur lors de la validation du code de l\'entreprise.';
+        }
+    }
+
+    if (Object.keys(newErrors).length === 0) {
+        try {
+            const company = await getCompanyByCode({ codeEntreprise: values.codeCompany });
+            console.log("companie:", company)
+            if (company) {
+                setCodeExistCompanyName(company.comp_name);
+                setCodeExistCompanySiret(company.comp_siret);
+                setCodeExistCompanyAdresse(company.comp_adresse);
+                setCodeExistCompanyCodePostal(company.comp_code_postal);
+                setCodeExistCompanyCity(company.comp_city);
+                consoleLog('Entreprise trouvée.', 'green');
+            } else {
+                newErrors.codeCompany = 'Code de l\'entreprise invalide.';
+            }
+        } catch (error) {
+            newErrors.codeCompany = 'Erreur lors de la recherche de l\'entreprise.';
         }
     }
 

@@ -11,6 +11,31 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
+const getCompanyByCode = async (req, res, internal = false) => {
+  try {
+    const codeEntreprise = internal ? req.codeEntreprise : req.params.codeEntreprise || req.body.codeEntreprise;
+    const company = await Company.findOne({ where: { comp_code: codeEntreprise } });
+
+    if (!internal) {
+      if (company) {
+        res.status(200).json(company);
+      } else {
+        res.status(404).json({ message: "Company not found" });
+      }
+    } else {
+      return company;
+    }
+  } catch (error) {
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
+
+
 const createCompany = async (req, res, internal = false) => {
   try {
     const { comp_name, comp_siret, comp_addre, comp_posta, comp_city, comp_subsid=null } = req.body;
@@ -116,6 +141,7 @@ const validateCompanyCode = async (req, res) => {
 
 module.exports = {
   getAllCompanies,
+  getCompanyByCode,
   createCompany,
   validateCompany,
   validateCompanyCode,
