@@ -18,15 +18,14 @@ module.exports = (sequelize, DataTypes) => {
     user_city: DataTypes.STRING,
     user_phone: {
       type: DataTypes.STRING,
-      unique: true,
     },
-    user_role: 
+    user_role:
     {
-      type : DataTypes.ENUM('client', 'admin'),
+      type: DataTypes.ENUM('client', 'admin'),
       defaultValue: 'client',
     },
     user_date: DataTypes.DATEONLY,
-    user_valid: 
+    user_valid:
     {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -40,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
 
-  User.associate = function(models) {
+  User.associate = function (models) {
     User.belongsTo(models.Subscription, { foreignKey: 'user_subid' });
     User.hasMany(models.Logs, { foreignKey: 'logs_userid' });
     User.hasMany(models.UserCompany, { foreignKey: 'user_id' });

@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Subscription.associate = function(models) {
     Subscription.hasMany(models.User, { foreignKey: 'user_subid' });
     Subscription.hasMany(models.CurrentSub, { foreignKey: 'curs_subsid' });
+    Subscription.hasMany(models.Company, { foreignKey: 'comp_subsid' });
   };
 
   return Subscription;

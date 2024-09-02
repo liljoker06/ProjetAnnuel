@@ -18,7 +18,10 @@ const adminRoute = require('./routes/adminRoute/adminRoute');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL, //l'URL  front-end
+    credentials: true // Permet l'envoi et la réception des cookies
+}));
 app.use(express.json());
 
 app.use('/api/companies', companyRoute);
@@ -58,7 +61,7 @@ const insertForDev = async () => {
         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
     ];
     const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'lahrimialadin06@gmail.com', user_passw: 'test', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+        { user_fname: 'test', user_lname: 'test', user_email: 'lahrimialadin06@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
     ];
 
     for (const company of defaultCompanies) {

@@ -13,7 +13,7 @@ const getAllCompanies = async (req, res) => {
 
 const createCompany = async (req, res, internal = false) => {
   try {
-    const { comp_name, comp_siret, comp_addre, comp_posta, comp_city } = req.body;
+    const { comp_name, comp_siret, comp_addre, comp_posta, comp_city, comp_subsid=null } = req.body;
 
     // Check if the company already exists by SIRET
     let company = await Company.findOne({ where: { comp_siret } });
@@ -25,7 +25,9 @@ const createCompany = async (req, res, internal = false) => {
         comp_siret,
         comp_addre,
         comp_posta,
-        comp_city
+        comp_city,
+        comp_code : Math.floor(Math.random() * 10000000000).toString().padStart(10, '0'),
+        comp_subsid,
       };
 
       company = await Company.create(companyData);

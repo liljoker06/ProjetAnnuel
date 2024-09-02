@@ -9,6 +9,25 @@ const getAllSubscriptions = async (req, res) => {
   }
 };
 
+const getSubscriptionById = async (subs_id) => {
+  try {
+    if (!subs_id) {
+      throw new Error('ID d\'abonnement requis');
+    }
+
+    const subscription = await Subscription.findByPk(subs_id);
+
+    if (subscription) {
+      return subscription;
+    } else {
+      throw new Error('Abonnement pas trouvé');
+    }
+  } catch (error) {
+    console.error('Error lors de la recherche d\'abonnement :', error);
+    throw error;
+  }
+};
+
 const getSubscriptionByName = async (subs_name) => {
   try {
     if (!subs_name) {
@@ -48,6 +67,7 @@ const createSubscription = async (req, res, internal = false) => {
 
 module.exports = {
   getAllSubscriptions,
+  getSubscriptionById,
   createSubscription,
   getSubscriptionByName,
 };
