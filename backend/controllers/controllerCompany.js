@@ -11,6 +11,42 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
+const getCompanyByCode = async (req, res, internal = false) => {
+  try {
+    consoleLog(`req.params: ${JSON.stringify(req.params)}`, 'blue');
+    consoleLog(`req.body: ${JSON.stringify(req.body)}`, 'blue');
+    consoleLog(`req.codeEntreprise: ${req.codeEntreprise}`, 'blue');
+
+    const codeEntreprise = internal ? req.codeEntreprise : req.params.codeEntreprise || req.body.codeEntreprise;
+    consoleLog(`Code de l'entreprise: \t${codeEntreprise}`, 'green');
+
+    if (!codeEntreprise) {
+      throw new Error("Le code de l'entreprise est manquant.");
+    }
+
+    const company = await Company.findOne({ where: { comp_code: codeEntreprise } });
+
+    if (!internal) {
+      if (company) {
+        res.status(200).json(company);
+      } else {
+        res.status(404).json({ message: "Company not found" });
+      }
+    } else {
+      return company;
+    }
+  } catch (error) {
+    console.error(`Erreur dans getCompanyByCode: ${error.message}`);
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
+
+
 const createCompany = async (req, res, internal = false) => {
   try {
     const { comp_name, comp_siret, comp_addre, comp_posta, comp_city, comp_subsid=null } = req.body;
@@ -93,10 +129,14 @@ const validateCompany = async (req, res) => {
 
 const validateCompanyCode = async (req, res) => {
   consoleLog(`• [START] controllers/controllerCompany/validateCompanyCode`, 'cyan');
+
+  const codeEntreprise = req.body.comp_code;
+
+  consoleLog(`Code de l'entreprise: \t${codeEntreprise}`, 'green');
   try {
     const company = await Company.findOne({
       where: {
-        comp_code: req.body.comp_code,
+        comp_code: codeEntreprise,
       },
     });
 
@@ -116,6 +156,7 @@ const validateCompanyCode = async (req, res) => {
 
 module.exports = {
   getAllCompanies,
+  getCompanyByCode,
   createCompany,
   validateCompany,
   validateCompanyCode,

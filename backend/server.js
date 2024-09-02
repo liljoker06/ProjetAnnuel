@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { Op } = require('sequelize');
 const { sequelize, Company, Subscription, User, UserCompany, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
 
 const companyRoute = require('./routes/companyRoute');
