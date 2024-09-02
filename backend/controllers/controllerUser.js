@@ -217,7 +217,7 @@ const createUser = async (req, res) => {
 
       // Envoi du mail de bienvenue
       try {
-        await welcomeMail(user, subscription);
+        await welcomeMail(user, subscription, company);
         consoleLog('Mail de bienvenue envoyé avec succès', 'green');
       } catch (error) {
         consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
@@ -227,7 +227,7 @@ const createUser = async (req, res) => {
     } else {
       // Envoi du mail de bienvenue2
       try {
-        await welcomeMail2(user, subscription);
+        await welcomeMail2(user, subscription, company);
         consoleLog('Mail de bienvenue2 envoyé avec succès', 'green');
       } catch (error) {
         consoleLog('Erreur lors de l\'envoi du mail de bienvenue2', 'red');
