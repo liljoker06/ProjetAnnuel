@@ -4,10 +4,11 @@ import axios from "axios";
 // get company by code 
 export const getCompanyByCode = async (data) => {
     try {
+        console.log('Données envoyées à l\'API:', data);
         const response = await axios.post('http://localhost:5555/api/companies/getByCode', data);
-
         return response.data;
     } catch (error) {
+        console.error('Erreur lors de l\'appel API:', error);
         return false;
     }
 }

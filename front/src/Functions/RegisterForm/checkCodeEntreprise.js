@@ -46,32 +46,28 @@ export const checkCodeEntreprise = async ({
 
     if (Object.keys(newErrors).length === 0) {
         try {
+            consoleLog(`Validation du code de l'entreprise: ${values.codeCompany}`, 'cyan');
             const isValid = await validateCompanyCode({ comp_code: values.codeCompany });
             consoleLog(`Code de l'entreprise: ${values.codeCompany}`, 'cyan');
             if (!isValid) {
                 newErrors.codeCompany = 'Code de l\'entreprise invalide.';
-            }
-        } catch (error) {
-            newErrors.codeCompany = 'Erreur lors de la validation du code de l\'entreprise.';
-        }
-    }
-
-    if (Object.keys(newErrors).length === 0) {
-        try {
-            const company = await getCompanyByCode({ codeEntreprise: values.codeCompany });
-            console.log("companie:", company)
-            if (company) {
-                setCodeExistCompanyName(company.comp_name);
-                setCodeExistCompanySiret(company.comp_siret);
-                setCodeExistCompanyAdresse(company.comp_adresse);
-                setCodeExistCompanyCodePostal(company.comp_code_postal);
-                setCodeExistCompanyCity(company.comp_city);
-                consoleLog('Entreprise trouvée.', 'green');
             } else {
-                newErrors.codeCompany = 'Code de l\'entreprise invalide.';
+                consoleLog(`Recherche de l'entreprise avec le code: ${values.codeCompany}`, 'cyan');
+                const company = await getCompanyByCode({ codeEntreprise: values.codeCompany });
+                console.log("companie:", company);
+                if (company) {
+                    setCodeExistCompanyName(company.comp_name);
+                    setCodeExistCompanySiret(company.comp_siret);
+                    setCodeExistCompanyAdresse(company.comp_adresse);
+                    setCodeExistCompanyCodePostal(company.comp_code_postal);
+                    setCodeExistCompanyCity(company.comp_city);
+                    consoleLog('Entreprise trouvée.', 'green');
+                } else {
+                    newErrors.codeCompany = 'Code de l\'entreprise invalide.';
+                }
             }
         } catch (error) {
-            newErrors.codeCompany = 'Erreur lors de la recherche de l\'entreprise.';
+            newErrors.codeCompany = 'Erreur lors de la validation ou de la recherche de l\'entreprise.';
         }
     }
 
