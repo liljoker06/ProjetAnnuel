@@ -14,7 +14,14 @@ const { createInvoice } = require('./controllerInvoice');
 const { connexionMail, welcomeMail, welcomeMail2 } = require('./controllerMailCode');
 
 
-
+const createToken = (user) => {
+  const token = jwt.sign(
+      { userId: user.user_id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+  );
+  return token;
+};
 
 
 const getAllUsers = async (req, res) => {
@@ -298,10 +305,10 @@ const loginUser = async (req, res) => {
 
     // Définir le cookie avec le jeton JWT
     res.cookie('token', token, {
-      httpOnly: true,
-      //secure: true, //Utilisez true en production pour envoyer le cookie uniquement via HTTPS
-      sameSite: 'strict', // Aide à prévenir les attaques CSRF
-      maxAge: 3600000 // Durée de vie du cookie (1 heure en millisecondes)
+      // httpOnly: true,    // Empêche l'accès au cookie via JavaScript
+      // secure: true,      //Utilisez true en production pour envoyer le cookie uniquement via HTTPS
+      sameSite: 'strict',   // Aide à prévenir les attaques CSRF
+      maxAge: 3600000       // Durée de vie du cookie (1 heure en millisecondes)
     });
     // Envoi du mail de connexion
     try {
