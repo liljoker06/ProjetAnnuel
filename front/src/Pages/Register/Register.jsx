@@ -277,7 +277,7 @@ export default function Register() {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cp">
                   Code postal
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cp" type="text" placeholder="00000" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cp" type="text" placeholder="00000" onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 5); }}/>
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="city">
@@ -406,7 +406,7 @@ export default function Register() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="codeCompany">
                       Code de l'entreprise
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 10)} />
+                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000"   onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 10); }}  />
                   </div>
                 </>
               ) : (
@@ -443,7 +443,7 @@ export default function Register() {
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cpCompany">
                         Code Postale
                       </label>
-                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 5)} />
+                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 5); }} />
                     </div>
                     <div className="flex-1">
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cityCompany">
