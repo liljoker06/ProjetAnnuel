@@ -38,6 +38,7 @@ const getUserByMail = async (email) => {
 
 const createUser = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
+  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     consoleLog('Erreur de validation aucune données à traiter', 'red');
@@ -45,23 +46,27 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { password, nom, prenom, email, phone, birth, adresse, codePostal, ville, nomEntreprise = null, siret = null, adresseEntreprise = null, codePostalEntreprise = null, cityCompany = null, plan = null, codeEntreprise = null } = req.body;
+    const { 
+      password, 
+      nom, 
+      prenom, 
+      email, 
+      phone, 
+      birth, 
+      adresse, 
+      codePostal, 
+      ville, 
+      nomEntreprise = null, 
+      siret = null, 
+      adresseEntreprise = null, 
+      codePostalEntreprise = null, 
+      cityCompany = null, 
+      plan = null, 
+      codeEntreprise = null 
+    } = req.body;
 
-    consoleLog('affichage des données', 'cyan');
-    consoleLog('Nom: ' + nom, 'cyan');
-    consoleLog('Prénom: ' + prenom, 'cyan');
-    consoleLog('Email: ' + email, 'cyan');
-    consoleLog('Téléphone: ' + phone, 'cyan');
-    consoleLog('Date de naissance: ' + birth, 'cyan');
-    consoleLog('Adresse: ' + adresse, 'cyan');
-    consoleLog('Code postal: ' + codePostal, 'cyan');
-    consoleLog('Ville: ' + ville, 'cyan');
-    consoleLog('Nom de l\'entreprise: ' + nomEntreprise, 'cyan');
-    consoleLog('Siret: ' + siret, 'cyan');
-    consoleLog('Adresse de l\'entreprise: ' + adresseEntreprise, 'cyan');
-    consoleLog('Code postal de l\'entreprise: ' + codePostalEntreprise, 'cyan');
-    consoleLog('Ville de l\'entreprise: ' + cityCompany, 'cyan');
-    consoleLog('Plan: ' + plan, 'cyan');
+    // Debug: Afficher les données reçues
+    consoleLog('Données reçues:', 'cyan');
     consoleLog('Code de l\'entreprise: ' + codeEntreprise, 'cyan');
 
     let hashedPassword;
@@ -109,6 +114,7 @@ const createUser = async (req, res) => {
 
     // Création de l'utilisateur
     try {
+      consoleLog('Tentative de création de l\'utilisateur...', 'cyan');
       user = await User.create(userData);
       consoleLog(`Utilisateur créé : \t\t\t${user.user_id} - ${user.user_email}`, 'green');
     } catch (error) {
@@ -124,17 +130,13 @@ const createUser = async (req, res) => {
 
     // Création/Liaison de l'entreprise
     if (codeEntreprise) {
-
       try {
-        try {
-        company = await getCompanyByCode({ codeEntreprise: values.codeCompany }, true);
+        consoleLog('Tentative de récupération de l\'entreprise avec code...', 'cyan');
+        company = await getCompanyByCode({ codeEntreprise }, true);
         consoleLog(`Entreprise trouvée : \t\t\t${company.comp_id} - ${company.comp_name} - (Code: ${company.comp_code})`, 'green');
-        } catch (error) {
-          consoleLog('Erreur lors de la récupération de l\'entreprise : ' + error.message, 'red');
-          consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
-          return res.status(500).json({ error: error.message });
-        }
+        
         try {
+          consoleLog('Tentative de récupération de l\'abonnement de l\'entreprise...', 'cyan');
           companySub = await getSubscriptionById(company.comp_subsid);
           consoleLog(`Abonnement trouvé : \t\t\t${companySub.subs_id} - ${companySub.subs_name}`, 'green');
         } catch (error) {
@@ -142,29 +144,36 @@ const createUser = async (req, res) => {
           consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
           return res.status(500).json({ error: error.message });
         }
-
       } catch (error) {
-        consoleLog('Erreur lors de la récupération de l\'entreprise ou de son abonnement : ' + error.message, 'red');
+        consoleLog('Erreur lors de la récupération de l\'entreprise : ' + error.message, 'red');
         consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
         return res.status(500).json({ error: error.message });
       }
-
     } else {
-
       try {
+        consoleLog('Tentative de création de l\'entreprise...', 'cyan');
         subscription = await getSubscriptionByName(plan);
-        company = await createCompany({ body: { comp_name: nomEntreprise, comp_siret: siret, comp_addre: adresseEntreprise, comp_posta: codePostalEntreprise, comp_city: cityCompany, comp_subsid: subscription.subs_id } }, res, true);
+        company = await createCompany({
+          body: { 
+            comp_name: nomEntreprise, 
+            comp_siret: siret, 
+            comp_addre: adresseEntreprise, 
+            comp_posta: codePostalEntreprise, 
+            comp_city: cityCompany, 
+            comp_subsid: subscription.subs_id 
+          } 
+        }, res, true);
         consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
       } catch (error) {
         consoleLog('Erreur lors de la création de l\'entreprise : ' + error.message, 'red');
         consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
         return res.status(500).json({ error: error.message });
       }
-
     }
 
     // Création de la liaison utilisateur-entreprise
     try {
+      consoleLog('Tentative de création de la liaison utilisateur-entreprise...', 'cyan');
       userCompany = await createUserCompany({ body: { user_id: user.user_id, comp_id: company.comp_id } }, res, true);
       consoleLog(`Liaison user-company créé : \t\t${user.user_email} + ${company.comp_name} = ID(${userCompany.id})`, 'green');
     } catch (error) {
@@ -178,6 +187,7 @@ const createUser = async (req, res) => {
       if (companySub) {
         subscription = companySub;
       }
+      consoleLog('Tentative d\'attribution de l\'abonnement à l\'utilisateur...', 'cyan');
       await User.update({ user_subid: subscription.subs_id }, { where: { user_id: user.user_id } });
       consoleLog(`Abonnement ajouté : \t\t\t${user.user_email} -> ${subscription.subs_name}(ID : ${subscription.subs_id})`, 'green');
     } catch (error) {
@@ -188,6 +198,7 @@ const createUser = async (req, res) => {
 
     // Création de la liaison abonnement-utilisateur
     try {
+      consoleLog('Tentative de création de la liaison abonnement-utilisateur...', 'cyan');
       currentSub = await createCurrentSub({ body: { curs_userid: user.user_id, curs_subsid: subscription.subs_id } }, res, true);
       consoleLog(`Liaison user-currentSub créé : \t\t${user.user_email} + ${subscription.subs_name} = ID(${currentSub.curs_id})`, 'green');
     } catch (error) {
@@ -200,6 +211,7 @@ const createUser = async (req, res) => {
     if (!codeEntreprise) {
       // Création de la facture
       try {
+        consoleLog('Tentative de création de la facture...', 'cyan');
         const invoiceData = {
           invo_userid: user.user_id,
           invo_compid: company.comp_id,
@@ -217,16 +229,17 @@ const createUser = async (req, res) => {
 
       // Envoi du mail de bienvenue
       try {
+        consoleLog('Tentative d\'envoi du mail de bienvenue...', 'cyan');
         await welcomeMail(user, subscription, company);
         consoleLog('Mail de bienvenue envoyé avec succès', 'green');
       } catch (error) {
         consoleLog('Erreur lors de l\'envoi du mail de bienvenue', 'red');
         return res.status(500).json({ error: error.message });
       }
-
     } else {
-      // Envoi du mail de bienvenue2
+      // Envoi du mail de bienvenue spécifique
       try {
+        consoleLog('Tentative d\'envoi du mail de bienvenue2...', 'cyan');
         await welcomeMail2(user, subscription, company);
         consoleLog('Mail de bienvenue2 envoyé avec succès', 'green');
       } catch (error) {
@@ -245,6 +258,8 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+
 
 // FAIRE UNE GESTION DE TOKEN DANS UN COOKIE
 const loginUser = async (req, res) => {
