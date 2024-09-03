@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { checkApiStatus, checkServerStatus } from '../../Functions/CallApi/CallPing';
 
 export default function Dashboard_status() {
   const [apiStatus, setApiStatus] = useState([
-    { name: 'API 1', status: 'Unknown' },
-    { name: 'API 2', status: 'Unknown' },
-    { name: 'API 3', status: 'Unknown' },
+    { name: 'API 1', status: 'Unknown', url: 'https://api1.example.com/ping' },
+    { name: 'API 2', status: 'Unknown', url: 'https://api2.example.com/ping' },
+    { name: 'API 3', status: 'Unknown', url: 'https://api3.example.com/ping' },
   ]);
 
   const [serverStatus, setServerStatus] = useState([
-    { name: 'Cloud', status: 'Unknown' },
-    { name: 'Mail', status: 'Unknown' },
-    { name: 'BDD', status: 'Unknown' },
+    { name: 'Cloud', status: 'Unknown', url: 'https://vitruvecloud.fr' },
+    { name: 'Mail', status: 'Unknown', url: 'https://mail.vitruvecloud.fr' },
+    { name: 'BDD', status: 'Unknown', url: 'https://vitruvecloud.fr:3306' },
   ]);
 
   const getStatusClass = (status) => {
@@ -26,6 +26,20 @@ export default function Dashboard_status() {
         return 'text-gray-500';
     }
   };
+
+  const checkStatus = async () => {
+    const updatedApiStatus = await checkApiStatus(apiStatus);
+    const updatedServerStatus = await checkServerStatus(serverStatus);
+
+    setApiStatus(updatedApiStatus);
+    setServerStatus(updatedServerStatus);
+  };
+
+  useEffect(() => {
+    checkStatus();
+    const interval = setInterval(checkStatus, 99999990000); // Vérifie toutes les 60 secondes
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-white p-6 shadow rounded-lg">
