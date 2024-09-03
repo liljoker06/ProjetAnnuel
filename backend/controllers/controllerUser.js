@@ -6,23 +6,12 @@ const { parse, format } = require('date-fns');
 const { validationResult } = require('express-validator');
 const consoleLog = require('../consoleLog');
 
-const { createCompany, getCompanyByCode } = require('./controllerCompany');
-const { createUserCompany } = require('./controllerUserCompany');
+const { createCompany, getCompanyByCode, getCompanyById } = require('./controllerCompany');
+const { createUserCompany, getUserCompanyByUser } = require('./controllerUserCompany');
 const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubscription');
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
 const { connexionMail, welcomeMail, welcomeMail2 } = require('./controllerMailCode');
-
-
-const createToken = (user) => {
-  const token = jwt.sign(
-      { userId: user.user_id },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-  );
-  return token;
-};
-
 
 const getAllUsers = async (req, res) => {
   try {
@@ -39,6 +28,113 @@ const getUserByMail = async (email) => {
     return user;
   } catch (error) {
     throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
+  }
+};
+
+// pas fini
+const getUserInfoByToken = async (req, res) => {
+  consoleLog('• [START] controllers/controllerUser/getUserInfoByToken', 'cyan');
+
+  let user;
+  let company;
+  let subscription;
+  let userCompany;
+  let userStorage;
+  let userFiles;
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      consoleLog('Aucun en-tête d\'autorisation trouvé', 'red');
+      return res.status(401).json({ message: 'Aucun en-tête d\'autorisation trouvé' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Vérification de la présence du token
+    if (!token) {
+      consoleLog('Aucun token trouvé', 'red');
+      consoleLog('• [END] controllers/controllerUser/getUserInfoByToken', 'cyan');
+      return res.status(401).json({ message: 'Aucun token trouvé' });
+    }
+
+    // Vérification du token
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    consoleLog(`Token reçu : ` + JSON.stringify(decodedToken), 'green');
+    const userId = decodedToken.userId;
+    const exp = decodedToken.exp;
+
+    // Vérification de l'expiration du token
+    if (Date.now() >= exp * 1000) {
+      consoleLog('Token expiré', 'red');
+      return res.status(401).json({ message: 'Token expiré' });
+    }
+    consoleLog('Token valide', 'green');
+
+
+    // Récupération de l'utilisateur
+    user = await User.findByPk(userId);
+    if (!user) {
+      consoleLog(`Utilisateur non trouvé : \t\t${userId}`, 'red');
+      consoleLog('• [END] controllers/controllerUser/getUserInfoByToken', 'cyan');
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+    consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+
+    // trouver l'entreprise de l'utilisateur
+    userCompany = await getUserCompanyByUser(user.user_id, null, true);
+    if (!userCompany) {
+      consoleLog('L\'utilisateur n\'a pas d\'entreprise', 'red');
+      consoleLog('• [END] controllers/controllerUser/getUserInfoByToken', 'cyan');
+      return res.status(404).json({ message: 'L\'utilisateur n\'a pas d\'entreprise' });
+    } else {
+      // trouver l'entreprise
+      consoleLog(`Liaison user-company trouvée : \t${userCompany.id}`, 'green');
+      company = await getCompanyById(userCompany.comp_id, null, true);
+      if (!company) {
+        consoleLog(`Entreprise non trouvée : \t${userCompany.comp_id}`, 'red');
+        consoleLog('• [END] controllers/controllerUser/getUserInfoByToken', 'cyan');
+        return res.status(404).json({ message: 'Entreprise non trouvée' });
+      }
+      consoleLog(`Entreprise trouvée : \t\t${company.comp_id} - ${company.comp_name}`, 'green');
+    }
+
+    // Récupération de l'abonnement de l'utilisateur
+    subscription = await getSubscriptionById(user.user_subid);
+    if (!subscription) {
+      consoleLog('Abonnement non trouvé', 'red');
+      consoleLog('• [END] controllers/controllerUser/getUserInfoByToken', 'cyan');
+      return res.status(404).json({ message: 'Abonnement non trouvé' });
+    }
+    consoleLog(`Abonnement trouvé : \t\t${subscription.subs_id} - ${subscription.subs_name}`, 'green');
+
+    // récupération de son espace de stockage
+
+    // récupération de ses fichiers
+
+    // récupération de son historique d'activité
+
+    // formatage des données pour l'envoi
+    const userInfo = {
+      user_id: user.user_id,
+      user_fname: user.user_fname,
+      user_lname: user.user_lname,
+      user_email: user.user_email,
+      user_company: company.comp_name,
+      user_subscription: subscription.subs_name,
+      user_storageTotal: subscription.subs_stora,
+      user_storageUsed: 5,    // à modifier pour récupérer l'espace utilisé
+      user_files: 0,          // à modifier pour récupérer le nombre de fichiers
+    };
+
+    consoleLog(`Informations à envoyer : \t${JSON.stringify(userInfo)}`, 'green');
+
+
+    consoleLog('• [END] controllers/controllerUser/getUserInfo', 'cyan');
+    return res.status(200).json({ userInfo });
+  } catch (error) {
+    consoleLog(`Erreur lors de la récupération des informations de l'utilisateur: ${error.message}`, 'red');
+    return res.status(500).json({ message: 'Erreur interne du serveur' });
   }
 };
 
@@ -295,7 +391,6 @@ const loginUser = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-
     // Génération du jeton JWT
     const token = jwt.sign(
       { userId: user.user_id },
@@ -399,6 +494,7 @@ const validateUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserByMail,
+  getUserInfoByToken,
   createUser,
   loginUser,
   validateUserEmail,
