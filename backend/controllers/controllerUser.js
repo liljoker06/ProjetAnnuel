@@ -130,6 +130,7 @@ const createUser = async (req, res) => {
 
     // Création/Liaison de l'entreprise
     if (codeEntreprise) {
+      consoleLog('Code de l\'entreprise test : ' + codeEntreprise, 'cyan');
       try {
         consoleLog('Tentative de récupération de l\'entreprise avec code...', 'cyan');
         company = await getCompanyByCode({ codeEntreprise }, true);

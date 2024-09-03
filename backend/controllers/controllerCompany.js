@@ -11,14 +11,19 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
-const getCompanyByCode = async (req, res, internal = false) => {
+const getCompanyByCode = async (req, res, next) => {
   try {
     consoleLog(`req.params: ${JSON.stringify(req.params)}`, 'blue');
     consoleLog(`req.body: ${JSON.stringify(req.body)}`, 'blue');
     consoleLog(`req.codeEntreprise: ${req.codeEntreprise}`, 'blue');
+    consoleLog(`internal: ${typeof next === 'function' ? 'false' : 'true'}`, 'blue');
 
-    const codeEntreprise = internal ? req.codeEntreprise : req.params.codeEntreprise || req.body.codeEntreprise;
-    consoleLog(`Code de l'entreprise: \t${codeEntreprise}`, 'green');
+    // Déterminer si c'est un appel interne ou non
+    const internal = typeof next !== 'function';
+
+    // Obtenir correctement codeEntreprise en fonction du contexte
+    const codeEntreprise = internal ? req.codeEntreprise : (req.params.codeEntreprise || req.body.codeEntreprise);
+    consoleLog(`Code de l'entreprise (déterminé): \t${codeEntreprise}`, 'green');
 
     if (!codeEntreprise) {
       throw new Error("Le code de l'entreprise est manquant.");
@@ -37,13 +42,14 @@ const getCompanyByCode = async (req, res, internal = false) => {
     }
   } catch (error) {
     console.error(`Erreur dans getCompanyByCode: ${error.message}`);
-    if (!internal) {
+    if (typeof next === 'function') {
       res.status(500).json({ error: error.message });
     } else {
       throw new Error(error.message);
     }
   }
 };
+
 
 
 
