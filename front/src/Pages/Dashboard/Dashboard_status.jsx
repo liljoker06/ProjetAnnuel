@@ -35,11 +35,18 @@ export default function Dashboard_status() {
     setServerStatus(updatedServerStatus);
   };
 
-  useEffect(() => {
-    checkStatus();
-    const interval = setInterval(checkStatus, 99999990000); // Vérifie toutes les 60 secondes
-    return () => clearInterval(interval);
-  }, []);
+  // décommenter pour faire les ping (rester une sec avant de commencer)
+  // pour ne pas bouffer toutes les requêtes
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     checkStatus();
+  //     const interval = setInterval(checkStatus, 60000); // Vérifie toutes les 60 secondes
+  //     return () => clearInterval(interval);
+  //   }, 1000); // Attendre 1 seconde avant de commencer les pings
+
+  //   return () => clearTimeout(timeoutId);
+  // }, []);
+
 
   return (
     <div className="bg-white p-6 shadow rounded-lg">
