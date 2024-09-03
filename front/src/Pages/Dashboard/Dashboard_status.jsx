@@ -11,7 +11,7 @@ export default function Dashboard_status() {
   const [serverStatus, setServerStatus] = useState([
     { name: 'Cloud', status: 'Unknown', url: 'https://vitruvecloud.fr' },
     { name: 'Mail', status: 'Unknown', url: 'https://mail.vitruvecloud.fr' },
-    { name: 'BDD', status: 'Unknown', url: 'https://vitruvecloud.fr:3306' },
+    { name: 'BDD', status: 'Unknown', url: 'http://185.229.202.179:3306' },
   ]);
 
   const getStatusClass = (status) => {

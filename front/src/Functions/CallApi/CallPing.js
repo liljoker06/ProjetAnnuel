@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const SITE_RELIC_API_URL = '/ping';
-// const API_KEY = 'd8f897cf-84a1-405c-b891-e370ef1028af'; 
+// const API_KEY = 'd8f897cf-84a1-405c-b891-e370ef1028af'; //J'ai bouffé toutes les requêtes (100max/mois)
 const API_KEY = 'xxx';
 
 const pingServer = async (url) => {
@@ -48,7 +48,7 @@ export const checkApiStatus = async (apiStatus) => {
   for (const api of apiStatus) {
     const result = await pingServer(api.url);
     checkStatus.push({ ...api, status: result.status, details: result.details });
-    await delay(5); // Délai de 1 seconde
+    await delay(1000); // Délai de 1 seconde
   }
   return checkStatus;
 };
@@ -58,7 +58,7 @@ export const checkServerStatus = async (serverStatus) => {
   for (const server of serverStatus) {
     const result = await pingServer(server.url);
     checkStatus.push({ ...server, status: result.status, details: result.details });
-    await delay(5); // Délai de 1 seconde
+    await delay(1000); // Délai de 1 seconde
   }
   return checkStatus;
 };
