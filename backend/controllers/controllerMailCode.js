@@ -33,7 +33,7 @@ const fetchIpData = async (ip) => {
             return null;
         }
     } catch (error) {
-        consoleLog(`\tErreur lors de la récupération des informations de l'IP : ${error}`, 'red');
+        consoleLog(`Erreur lors de la récupération des informations de l'IP : ${error}`, 'red');
         return null;
     }
 };
@@ -323,7 +323,6 @@ const connexionMail = async (user, ip = null) => {
 
             // Attendre que le mail soit envoyé
             await sendMail(user.user_email, mailContent, 'Connexion à Vitruve Cloud');
-            consoleLog('\t• [END] controllers/controllerMailCode/connectionMail', 'cyan');
         } catch (error) {
             consoleLog(`Erreur lors de l'envoi du mail de connexion : ${error}`, 'red');
         }

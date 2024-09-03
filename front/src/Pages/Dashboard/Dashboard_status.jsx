@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { checkApiStatus, checkServerStatus } from '../../Functions/CallApi/CallPing';
 
 export default function Dashboard_status() {
   const [apiStatus, setApiStatus] = useState([
-    { name: 'API 1', status: 'Unknown' },
-    { name: 'API 2', status: 'Unknown' },
-    { name: 'API 3', status: 'Unknown' },
+    { name: 'API User', status: 'Unknown', url: 'https://vitruvecloud.fr/api/users' },
+    { name: 'API Company', status: 'Unknown', url: 'https://vitruvecloud.fr/api/companies' },
+    { name: 'API File', status: 'Unknown', url: 'https://vitruvecloud.fr/api/file' },
   ]);
 
   const [serverStatus, setServerStatus] = useState([
-    { name: 'Cloud', status: 'Unknown' },
-    { name: 'Mail', status: 'Unknown' },
-    { name: 'BDD', status: 'Unknown' },
+    { name: 'Cloud', status: 'Unknown', url: 'https://vitruvecloud.fr' },
+    { name: 'Mail', status: 'Unknown', url: 'https://mail.vitruvecloud.fr' },
+    { name: 'BDD', status: 'Unknown', url: 'http://185.229.202.179:3306' },
   ]);
 
   const getStatusClass = (status) => {
@@ -26,6 +26,27 @@ export default function Dashboard_status() {
         return 'text-gray-500';
     }
   };
+
+  const checkStatus = async () => {
+    const updatedApiStatus = await checkApiStatus(apiStatus);
+    const updatedServerStatus = await checkServerStatus(serverStatus);
+
+    setApiStatus(updatedApiStatus);
+    setServerStatus(updatedServerStatus);
+  };
+
+  // décommenter pour faire les ping (rester une sec avant de commencer)
+  // pour ne pas bouffer toutes les requêtes
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     checkStatus();
+  //     const interval = setInterval(checkStatus, 60000); // Vérifie toutes les 60 secondes
+  //     return () => clearInterval(interval);
+  //   }, 1000); // Attendre 1 seconde avant de commencer les pings
+
+  //   return () => clearTimeout(timeoutId);
+  // }, []);
+
 
   return (
     <div className="bg-white p-6 shadow rounded-lg">
