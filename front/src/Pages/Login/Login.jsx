@@ -61,8 +61,6 @@ export default function Login() {
     navigate('/register');
   };
 
-
-
   const nextCase = () => {
     if (currentCase < nbCases) {
       setCurrentCase(currentCase + 1);
@@ -216,7 +214,7 @@ export default function Login() {
               <button onClick={() => skipCase(CASE_LOGIN)} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
               </button>
             </div>
