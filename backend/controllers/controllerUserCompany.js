@@ -9,6 +9,29 @@ const getAllUserCompanies = async (req, res) => {
   }
 };
 
+const getUserCompanyByUser = async (req, res, internal = false) => {
+  try {
+    const user_id = internal ? req : req.params.user_id;
+    const userCompany = await UserCompany.findOne({ where: { user_id } });
+
+    if (!internal) {
+      if (userCompany) {
+        res.status(200).json(userCompany);
+      } else {
+        res.status(404).json({ message: "User company not found" });
+      }
+    } else {
+      return userCompany;
+    }
+  } catch (error) {
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
 const createUserCompany = async (req, res, internal = false) => {
   try {
     const { user_id, comp_id } = req.body;
@@ -44,5 +67,6 @@ const createUserCompany = async (req, res, internal = false) => {
 
 module.exports = {
   getAllUserCompanies,
+  getUserCompanyByUser,
   createUserCompany,
 };
