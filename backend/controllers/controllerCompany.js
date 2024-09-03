@@ -11,6 +11,31 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
+const getCompanyById = async (req, res, internal = false) => {
+  try {
+    const id = internal ? req : req.params.id;
+    const company = await Company.findByPk(id);
+
+    consoleLog(`Company ID reçu: \t\t${JSON.stringify(company)}`, 'green');
+
+    if (!internal) {
+      if (company) {
+        res.status(200).json(company);
+      } else {
+        res.status(404).json({ message: "Company not found" });
+      }
+    } else {
+      return company;
+    }
+  } catch (error) {
+    if (!internal) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
 const getCompanyByCode = async (req, res, internal = false) => {
   try {
     consoleLog(`req.params: ${JSON.stringify(req.params)}`, 'blue');
@@ -156,6 +181,7 @@ const validateCompanyCode = async (req, res) => {
 
 module.exports = {
   getAllCompanies,
+  getCompanyById,
   getCompanyByCode,
   createCompany,
   validateCompany,
