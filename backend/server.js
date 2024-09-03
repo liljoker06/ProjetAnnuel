@@ -43,7 +43,7 @@ const insertDefaultSubscriptions = async () => {
     const defaultSubscriptions = [
         { subs_name: 'Basique', subs_stora: 2, subs_price: 9, subs_nbuser: 10 },
         { subs_name: 'Pro', subs_stora: 20, subs_price: 49, subs_nbuser: 100 },
-        { subs_name: 'Business', subs_stora: 999, subs_price: 19.99, subs_nbuser: 999 },
+        { subs_name: 'Business', subs_stora: 1000, subs_price: 99, subs_nbuser: 1000 },
     ];
 
     for (const subscription of defaultSubscriptions) {
@@ -60,7 +60,7 @@ const insertForDev = async () => {
         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
     ];
     const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'lahrimialadin06@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+        { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
     ];
 
     for (const company of defaultCompanies) {
@@ -88,7 +88,7 @@ app.listen(PORT, async () => {
         console.log('Database connection has been established successfully.');
 
         // reset la base de données à chaque démarrage avec force: true
-        await sequelize.sync({ alter: true, force: true });
+        await sequelize.sync({ alter: true });
 
         // await Company.sync({ alter: true, force: true });
         // await Subscription.sync({ alter: true, force: true });

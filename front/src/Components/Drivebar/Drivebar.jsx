@@ -11,15 +11,11 @@ import Cookies from 'js-cookie';
 
 export default function Drivebar() {
     const navigate = useNavigate();
-
+    
     const handleLogout = () => {
-
-        // Déconnexion
-        Cookies.remove('token', { path: '/' });
-
+        Cookies.remove('token');
         navigate('/');
-    }
-
+    };
     return (
         <aside className="w-64 bg-white p-6 shadow">
             <div className="mb-8 flex flex-col items-center">
