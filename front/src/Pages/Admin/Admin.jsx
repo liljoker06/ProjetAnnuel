@@ -17,7 +17,8 @@ const Admin = () => {
     }, []);
 
     const deleteUser = (userId) => {
-        axios.delete(`http://localhost:5555/api/users/${userId}`)
+        console.log(`Tentative de suppression de l'utilisateur avec l'ID: ${userId}`);
+        axios.delete(`http://localhost:5555/api/deleteUser/${userId}`)
             .then(() => {
                 setUsers(users.filter(user => user.user_id !== userId));
                 console.log(`Utilisateur ${userId} supprimé`);
@@ -41,15 +42,12 @@ const Admin = () => {
             {showUsers && (
                 <ul>
                     {users.map(user => (
-                        <>
                         <li key={user.user_id}>
                             {user.user_fname} - {user.user_lname}
                             <button onClick={() => deleteUser(user.user_id)} style={{ marginLeft: 10 }}>
                                 Supprimer utilisateur
                             </button>
                         </li>
-                        
-                        </>
                     ))}
                 </ul>
             )}

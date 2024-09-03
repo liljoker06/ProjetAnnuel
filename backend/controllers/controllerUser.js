@@ -33,6 +33,20 @@ const getUserByMail = async (email) => {
   } catch (error) {
     throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
   }
+}
+
+const deleteUser = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+    await user.destroy();
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 
@@ -393,6 +407,7 @@ module.exports = {
   getAllUsers,
   getUserByMail,
   createUser,
+  deleteUser,
   loginUser,
   validateUserEmail,
   validateUser

@@ -10,6 +10,7 @@ router.post('/create', validateUser, userController.createUser);
 router.post('/login', userController.loginUser);
 router.post('/validateEmail', userController.validateUserEmail);
 router.post('/validateUser', userController.validateUser);
+router.delete('/deleteUser/:user_id', userController.deleteUser);
 
 
 
