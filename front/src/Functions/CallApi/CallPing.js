@@ -41,20 +41,24 @@ const pingServer = async (url) => {
   }
 };
 
-export const checkApiStatus = async (apiStatus) => {
-  const checkStatus = apiStatus.map(async (api) => {
-    const result = await pingServer(api.url);
-    return { ...api, status: result.status, details: result.details };
-  });
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  return await Promise.all(checkStatus);
+export const checkApiStatus = async (apiStatus) => {
+  const checkStatus = [];
+  for (const api of apiStatus) {
+    const result = await pingServer(api.url);
+    checkStatus.push({ ...api, status: result.status, details: result.details });
+    await delay(5); // Délai de 1 seconde
+  }
+  return checkStatus;
 };
 
 export const checkServerStatus = async (serverStatus) => {
-  const checkStatus = serverStatus.map(async (server) => {
+  const checkStatus = [];
+  for (const server of serverStatus) {
     const result = await pingServer(server.url);
-    return { ...server, status: result.status, details: result.details };
-  });
-
-  return await Promise.all(checkStatus);
+    checkStatus.push({ ...server, status: result.status, details: result.details });
+    await delay(5); // Délai de 1 seconde
+  }
+  return checkStatus;
 };

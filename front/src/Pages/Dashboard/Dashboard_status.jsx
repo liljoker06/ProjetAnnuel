@@ -3,9 +3,9 @@ import { checkApiStatus, checkServerStatus } from '../../Functions/CallApi/CallP
 
 export default function Dashboard_status() {
   const [apiStatus, setApiStatus] = useState([
-    { name: 'API 1', status: 'Unknown', url: 'https://api1.example.com/ping' },
-    { name: 'API 2', status: 'Unknown', url: 'https://api2.example.com/ping' },
-    { name: 'API 3', status: 'Unknown', url: 'https://api3.example.com/ping' },
+    { name: 'API User', status: 'Unknown', url: 'https://vitruvecloud.fr/api/users' },
+    { name: 'API Company', status: 'Unknown', url: 'https://vitruvecloud.fr/api/companies' },
+    { name: 'API File', status: 'Unknown', url: 'https://vitruvecloud.fr/api/file' },
   ]);
 
   const [serverStatus, setServerStatus] = useState([
