@@ -44,7 +44,7 @@ export default function Drivebar() {
                         </Link>
                     </li>
                     <li className="mb-4">
-                        <Link to="#" className="flex items-center text-gray-700 hover:text-black">
+                        <Link to="/myProfile" className="flex items-center text-gray-700 hover:text-black">
                             <Account />
                             <span className="ml-2">Mon Compte</span>
                         </Link>
