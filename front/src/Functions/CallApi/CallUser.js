@@ -41,9 +41,9 @@ export const getUserInfoByToken = async (token) => {
 export const changeUserPassword = async (data) => {
     try {
         const response = await axios.post('http://localhost:5555/api/users/changeUserPassword', data);
-        return response.data;
+        return response.data; 
     } catch (error) {
         console.error('API error:', error);
-        return false;
+        return { success: false, error: 'API call failed' }; 
     }
 }

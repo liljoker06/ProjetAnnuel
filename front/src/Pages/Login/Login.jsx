@@ -480,6 +480,7 @@ export default function Login() {
     checkCodeMail({
       setLoading,
       setErrors,
+      setCodeMail,
       getFullCode,
       validateMailCode,
       navigate,
@@ -510,6 +511,7 @@ export default function Login() {
     checkCodeMailPasswordForget({
       setLoading,
       setErrors,
+      setCodeMail,
       getFullCode,
       validateMailCode,
       CASE_RESETPASSWD,
@@ -524,10 +526,11 @@ export default function Login() {
       setLoading,
       setErrors,
       changeUserPassword,
+      CASE_LOGIN,
       email,
       setPassword,
       setNewPassword,
-      navigate
+      skipCase
     });
   
   }
