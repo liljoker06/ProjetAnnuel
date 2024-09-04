@@ -96,6 +96,10 @@ export default function Login() {
     );
   };
 
+  useEffect(() => {
+    consoleLog(`Case actuelle : ${currentCase}`, 'cyan');
+  }, [currentCase]);
+
   const renderCase = () => {
     switch (currentCase) {
       // Informations de connexion
@@ -232,7 +236,7 @@ export default function Login() {
             }
           </>
         );
-      // Oubli du mot de passe avec email dans le form
+      // mot de passe oublié
       case 3:
         return (
           <>
@@ -304,7 +308,7 @@ export default function Login() {
             }
           </>
         );
-      // Oubli du mot de passe sans email dans le form
+      // oublie de mail dans le form
       case 4:
         return (
           <>
