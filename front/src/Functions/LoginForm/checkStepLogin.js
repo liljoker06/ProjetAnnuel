@@ -5,6 +5,7 @@ export const checkStepLogin = async ({
     setPassword,        // Fonction pour définir le mot de passe
     validateUser,       // Fonction pour vérifier si l'utilisateur existe
     generateMailCode,   // Fonction pour envoyer le code de vérification
+    setCanEmail,        // Fonction pour définir si l'email est valide
     nextCase,           // Fonction pour passer à l'étape suivante
     setLoading,         // Fonction pour définir l'état de chargement
     setErrors           // Fonction pour définir les erreurs
@@ -68,7 +69,7 @@ export const checkStepLogin = async ({
                 consoleLog('Envoi de l\'email de vérification...', 'cyan');
                 generateMailCode({ mailcode_email: values.email });
                 consoleLog('Email de vérification envoyé à ' + values.email, 'green');
-
+                setCanEmail(true);
                 nextCase();
             } catch (error) {
                 consoleLog('Erreur lors de l\'envoi de l\'email de vérification:' + error, 'red');

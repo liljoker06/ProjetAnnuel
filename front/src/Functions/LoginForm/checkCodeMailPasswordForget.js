@@ -1,15 +1,17 @@
 import consoleLog from '../Dev/consoleLog';
 
-export const checkCodeMail = async ({
+export const checkCodeMailPasswordForget = async ({
     setLoading,
     setErrors,
     getFullCode,
     validateMailCode,
+    CASE_RESETPASSWD,
     email,
-    nextStep
+    password,
+    skipCase
 }) => {
     setLoading(true);
-    consoleLog('• [START] checkCodeMail', 'white');
+    consoleLog('• [START] checkCodeMailPasswordForget', 'white');
     consoleLog('Vérification du code de vérification...', 'cyan');
     const newErrors = {};
 
@@ -37,17 +39,17 @@ export const checkCodeMail = async ({
             setLoading(false); // Termine le chargement
             consoleLog('Verification terminée.', 'cyan');
             if (newErrors.codeMail) consoleLog('Erreurs: ' + newErrors.codeMail, 'red');
-
-            // Vérifie s'il n'y a pas d'erreurs avant de passer à l'étape suivante
-            if (Object.values(newErrors).filter(error => error).length === 0) {
-                consoleLog('• [END] checkCodeMail', 'white');
-                nextStep();
-            } else {
-                consoleLog('• [END] checkCodeMail', 'white');
-            }
         }
     } else {
         setErrors(newErrors); // Met à jour l'état des erreurs
         setLoading(false); // Termine le chargement
+    }
+
+    // Vérifie s'il n'y a pas d'erreurs avant de passer à l'étape suivante
+    if (Object.values(newErrors).filter(error => error).length === 0) {
+        consoleLog('• [END] checkCodeMail', 'white');
+        skipCase(CASE_RESETPASSWD);
+    } else {
+        consoleLog('• [END] checkCodeMail', 'white');
     }
 };

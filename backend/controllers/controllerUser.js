@@ -141,7 +141,7 @@ const getUserInfoByToken = async (req, res) => {
 
 const createUser = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
-  
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     consoleLog('Erreur de validation aucune données à traiter', 'red');
@@ -149,23 +149,23 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { 
-      password, 
-      nom, 
-      prenom, 
-      email, 
-      phone, 
-      birth, 
-      adresse, 
-      codePostal, 
-      ville, 
-      nomEntreprise = null, 
-      siret = null, 
-      adresseEntreprise = null, 
-      codePostalEntreprise = null, 
-      cityCompany = null, 
-      plan = null, 
-      codeEntreprise = null 
+    const {
+      password,
+      nom,
+      prenom,
+      email,
+      phone,
+      birth,
+      adresse,
+      codePostal,
+      ville,
+      nomEntreprise = null,
+      siret = null,
+      adresseEntreprise = null,
+      codePostalEntreprise = null,
+      cityCompany = null,
+      plan = null,
+      codeEntreprise = null
     } = req.body;
 
     // Debug: Afficher les données reçues
@@ -238,7 +238,7 @@ const createUser = async (req, res) => {
         consoleLog('Tentative de récupération de l\'entreprise avec code...', 'cyan');
         company = await getCompanyByCode({ codeEntreprise }, true);
         consoleLog(`Entreprise trouvée : \t\t\t${company.comp_id} - ${company.comp_name} - (Code: ${company.comp_code})`, 'green');
-        
+
         try {
           consoleLog('Tentative de récupération de l\'abonnement de l\'entreprise...', 'cyan');
           companySub = await getSubscriptionById(company.comp_subsid);
@@ -258,14 +258,14 @@ const createUser = async (req, res) => {
         consoleLog('Tentative de création de l\'entreprise...', 'cyan');
         subscription = await getSubscriptionByName(plan);
         company = await createCompany({
-          body: { 
-            comp_name: nomEntreprise, 
-            comp_siret: siret, 
-            comp_addre: adresseEntreprise, 
-            comp_posta: codePostalEntreprise, 
-            comp_city: cityCompany, 
-            comp_subsid: subscription.subs_id 
-          } 
+          body: {
+            comp_name: nomEntreprise,
+            comp_siret: siret,
+            comp_addre: adresseEntreprise,
+            comp_posta: codePostalEntreprise,
+            comp_city: cityCompany,
+            comp_subsid: subscription.subs_id
+          }
         }, res, true);
         consoleLog(`Entreprise créée : \t\t\t${company.comp_id} - ${company.comp_name}`, 'green');
       } catch (error) {
@@ -364,8 +364,67 @@ const createUser = async (req, res) => {
 };
 
 
+const changeUserPassword = async (req, res) => {
+  consoleLog('• [START] controllers/controllerUser/updateUserPassword', 'cyan');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    consoleLog('Erreur de validation aucune données à traiter', 'red');
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-// FAIRE UNE GESTION DE TOKEN DANS UN COOKIE
+  try {
+    const { password, email } = req.body;
+
+    let user;
+    let hashedPassword;
+
+    // Récupération de l'utilisateur
+    try {
+      user = await User.findOne({ where: { user_email: email } });
+      if (!user) {
+        consoleLog('Utilisateur non trouvé', 'red');
+        return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      }
+      consoleLog(`Utilisateur trouvé : \t\t${user.user_id} - ${user.user_email}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la récupération de l\'utilisateur : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/updateUserPassword', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Hashage du mot de passe
+    try {
+      hashedPassword = await bcrypt.hash(password, 10);
+      consoleLog('Mot de passe hashé avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors du hashage du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    // Mise à jour du mot de passe
+    try {
+      await User.update({ user_passw: hashedPassword }, { where: { user_email: email } });
+      consoleLog('Mot de passe mis à jour avec succès', 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la mise à jour du mot de passe', 'red');
+      return res.status(500).json({ error: error.message });
+    }
+
+    consoleLog('• [END] controllers/controllerUser/updateUserPassword', 'cyan');
+
+    return res.status(200).json({ message: 'Mot de passe mis à jour avec succès' });
+
+  } catch (error) {
+    consoleLog('Erreur FATAL lors de la mise à jour du mot de passe : ' + error.message, 'red');
+    consoleLog('• [END] controllers/controllerUser/updateUserPassword', 'cyan');
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+
+/*******************************************************/
+
+
 const loginUser = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/loginUser', 'cyan');
   const errors = validationResult(req);
@@ -445,7 +504,7 @@ const loginUser = async (req, res) => {
 };
 
 
-/*******************************************************/
+
 
 
 const validateUserEmail = async (req, res) => {
@@ -512,6 +571,7 @@ module.exports = {
   getUserByMail,
   getUserInfoByToken,
   createUser,
+  changeUserPassword,
   loginUser,
   validateUserEmail,
   validateUser
