@@ -9,9 +9,10 @@ import { checkStepLogin } from '../../Functions/LoginForm/checkStepLogin';
 import { checkCodeMail } from '../../Functions/LoginForm/checkCodeMail';
 import { checkForgetPassword } from '../../Functions/LoginForm/checkForgetPassword';
 import { checkCodeMailPasswordForget } from '../../Functions/LoginForm/checkCodeMailPasswordForget';
+import { checkPasswdReset } from '../../Functions/LoginForm/checkPasswdReset';
 
 import { loginUser } from '../../Functions/CallApi/CallLogin';
-import { validateUser, validateUserEmail } from '../../Functions/CallApi/CallUser';
+import { validateUser, validateUserEmail, changeUserPassword } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
 
 export default function Login() {
@@ -46,6 +47,10 @@ export default function Login() {
 
   /*case 3*/
   const [canEmail, setCanEmail] = useState(true);
+
+  /*case 5*/
+  const [newPassword, setNewPassword] = useState('');
+  const [repeatNewPassword, setRepeatNewPassword] = useState('');
 
   /****************************************/
   //    Outils pour les champs forms      //
@@ -95,10 +100,6 @@ export default function Login() {
       </SwitchTransition>
     );
   };
-
-  useEffect(() => {
-    consoleLog(`Case actuelle : ${currentCase}`, 'cyan');
-  }, [currentCase]);
 
   const renderCase = () => {
     switch (currentCase) {
@@ -360,7 +361,7 @@ export default function Login() {
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
+                id="new-password"
                 type="password"
                 placeholder="••••••"
               />
@@ -371,7 +372,7 @@ export default function Login() {
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
+                id="repeat-new-password"
                 type="password"
                 placeholder="••••••"
               />
@@ -519,7 +520,16 @@ export default function Login() {
   };
 
   const handleCheckResetPassword = () => {
-    console.log('Réinitialisation du mot de passe...');
+    checkPasswdReset({
+      setLoading,
+      setErrors,
+      changeUserPassword,
+      email,
+      setPassword,
+      setNewPassword,
+      navigate
+    });
+  
   }
 
 
