@@ -18,6 +18,14 @@ export default function Profil() {
   const [stockageUsed, setStockageUsed] = useState(null);
   const [numberFiles, setNumberFiles] = useState(null);
   const [company, setCompany] = useState(null);
+  const [user_phone, setUser_phone] = useState(null);
+  const [user_addre, setUser_addre] = useState(null);
+  const [user_city, setUser_city] = useState(null);
+  const [user_posta, setUser_posta] = useState(null);
+  const [country, setCountry] = useState(null);
+  const [user_role, setUserRole] = useState(null);
+
+
 
   // Vérification de la connexion
   useEffect(() => {
@@ -38,6 +46,12 @@ export default function Profil() {
             setStockage(userInfo.user_storageTotal);
             setStockageUsed(userInfo.user_storageUsed);
             setNumberFiles(userInfo.user_files);
+            setUser_phone(userInfo.user_phone);
+            setUser_addre(userInfo.user_addre);
+            setUser_city(userInfo.user_city);
+            setUser_posta(userInfo.user_posta);
+            setCountry(userInfo.user_country);
+            setUserRole(userInfo.user_role);
           }
         })
         .catch((error) => {
@@ -60,7 +74,19 @@ export default function Profil() {
             </div>
             {/* Information Account Section */}
             <div className="w-full max-w-full px-3 lg:mt-6 xl:w-4/12 mb-4">
-              <Profile_information user_name={user_name} company={company} user_email={user_email}/>
+              <Profile_information 
+              user_name={user_name} 
+              company={company} 
+              user_email={user_email} 
+              user_phone={user_phone}
+              user_addre={user_addre}
+              user_city={user_city}
+              user_posta={user_posta}
+              country={country}
+              user_role={user_role}
+              
+              
+              />
             </div>
             {/* Information Subscription Section */}
             <div className="w-full max-w-full px-3 lg:mt-6 xl:w-4/12 mb-4">

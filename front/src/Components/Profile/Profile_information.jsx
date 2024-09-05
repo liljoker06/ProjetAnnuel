@@ -1,6 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
-export default function Profile_information() {
+export default function Profile_information({ user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country }) {
+    const [open, setOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        user_name,
+        user_email,
+        user_role,
+        user_phone,
+        user_addre,
+        user_city,
+        user_posta,
+        country,
+    });
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (open) {
+            // Update form data with the latest props when the dialog is opened
+            setFormData({
+                user_name,
+                user_email,
+                user_role,
+                user_phone,
+                user_addre,
+                user_city,
+                user_posta,
+                country,
+            });
+        }
+    }, [open, user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country]);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setPassword('');
+        setError('');
+    };
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
+
+    const handleSubmit = () => {
+        if (password === '') {
+            setError('Veuillez confirmer votre mot de passe');
+        } else {
+            // Here you can add your logic for password verification (e.g., send to the server for validation)
+            console.log('Form Data Submitted:', formData);
+            console.log('Password Confirmation:', password);
+            handleClose();
+        }
+    };
+
     return (
         <div className="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
             <div className="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
@@ -9,75 +73,124 @@ export default function Profile_information() {
                         <h6 className="mb-0">Informations du Profil</h6>
                     </div>
                     <div className="w-full max-w-full px-3 text-right shrink-0 md:w-4/12 md:flex-none">
-                        <a href="javascript:;" data-target="tooltip_trigger" data-placement="top">
-                            <i className="leading-normal fas fa-user-edit text-sm text-slate-400" aria-hidden="true"></i>
-                        </a>
-                        
-                        <div
-                            data-target="tooltip"
-                            className="px-2 py-1 text-center text-white bg-black rounded-lg text-sm hidden"
-                            role="tooltip"
-                            style={{
-                                position: 'absolute',
-                                inset: 'auto auto 0px 0px',
-                                margin: '0px',
-                                transform: 'translate(1173px, -724px)',
-                            }}
-                            data-popper-placement="top"
-                        >
-                            Modifier le profil
-                            <div
-                                className="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']"
-                                data-popper-arrow=""
-                                style={{
-                                    position: 'absolute',
-                                    left: '0px',
-                                    transform: 'translate(0px, 0px)',
-                                }}
-                            ></div>
-                        </div>
+                        {/* Material UI IconButton */}
+                        <IconButton onClick={handleClickOpen} color="primary">
+                            <EditIcon />
+                        </IconButton>
                     </div>
                 </div>
             </div>
             <div className="flex-auto p-4">
-                <p className="leading-normal text-sm">Le rôle de votre compte :</p>
+                <p className="leading-normal text-sm">Le rôle de votre compte : {user_role}</p>
                 <hr className="h-px my-6 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
                 <ul className="flex flex-col pl-0 mb-0 rounded-lg">
                     <li className="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit">
-                        <strong className="text-slate-700">Nom complet :</strong> &nbsp; Alec M. Thompson
+                        <strong className="text-slate-700">Nom complet :</strong> &nbsp; {user_name}
                     </li>
                     <li className="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit">
-                        <strong className="text-slate-700">Mobile :</strong> &nbsp; (44) 123 1234 123
+                        <strong className="text-slate-700">Mobile :</strong> &nbsp; {user_phone}
                     </li>
                     <li className="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit">
-                        <strong className="text-slate-700">Email :</strong> &nbsp; alecthompson@mail.com
+                        <strong className="text-slate-700">Email :</strong> &nbsp; {user_email}
                     </li>
                     <li className="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit">
-                        <strong className="text-slate-700">Localisation :</strong> &nbsp; USA
+                        <strong className="text-slate-700">Localisation :</strong> &nbsp; {country}
                     </li>
                     <li className="relative block px-4 py-2 pb-0 pl-0 bg-white border-0 border-t-0 rounded-b-lg text-inherit">
-                        <strong className="leading-normal text-sm text-slate-700">Réseaux sociaux :</strong> &nbsp;
-                        <a
-                            className="inline-block py-0 pl-1 pr-2 mb-0 font-bold text-center text-blue-800 align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-none"
-                            href="javascript:;"
-                        >
-                            <i className="fab fa-facebook fa-lg" aria-hidden="true"></i>
-                        </a>
-                        <a
-                            className="inline-block py-0 pl-1 pr-2 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-none text-sky-600"
-                            href="javascript:;"
-                        >
-                            <i className="fab fa-twitter fa-lg" aria-hidden="true"></i>
-                        </a>
-                        <a
-                            className="inline-block py-0 pl-1 pr-2 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-none text-sky-900"
-                            href="javascript:;"
-                        >
-                            <i className="fab fa-instagram fa-lg" aria-hidden="true"></i>
-                        </a>
+                        <strong className="leading-normal text-sm text-slate-700">Adresse postal :</strong> &nbsp; {user_addre}, {user_city} {user_posta} {country}
                     </li>
                 </ul>
             </div>
+
+            {/* Dialog for editing the profile information */}
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Modifier le profil</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Nom complet"
+                        name="user_name"
+                        value={formData.user_name}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Mobile"
+                        name="user_phone"
+                        value={formData.user_phone}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Email"
+                        name="user_email"
+                        value={formData.user_email}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Adresse"
+                        name="user_addre"
+                        value={formData.user_addre}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Ville"
+                        name="user_city"
+                        value={formData.user_city}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Code Postal"
+                        name="user_posta"
+                        value={formData.user_posta}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Pays"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleChange}
+                        fullWidth
+                    />
+                    {/* Password Confirmation Field */}
+                    <TextField
+                        margin="dense"
+                        label="Confirmez votre mot de passe"
+                        type="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        fullWidth
+                        error={error !== ''}
+                        helperText={error}
+                    />
+                </DialogContent>
+                {/* Tailwind Styled Buttons for Actions */}
+                <div className="flex justify-end p-4">
+                    <button
+                        onClick={handleClose}
+                        className="bg-gray-500 text-white font-bold py-2 px-4 rounded mr-2 hover:bg-gray-700"
+                    >
+                        Annuler
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
+                    >
+                        Enregistrer
+                    </button>
+                </div>
+            </Dialog>
         </div>
     );
 }
