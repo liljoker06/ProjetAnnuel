@@ -58,8 +58,8 @@ export const checkCodeEntreprise = async ({
                 if (company) {
                     setCodeExistCompanyName(company.comp_name);
                     setCodeExistCompanySiret(company.comp_siret);
-                    setCodeExistCompanyAdresse(company.comp_adresse);
-                    setCodeExistCompanyCodePostal(company.comp_code_postal);
+                    setCodeExistCompanyAdresse(company.comp_addre);
+                    setCodeExistCompanyCodePostal(company.comp_posta);
                     setCodeExistCompanyCity(company.comp_city);
                     consoleLog('Entreprise trouvée.', 'green');
                 } else {
