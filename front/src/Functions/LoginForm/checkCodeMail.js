@@ -4,6 +4,7 @@ import consoleLog from '../Dev/consoleLog';
 export const checkCodeMail = async ({
     setLoading,
     setErrors,
+    setCodeMail,
     getFullCode,
     validateMailCode,
     email,
@@ -20,6 +21,7 @@ export const checkCodeMail = async ({
     const code = getFullCode();
     consoleLog('Code : ' + code, 'cyan');
     newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
+    setCodeMail(['', '', '', '', '']);
 
     try {
         const response = await validateMailCode({ mailcode_email: email, mailcode_code: code });
@@ -27,12 +29,8 @@ export const checkCodeMail = async ({
 
         if (response.success) {
             consoleLog('Code valide.', 'green');
-
-
             const loginResponse = await loginUser({ email, password});
-
             console.log('Réponse du serveur:', loginResponse);
-
             if (loginResponse.success) {
                 consoleLog('Connexion réussie.', 'green');
                 navigate('/dashboard');
