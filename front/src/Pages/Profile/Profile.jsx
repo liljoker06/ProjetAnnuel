@@ -64,7 +64,8 @@ export default function Profil() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Drivebar />
-      <div className="w-full px-6 py-6 mx-auto loopple-min-height-78vh text-slate-500">
+      <main className="flex-1 p-6">
+        <h2 className="text-4xl font-bold mb-4 text-gray-700">Mon Compte</h2>
         <Profile_cardinfo user_name={user_name} company={company} />
         <div className="w-full pb-6 mx-auto removable">
           <div className="flex flex-wrap -mx-3">
@@ -74,18 +75,18 @@ export default function Profil() {
             </div>
             {/* Information Account Section */}
             <div className="w-full max-w-full px-3 lg:mt-6 xl:w-4/12 mb-4">
-              <Profile_information 
-              user_name={user_name} 
-              company={company} 
-              user_email={user_email} 
-              user_phone={user_phone}
-              user_addre={user_addre}
-              user_city={user_city}
-              user_posta={user_posta}
-              country={country}
-              user_role={user_role}
-              
-              
+              <Profile_information
+                user_name={user_name}
+                company={company}
+                user_email={user_email}
+                user_phone={user_phone}
+                user_addre={user_addre}
+                user_city={user_city}
+                user_posta={user_posta}
+                country={country}
+                user_role={user_role}
+
+
               />
             </div>
             {/* Information Subscription Section */}
@@ -94,7 +95,7 @@ export default function Profil() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+    </div >
   );
 }

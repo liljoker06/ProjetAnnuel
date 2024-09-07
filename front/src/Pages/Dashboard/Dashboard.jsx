@@ -98,6 +98,7 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <main className="flex-1 p-6">
+            <h2 className="text-4xl font-bold mb-4 text-gray-700">Dashboard</h2>
                 <div className="grid grid-cols-3 gap-6">
                     {/* Up Next Section */}
                     <section className="col-span-2">
