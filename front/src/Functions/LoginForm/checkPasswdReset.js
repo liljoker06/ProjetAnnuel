@@ -4,18 +4,19 @@ export const checkPasswdReset = async ({
     setLoading,
     setErrors,
     changeUserPassword,
+    CASE_LOGIN,
     email,
     setPassword,
     setNewPassword,
-    navigate
+    skipCase
 }) => {
     consoleLog('• [START] checkPasswdReset', 'white');
     setLoading(true);
     const newErrors = {};
 
     // Vérification de la présence
-    const newpassword = document.getElementById('newpassword').value;
-    const repeatnewpassword = document.getElementById('repeatnewpassword').value;
+    const newpassword = document.getElementById('new-password').value;
+    const repeatnewpassword = document.getElementById('repeat-new-password').value;
 
     newErrors.newpassword = newpassword.length < 6 ? 'Mot de passe trop court (6 caractères minimum).' : '';
     newErrors.repeatnewpassword = newpassword !== repeatnewpassword ? 'Les mots de passe ne correspondent pas.' : '';
@@ -23,30 +24,26 @@ export const checkPasswdReset = async ({
     if (newpassword.length >= 6 && newpassword === repeatnewpassword) {
         try {
             const response = await changeUserPassword({ email, password: newpassword });
-            consoleLog('Réponse du serveur: ' + response.success, 'cyan');
 
-            if (response.success) {
+            if (response && response.success) {
                 consoleLog('Mot de passe changé.', 'green');
                 setPassword('');
                 setNewPassword('');
-                navigate('/login');
+                skipCase(CASE_LOGIN);
             } else {
-                newErrors.newpassword = response.data.error || 'Erreur lors du changement de mot de passe.';
+                newErrors.newpassword = response.error || 'Erreur lors du changement de mot de passe.';
                 consoleLog('Erreur lors du changement de mot de passe.', 'red');
             }
         } catch (error) {
-            consoleLog('Erreur lors du changement de mot de passe:' + error, 'red');
+            consoleLog('Erreur lors du changement de mot de passe:', error);
             newErrors.newpassword = 'Erreur lors du changement de mot de passe.';
         } finally {
-            setErrors(newErrors); // Met à jour l'état des erreurs
-            setLoading(false); // Termine le chargement
-            consoleLog('Changement terminé.', 'cyan');
-            if (newErrors.newpassword) consoleLog('Erreurs: ' + newErrors.newpassword, 'red');
+            setErrors(newErrors);
+            setLoading(false);
+            if (newErrors.newpassword) consoleLog('Erreurs:', newErrors.newpassword, 'red');
         }
     } else {
-        setErrors(newErrors); // Met à jour l'état des erreurs
-        setLoading(false); // Termine le chargement
+        setErrors(newErrors);
+        setLoading(false); 
     }
-
-
 };

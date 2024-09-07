@@ -412,7 +412,7 @@ const changeUserPassword = async (req, res) => {
 
     consoleLog('• [END] controllers/controllerUser/updateUserPassword', 'cyan');
 
-    return res.status(200).json({ message: 'Mot de passe mis à jour avec succès' });
+    return res.status(200).json({ success: true, message: 'Mot de passe mis à jour avec succès' });
 
   } catch (error) {
     consoleLog('Erreur FATAL lors de la mise à jour du mot de passe : ' + error.message, 'red');

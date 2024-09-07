@@ -3,6 +3,7 @@ import consoleLog from '../Dev/consoleLog';
 export const checkCodeMailPasswordForget = async ({
     setLoading,
     setErrors,
+    setCodeMail,
     getFullCode,
     validateMailCode,
     CASE_RESETPASSWD,
@@ -19,6 +20,7 @@ export const checkCodeMailPasswordForget = async ({
     const code = getFullCode();
     consoleLog('Code : ' + code, 'cyan');
     newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
+    setCodeMail(['', '', '', '', '']);
 
     if (code.length === 5) {
         try {

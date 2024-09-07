@@ -3,6 +3,7 @@ import consoleLog from '../Dev/consoleLog';
 export const checkCodeMail = async ({
     setLoading,
     setErrors,
+    setCodeMail,
     getFullCode,
     validateMailCode,
     email,
@@ -17,6 +18,7 @@ export const checkCodeMail = async ({
     const code = getFullCode();
     consoleLog('Code : ' + code, 'cyan');
     newErrors.codeMail = code.length !== 5 ? 'Code invalide (5 chiffres requis).' : '';
+    setCodeMail(['', '', '', '', '']);
 
     if (code.length === 5) {
         try {

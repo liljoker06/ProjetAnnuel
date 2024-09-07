@@ -854,6 +854,7 @@ export default function Register() {
     checkCodeMail({
       setLoading,
       setErrors,
+      setCodeMail,
       getFullCode,
       validateMailCode,
       email,
