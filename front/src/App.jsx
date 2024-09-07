@@ -27,7 +27,8 @@ import Myfiles from "./Pages/Myfiles/Myfiles";
 import Page404 from "./Pages/Page404/Page404";
 
 import Footer from "./Components/Footer/Footer";
-import Myaccount from "./Pages/Myaccount/Myaccount";
+import Profile from "./Pages/Profile/Profile";
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,7 +51,7 @@ function App() {
 
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/myfiles" element={<Myfiles />} />
-        <Route path="/myaccount" element={<Myaccount />} />
+        <Route path="/myProfile" element={<Profile/>} />
 
         <Route path="*" element={<Page404 />} />
       </Routes>
