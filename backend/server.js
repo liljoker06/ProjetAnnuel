@@ -54,29 +54,29 @@ const insertDefaultSubscriptions = async () => {
     }
 };
 
-// Insertion des données pour le développement
-const insertForDev = async () => {
-    const defaultCompanies = [
-        { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
-    ];
-    const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
-    ];
+// // Insertion des données pour le développement
+// const insertForDev = async () => {
+//     const defaultCompanies = [
+//         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
+//     ];
+//     const defaultUsers = [
+//         { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+//     ];
 
-    for (const company of defaultCompanies) {
-        await Company.findOrCreate({
-            where: { comp_name: company.comp_name },
-            defaults: company,
-        });
-    }
+//     for (const company of defaultCompanies) {
+//         await Company.findOrCreate({
+//             where: { comp_name: company.comp_name },
+//             defaults: company,
+//         });
+//     }
 
-    for (const user of defaultUsers) {
-        await User.findOrCreate({
-            where: { user_email: user.user_email },
-            defaults: user,
-        });
-    }
-};
+//     for (const user of defaultUsers) {
+//         await User.findOrCreate({
+//             where: { user_email: user.user_email },
+//             defaults: user,
+//         });
+//     }
+// };
 
 
 
@@ -104,7 +104,7 @@ app.listen(PORT, async () => {
 
         // Insertion des données
         await insertDefaultSubscriptions();
-        await insertForDev();
+        // await insertForDev();
         console.log('Database synced');
     } catch (error) {
         console.error('Unable to connect to the database:', error);

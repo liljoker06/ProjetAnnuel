@@ -6,6 +6,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import Setting from '@mui/icons-material/Settings';
 import Account from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
+import Receipt from '@mui/icons-material/Receipt';
 
 import Cookies from 'js-cookie';
 
@@ -41,6 +42,12 @@ export default function Drivebar() {
                         <Link to="#" className="flex items-center text-gray-700 hover:text-black">
                             <Setting />
                             <span className="ml-2">Paramètres</span>
+                        </Link>
+                    </li>
+                    <li className="mb-4">
+                        <Link to="/myInvoices" className="flex items-center text-gray-700 hover:text-black">
+                        <Receipt />
+                            <span className="ml-2">Mes Factures</span>
                         </Link>
                     </li>
                     <li className="mb-4">

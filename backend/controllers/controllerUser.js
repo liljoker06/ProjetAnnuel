@@ -127,6 +127,7 @@ const getUserInfoByToken = async (req, res) => {
       user_posta: user.user_posta,
       user_country: "France",
       user_company: company.comp_name,
+      user_codecompany: company.comp_code,
       user_subscription: subscription.subs_name,
       user_storageTotal: subscription.subs_stora,
       user_storageUsed: 5,    // à modifier pour récupérer l'espace utilisé

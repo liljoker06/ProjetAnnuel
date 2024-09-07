@@ -77,7 +77,7 @@ export default function Navbar() {
   const activeColourClass = scrollPos > 10 ? "text-gray-800" : "text-white";
   const logoTitleClass = scrollPos > 10 ? "text-blue-500" : "text-white";
 
-  if (location.pathname === '/dashboard' || location.pathname === '/myfiles' || location.pathname === '/myProfile') {
+  if (location.pathname === '/dashboard' || location.pathname === '/myfiles' || location.pathname === '/myProfile' || location.pathname === '/myInvoices') {
     return null; 
   }
   
