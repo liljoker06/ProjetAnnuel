@@ -23,11 +23,14 @@ import Register from "./Pages/Register/Register";
 
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Myfiles from "./Pages/Myfiles/Myfiles";
+import Myinvoices from "./Pages/Myinvoices/Myinvoices";
+import Profile from "./Pages/Profile/Profile";
 
 import Page404 from "./Pages/Page404/Page404";
 
 import Footer from "./Components/Footer/Footer";
 import Admin from "./Pages/Admin/Admin";
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -51,6 +54,8 @@ function App() {
 
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/myfiles" element={<Myfiles />} />
+        <Route path="/myProfile" element={<Profile/>} />
+        <Route path="/myInvoices" element={<Myinvoices/>} />
 
         <Route path="*" element={<Page404 />} />
       </Routes>

@@ -21,3 +21,29 @@ export const validateUser = async (data) => {
         return false;
     }
 }
+
+// récupère les infos de l'utilisateur par son token
+export const getUserInfoByToken = async (token) => {
+    try {
+        const response = await axios.post('http://localhost:5555/api/users/getUserInfoByToken', {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('API error:', error);
+        return false;
+    }
+}
+
+//changer le mot de passe
+export const changeUserPassword = async (data) => {
+    try {
+        const response = await axios.post('http://localhost:5555/api/users/changeUserPassword', data);
+        return response.data; 
+    } catch (error) {
+        console.error('API error:', error);
+        return { success: false, error: 'API call failed' }; 
+    }
+}

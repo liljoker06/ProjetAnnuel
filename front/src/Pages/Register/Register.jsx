@@ -19,7 +19,7 @@ import { checkStepCard } from '../../Functions/RegisterForm/checkStepCard';
 import { submitRegistration } from '../../Functions/CallApi/CallRegister';
 import { validateUserEmail } from '../../Functions/CallApi/CallUser';
 import { generateMailCode, resendMailCode, validateMailCode } from '../../Functions/CallApi/CallMailCode';
-import { validateCompany, validateCompanyCode } from '../../Functions/CallApi/CallCompany';
+import { validateCompany, validateCompanyCode, getCompanyByCode } from '../../Functions/CallApi/CallCompany';
 
 export default function Register() {
   const [progress, setProgress] = useState(14);       // En %
@@ -71,6 +71,12 @@ export default function Register() {
   const [siret, setSiret] = useState('');
   const [adresseEntreprise, setAdresseEntreprise] = useState('');
   const [codePostalEntreprise, setCodePostalEntreprise] = useState('');
+
+  const [codeExistCompanyName, setCodeExistCompanyName] = useState('');
+  const [codeExistSiret, setCodeExistCompanySiret] = useState('');
+  const [codeExistCity, setCodeExistCompanyCity] = useState('');
+  const [codeExistAdresse, setCodeExistCompanyAdresse] = useState('');
+  const [codeExistCodePostal, setCodeExistCompanyCodePostal] = useState('');
 
   /*case 4*/
   const [plan, setPlan] = useState('');
@@ -277,7 +283,7 @@ export default function Register() {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cp">
                   Code postal
                 </label>
-                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cp" type="text" placeholder="00000" />
+                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cp" type="text" placeholder="00000" onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 5); }}/>
               </div>
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="city">
@@ -360,7 +366,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckCodeMail} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
 
               </button>
@@ -389,7 +395,7 @@ export default function Register() {
               </span>
 
               <label className="switch ml-5">
-                <input type="checkbox" onChange={toggleEntrepriseExistante} />
+                <input type="checkbox" onChange={toggleEntrepriseExistante} checked={estEntrepriseExistante} />
                 <span className="slider rounded"></span>
                 <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAIG/8QAIxAAAgIABQQDAAAAAAAAAAAAAQMCBAAREiExBUFRcROBsf/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAWEQADAAAAAAAAAAAAAAAAAAAAEiL/2gAMAwEAAhEDEQA/AMBTp03dNglMVuttjqnKQ2UPOfntkOThbqVVUJ12BKnogZQZpy+Ucc8knwePWJrWqyqEHVmrTahEBqpbBoAH1n635wt3a9mjN1p8X2pw0qVEbKB/CO/c4OphSVP/2Q==" className="off cursor-pointer" />
                 <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAQIEBf/EACMQAAEDAwQDAQEAAAAAAAAAAAQBAgUDESEAEjFBBlFhMkL/xAAUAQEAAAAAAAAAAAAAAAAAAAAF/8QAGBEAAwEBAAAAAAAAAAAAAAAAABIiMUH/2gAMAwEAAhEDEQA/AM+Bg4mS8coRccMOdNG01qVyH/kRvHPKKmMdr8uujPwUTG+NkRpw1AKWCbvHKa2zTGphc9u9p0q+rLqeMl4kSCGkYgtoE0HTahIz3bWGNanPrdyqWzn7p5ibh5CArnyZNMyVLpK0QSkt2BNXtVX+7ol1wuLJiyaHt+6Kyp//2Q==" className="on cursor-pointer	" />
@@ -406,7 +412,7 @@ export default function Register() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="codeCompany">
                       Code de l'entreprise
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 10)} />
+                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="codeCompany" type="number" placeholder="0000000000"   onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 10); }}  />
                   </div>
                 </>
               ) : (
@@ -443,7 +449,7 @@ export default function Register() {
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cpCompany">
                         Code Postale
                       </label>
-                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" onInput={(e) => e.target.value = Math.max(1, parseInt(e.target.value)).toString().slice(0, 5)} />
+                      <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline" id="cpCompany" type="number" placeholder="00000" onInput={(e) => {let value = e.target.value; value = value.replace(/\D/g, ''); e.target.value = value.slice(0, 5); }} />
                     </div>
                     <div className="flex-1">
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cityCompany">
@@ -460,7 +466,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={handleCkeckStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCkeckStepEntreprise} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Confirmer'}
               </button>
               <button onClick={AutoCompany} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
@@ -542,7 +548,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={handleCheckStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckStepForfait} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
 
               </button>
@@ -604,7 +610,7 @@ export default function Register() {
               <button onClick={previousStep} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Retour
               </button>
-              <button onClick={handleCheckStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button disabled={loading} onClick={handleCheckStepCard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {loading ? 'Chargement...' : 'Suivant'}
               </button>
               <button onClick={AutoCard} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
@@ -687,12 +693,12 @@ export default function Register() {
                 Retour
               </button>
               {estEntrepriseExistante ? (
-                <button onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                <button disabled={loading} onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                   Rejoindre
                 </button>
               ) : (
                 <>
-                  <button onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                  <button disabled={loading} onClick={checkPayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                     {loading ? 'Chargement...' : `S'abonner pour ${plan === 'BasicPlan' ? '9€' : plan === 'ProPlan' ? '49€' : '99€'}/mois`}
                   </button>
                 </>
@@ -848,6 +854,7 @@ export default function Register() {
     checkCodeMail({
       setLoading,
       setErrors,
+      setCodeMail,
       getFullCode,
       validateMailCode,
       email,
@@ -862,9 +869,14 @@ export default function Register() {
         STEP_CONFIRMATION,
         setLoading,
         setErrors,
-        codeCompany,
         setCodeCompany,
         validateCompanyCode,
+        getCompanyByCode,
+        setCodeExistCompanyName,
+        setCodeExistCompanySiret,
+        setCodeExistCompanyAdresse,
+        setCodeExistCompanyCodePostal,
+        setCodeExistCompanyCity,
         skipStep
       });
     } else {
@@ -917,36 +929,36 @@ export default function Register() {
   };
 
   // Vérification des champs de l'étape 6
-  const handleCheckStepPayment = () => {
-    const userData = {
-      email,
-      phone,
-      password,
-      nom,
-      prenom,
-      birth,
-      adresse,
-      codePostal,
-      ville,
-      nomEntreprise,
-      siret,
-      adresseEntreprise,
-      codePostalEntreprise,
-      cityCompany,
-      plan,
-      numCard,
-      nameCard,
-      dateCard,
-      cvvCard
-    };
-    checkPayment({
-      setLoading,
-      setErrors,
-      nextStep,
-      userData,
-      submitRegistration
-    });
-  }
+  // const handleCheckStepPayment = () => {
+  //   const userData = {
+  //     email,
+  //     phone,
+  //     password,
+  //     nom,
+  //     prenom,
+  //     birth,
+  //     adresse,
+  //     codePostal,
+  //     ville,
+  //     nomEntreprise,
+  //     siret,
+  //     adresseEntreprise,
+  //     codePostalEntreprise,
+  //     cityCompany,
+  //     plan,
+  //     numCard,
+  //     nameCard,
+  //     dateCard,
+  //     cvvCard
+  //   };
+  //   checkPayment({
+  //     setLoading,
+  //     setErrors,
+  //     nextStep,
+  //     userData,
+  //     submitRegistration
+  //   });
+  // }
 
   const checkPayment = async () => {
     setLoading(true);

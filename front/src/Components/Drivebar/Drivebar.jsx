@@ -1,12 +1,22 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
 import Setting from '@mui/icons-material/Settings';
 import Account from '@mui/icons-material/AccountCircle';
+import Logout from '@mui/icons-material/Logout';
+import Receipt from '@mui/icons-material/Receipt';
+
+import Cookies from 'js-cookie';
 
 export default function Drivebar() {
+    const navigate = useNavigate();
+    
+    const handleLogout = () => {
+        Cookies.remove('token');
+        navigate('/');
+    };
     return (
         <aside className="w-64 bg-white p-6 shadow">
             <div className="mb-8 flex flex-col items-center">
@@ -35,12 +45,23 @@ export default function Drivebar() {
                         </Link>
                     </li>
                     <li className="mb-4">
-                        <Link to="#" className="flex items-center text-gray-700 hover:text-black">
+                        <Link to="/myInvoices" className="flex items-center text-gray-700 hover:text-black">
+                        <Receipt />
+                            <span className="ml-2">Mes Factures</span>
+                        </Link>
+                    </li>
+                    <li className="mb-4">
+                        <Link to="/myProfile" className="flex items-center text-gray-700 hover:text-black">
                             <Account />
                             <span className="ml-2">Mon Compte</span>
                         </Link>
                     </li>
-                    
+                    <li className="mb-4">
+                        <button onClick={handleLogout} className="flex items-center text-gray-700 hover:text-black">
+                            <Logout/>
+                            <span className="ml-2">Déconnexion</span>
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </aside>
