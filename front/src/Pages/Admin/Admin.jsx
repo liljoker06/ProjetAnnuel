@@ -3,9 +3,16 @@ import axios from 'axios';
 
 const Admin = () => {
     const [users, setUsers] = useState([]);
+    const [companies, setCompanies] = useState([]);
+    const [subscriptions, setSubscriptions] = useState([]);
+
     const [showUsers, setShowUsers] = useState(false);
+    const [showCompanies, setShowCompanies] = useState(false);
+    const [showSubscriptions, setShowSubscriptions] = useState(false);
+
     const [editUser, setEditUser] = useState(null);
     const [showEditPopup, setShowEditPopup] = useState(false);
+
 
     useEffect(() => {
         axios.get('http://localhost:5555/api/users')
@@ -17,6 +24,29 @@ const Admin = () => {
                 console.error('Erreur lors de la récupération des utilisateurs:', error);
             });
     }, []);
+
+    useEffect(() => {
+        axios.get('http://localhost:5555/api/companies')
+            .then(response => {
+                console.log('Entreprises récupérées:', response.data);
+                setCompanies(response.data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des entreprises:', error);
+            });
+    }, []);
+
+    useEffect(() => {
+        axios.get('http://localhost:5555/api/subscriptions')
+            .then(response => {
+                console.log('Abonnements récupérés:', response.data);
+                setSubscriptions(response.data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des abonnements:', error);
+            });
+    }, []);
+
 
     const deleteUser = (userId) => {
         console.log(`Tentative de suppression de l'utilisateur avec l'ID: ${userId}`);
@@ -33,6 +63,16 @@ const Admin = () => {
     const toggleUserList = () => {
         setShowUsers(!showUsers);
         console.log('État showUsers:', !showUsers);
+    };
+
+    const toggleCompanyList = () => {
+        setShowCompanies(!showCompanies);
+        console.log('État showCompanies:', !showCompanies);
+    };
+
+    const toggleSubscriptionList = () => {
+        setShowSubscriptions(!showSubscriptions);
+        console.log('État showSubscriptions:', !showSubscriptions);
     };
 
     const handleEditClick = (user) => {
@@ -68,12 +108,11 @@ const Admin = () => {
                     Créer utilisateur
                 </button>
             </div>
-            
             {showUsers && (
                 <ul>
                     {users.map(user => (
                         <li key={user.user_id}>
-                            {user.user_fname} - {user.user_lname}
+                            {user.user_id} - {user.user_fname} - {user.user_lname} - {user.user_email} - {user.user_addre} - {user.user_posta} - {user.user_city} - {user.user_phone} - {user.user_role} - {user.user_subid}
                             <button onClick={() => deleteUser(user.user_id)} style={{ marginLeft: 10 }}>
                                 Supprimer utilisateur
                             </button>
@@ -84,6 +123,38 @@ const Admin = () => {
                     ))}
                 </ul>
             )}
+
+            <div>
+                <button onClick={toggleCompanyList}>
+                        Liste des Entreprises
+                </button>
+            </div>
+            {showCompanies && (
+                <ul>
+                    {companies.map(comp => (
+                        <li key={comp.comp_id}>
+                            {comp.comp_name} - {comp.comp_addre}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <div>
+                <button onClick={toggleSubscriptionList}>
+                        Liste des Abonnements
+                </button>
+            </div>
+            {showSubscriptions && (
+                <ul>
+                    {subscriptions.map(subs => (
+                        <li key={subs.subs_id}>
+                            {subs.subs_name} - {subs.subs_stora} - {subs.subs_price} - {subs.subs_nbuser}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+
             {showEditPopup && (
                 <div className="popup">
                     <h2>Modifier utilisateur</h2>

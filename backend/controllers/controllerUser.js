@@ -34,17 +34,22 @@ const getUserByMail = async (email) => {
 const deleteUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const user = await User.findByPk(user_id);
+    console.log(`Tentative de suppression de l'utilisateur avec l'ID: ${user_id}`);
+    
+    const user = await User.findOne({ where: { user_id: user_id } });
     if (!user) {
+      console.log('Utilisateur non trouvé');
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
+    
     await user.destroy();
+    console.log(`Utilisateur supprimé avec succès`);
     res.status(204).end();
   } catch (error) {
+    console.error('Erreur lors de la suppression:', error);
     res.status(500).json({ error: error.message });
   }
 };
-
 const updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
