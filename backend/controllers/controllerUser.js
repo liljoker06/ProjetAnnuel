@@ -1,4 +1,7 @@
-const { User } = require('../database/database');
+const { User} = require('../database/database');
+
+const { createUserStorageEntry } =  ('../database/services/userStorageService');
+
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -317,6 +320,18 @@ const createUser = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
+    // *** Nouvelle étape : Création de l'entrée dans UserStorage ***
+    try {
+      consoleLog('Tentative de création de l\'entrée dans UserStorage...', 'cyan');
+      await createUserStorageEntry(user.user_id, subscription.subs_id);
+      consoleLog(`Entrée dans UserStorage créée pour l'utilisateur : ${user.user_id}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'entrée dans UserStorage : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+
     // Création de la facture et/ou envoi du mail de bienvenue
     if (!codeEntreprise) {
       // Création de la facture
@@ -368,6 +383,8 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+
 
 
 const changeUserPassword = async (req, res) => {

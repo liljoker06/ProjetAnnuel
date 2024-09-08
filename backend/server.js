@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Op } = require('sequelize');
-const { sequelize, Company, Subscription, User, UserCompany, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
+const { sequelize, User, Subscription, UserCompany, Company, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
 
 const companyRoute = require('./routes/companyRoute');
 const userRoute = require('./routes/userRoute');
@@ -30,7 +30,7 @@ app.use('/api/userCompanies', userCompanyRoute);
 app.use('/api/logs', logsRoute);
 app.use('/api/files', fileRoute);
 app.use('/api/userStorages', userStorageRoute);
-app.use('/api/storageFiles', storageFileRoute);
+app.use('/api/storagefiles', storageFileRoute);
 app.use('/api/invoices', invoiceRoute);
 app.use('/api/subscriptions', subscriptionRoute);
 app.use('/api/currentSubs', currentSubRoute);
@@ -55,28 +55,28 @@ const insertDefaultSubscriptions = async () => {
 };
 
 // Insertion des données pour le développement
-const insertForDev = async () => {
-    const defaultCompanies = [
-        { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
-    ];
-    const defaultUsers = [
-        { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
-    ];
+// const insertForDev = async () => {
+//     const defaultCompanies = [
+//         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },
+//     ];
+//     const defaultUsers = [
+//         { user_fname: 'test', user_lname: 'test', user_email: 'matisagr@gmail.com', user_passw: '$2y$10$59Iz8v.Bo0IkFfMOcgLs..brpaSS8T/o0.fhRtobDYx5eV4YYX61u', user_addre: 'test', user_posta: 12345, user_city: 'test', user_phone: 'test', user_role: 1, user_subid: 1 },
+//     ];
 
-    for (const company of defaultCompanies) {
-        await Company.findOrCreate({
-            where: { comp_name: company.comp_name },
-            defaults: company,
-        });
-    }
+//     for (const company of defaultCompanies) {
+//         await Company.findOrCreate({
+//             where: { comp_name: company.comp_name },
+//             defaults: company,
+//         });
+//     }
 
-    for (const user of defaultUsers) {
-        await User.findOrCreate({
-            where: { user_email: user.user_email },
-            defaults: user,
-        });
-    }
-};
+//     for (const user of defaultUsers) {
+//         await User.findOrCreate({
+//             where: { user_email: user.user_email },
+//             defaults: user,
+//         });
+//     }
+// };
 
 
 
@@ -88,7 +88,7 @@ app.listen(PORT, async () => {
         console.log('Database connection has been established successfully.');
 
         // reset la base de données à chaque démarrage avec force: true
-        await sequelize.sync({ alter: true,  force: true });
+        await sequelize.sync({ alter: true, force: true });
 
         // await Company.sync({ alter: true, force: true });
         // await Subscription.sync({ alter: true, force: true });
@@ -104,7 +104,7 @@ app.listen(PORT, async () => {
 
         // Insertion des données
         await insertDefaultSubscriptions();
-        await insertForDev();
+        // await insertForDev();
         console.log('Database synced');
     } catch (error) {
         console.error('Unable to connect to the database:', error);

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { checkStorageLimit, uploadFile, getUserFiles } from '../../Functions/CallApi/CallStorage'; // Import des API pour récupérer et uploader les fichiers
+import Cookies from 'js-cookie'; // Pour récupérer le token de l'utilisateur
+import { getUserInfoByToken } from '../../Functions/CallApi/CallUser'; 
 
 import './Myfiles.css';
-
 import Drivebar from '../../Components/Drivebar/Drivebar';
 import FilterZone from './FilterZone';
 import SortZone from './SortZone';
@@ -15,17 +17,6 @@ import SortIcon from '@mui/icons-material/Sort';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
 
-const files = [
-    { name: 'Document 1', type: 'doc', updatedAt: '2024-07-29' },
-    { name: 'Spreadsheet 1', type: 'sheet', updatedAt: '2024-07-28' },
-    { name: 'Presentation 1', type: 'slides', updatedAt: '2024-07-27' },
-    { name: 'Image 1', type: 'image', updatedAt: '2024-07-26' },
-    { name: 'Document 2', type: 'doc', updatedAt: '2024-07-26' },
-    { name: 'Spreadsheet 2', type: 'sheet', updatedAt: '2024-07-25' },
-    { name: 'Presentation 2', type: 'slides', updatedAt: '2024-07-24' },
-    { name: 'Image 2', type: 'image', updatedAt: '2024-07-23' },
-];
-
 const fileIcons = {
     doc: <DescriptionIcon className="text-gray-600 text-4xl" />,
     sheet: <TableChartIcon className="text-gray-600 text-4xl" />,
@@ -37,14 +28,60 @@ export default function Myfiles() {
     const [isFilterZoneOpen, setFilterZoneIsOpen] = useState(false);
     const [isSortZoneOpen, setSortZoneIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredFiles, setFilteredFiles] = useState(files);
+    const [filteredFiles, setFilteredFiles] = useState([]);
+    const [files, setFiles] = useState([]); // Initialiser les fichiers vides (données non statiques)
 
     const [filters, setFilters] = useState({ doc: false, sheet: false, slides: false, image: false });
     const [sortField, setSortField] = useState('');
     const [sortOrder, setSortOrder] = useState('');
 
+    const [userId, setUserId] = useState(null); // Stocker l'ID utilisateur
 
-    // Recherche et filtrage des fichiers
+    // Récupérer l'ID de l'utilisateur à partir du token et charger les fichiers dynamiquement
+    useEffect(() => {
+        const token = Cookies.get('token');
+        if (token) {
+            getUserInfoByToken(token)
+                .then((data) => {
+                    if (data && data.userInfo) {
+                        setUserId(data.userInfo.user_id);
+                        loadUserFiles(data.userInfo.user_id); // Charger les fichiers après avoir récupéré l'ID utilisateur
+                    }
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de la récupération des informations utilisateur:', error);
+                });
+        }
+    }, []);
+
+    // Charger les fichiers de l'utilisateur
+    const loadUserFiles = async (userId) => {
+        try {
+            const userFiles = await getUserFiles(userId); // Appel API pour récupérer les fichiers de l'utilisateur
+            setFiles(userFiles); // Mettre à jour les fichiers dans l'état
+        } catch (error) {
+            console.error('Erreur lors du chargement des fichiers:', error);
+        }
+    };
+
+    // Gestion de l'upload des fichiers
+    const handleDrop = async (acceptedFiles) => {
+        if (!userId) {
+            alert("Utilisateur non authentifié");
+            return;
+        }
+
+        const file = acceptedFiles[0];
+
+        try {
+            await checkStorageLimit(userId, file.size); // Vérifier la limite de stockage
+            await uploadFile(file, userId); // Upload du fichier
+            alert('Fichier téléchargé avec succès');
+            loadUserFiles(userId); // Recharger la liste des fichiers après un upload réussi
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     const handleFilterChange = (type) => {
         setFilters(prevFilters => ({ ...prevFilters, [type]: !prevFilters[type] }));
@@ -95,16 +132,9 @@ export default function Myfiles() {
         setSortOrder('');
     };
 
-    const onDrop = useCallback(acceptedFiles => {
-        //mettre un envoi au serveur ici
-        //mettre l'actualisation de l'interface ici
-        console.log(acceptedFiles);
-    }, []);
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleDrop });
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-
-
+    // Mettre à jour les fichiers filtrés et triés dynamiquement lorsque la recherche, les filtres ou le tri changent
     useEffect(() => {
         let updatedFiles = searchFiles(files, searchQuery);
         updatedFiles = applyFilters(updatedFiles);

@@ -1,31 +1,29 @@
-module.exports = (sequelize, DataTypes) => {
-    const File = sequelize.define('File', {
-      file_id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-        unique: true,
-        allowNull: false,
-      },
-      file_userid: {
-        type: DataTypes.UUID,
-        references: {
-          model: 'Users',
-          key: 'user_id'
-        }
-      },
-      file_name: DataTypes.STRING,
-      file_updat: DataTypes.DATE,
-      file_modat: DataTypes.DATE,
-      file_size: DataTypes.INTEGER,
-      file_form: DataTypes.STRING,
-      file_path: DataTypes.STRING,
-    }, {});
-    File.associate = function(models) {
-      // associations can be defined here
-      File.belongsTo(models.User, { foreignKey: 'file_userid' });
-      File.hasMany(models.StorageFile, { foreignKey: 'file_id' });
-    };
-    return File;
-  };
-  
+const { sequelize, DataTypes } = require('../database'); 
+const File = require('./modelFile'); 
+const UserStorage = require('./modelUserStorage'); 
+
+const StorageFile = sequelize.define('StorageFile', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  file_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  stor_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  }
+}, {
+  tableName: 'storagefiles', // Si la table a un nom spécifique
+});
+
+// Associe StorageFile à File et UserStorage
+StorageFile.associate = () => {
+  StorageFile.belongsTo(File, { foreignKey: 'file_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+  StorageFile.belongsTo(UserStorage, { foreignKey: 'stor_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+};
+
+module.exports = StorageFile;
