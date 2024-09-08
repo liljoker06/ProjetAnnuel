@@ -60,9 +60,15 @@ const Admin = () => {
     return (
         <div>
             <h1>Admin</h1>
-            <button onClick={toggleUserList} style={{ marginTop: 100 }}>
-                Liste des utilisateurs
-            </button>
+            <div>
+                <button onClick={toggleUserList} style={{ marginTop: 100 }}>
+                    Liste des utilisateurs
+                </button>
+                <button>
+                    Créer utilisateur
+                </button>
+            </div>
+            
             {showUsers && (
                 <ul>
                     {users.map(user => (

@@ -605,6 +605,8 @@ const validateUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserByMail,
+  deleteUser,
+  updateUser,
   getUserInfoByToken,
   createUser,
   loginUser,
