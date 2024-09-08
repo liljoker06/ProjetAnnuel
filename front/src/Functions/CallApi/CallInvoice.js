@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const linkAPI = process.env.REACT_APP_LinkAPI;
+
 // récupère les factures par l'id de l'utilisateur
 export const getInvoicesByUserId = async (token) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/invoices/getInvoicesByUserId', {}, {
+        const response = await axios.post(`${linkAPI}/invoices/getByUserId`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
