@@ -49,6 +49,21 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const [updated] = await User.update(req.body, {
+      where: { user_id: user_id }
+    });
+    if (updated) {
+      const updatedUser = await User.findByPk(user_id);
+      return res.status(200).json(updatedUser);
+    }
+    throw new Error('Utilisateur non trouvé');
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 const createUser = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/createUser', 'cyan');
@@ -408,6 +423,7 @@ module.exports = {
   getUserByMail,
   createUser,
   deleteUser,
+  updateUser,
   loginUser,
   validateUserEmail,
   validateUser
