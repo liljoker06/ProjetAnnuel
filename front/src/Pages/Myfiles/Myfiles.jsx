@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { checkStorageLimit, uploadFile, getUserFiles} from '../../Functions/CallApi/CallStorage'; 
+import { checkStorageLimit, uploadFile, getUserFiles } from '../../Functions/CallApi/CallStorage'; 
 import { getUserInfoByToken } from '../../Functions/CallApi/CallUser'; 
 import Cookies from 'js-cookie';
 
@@ -18,10 +18,21 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
 
 const fileIcons = {
-    doc: <DescriptionIcon className="text-gray-600 text-4xl" />,
-    sheet: <TableChartIcon className="text-gray-600 text-4xl" />,
-    slides: <SlideshowIcon className="text-gray-600 text-4xl" />,
-    image: <ImageIcon className="text-gray-600 text-4xl" />,
+    pdf: <DescriptionIcon className="text-gray-600 text-4xl" />,
+    xls: <TableChartIcon className="text-gray-600 text-4xl" />,
+    xlsx: <TableChartIcon className="text-gray-600 text-4xl" />,
+    ppt: <SlideshowIcon className="text-gray-600 text-4xl" />,
+    jpg: <ImageIcon className="text-gray-600 text-4xl" />,
+    jpeg: <ImageIcon className="text-gray-600 text-4xl" />,
+    png: <ImageIcon className="text-gray-600 text-4xl" />,
+    gif: <ImageIcon className="text-gray-600 text-4xl" />,
+};
+
+const fileTypes = {
+    pdf: ['.pdf'],
+    spreadsheet: ['.xls', '.xlsx'],
+    presentation: ['.ppt'],
+    image: ['.jpg', '.jpeg', '.png', '.gif'],
 };
 
 export default function Myfiles() {
@@ -31,7 +42,12 @@ export default function Myfiles() {
     const [filteredFiles, setFilteredFiles] = useState([]);
     const [files, setFiles] = useState([]); // Initialiser les fichiers vides (données non statiques)
 
-    const [filters, setFilters] = useState({ doc: false, sheet: false, slides: false, image: false });
+    const [filters, setFilters] = useState({
+        pdf: false,
+        spreadsheet: false,
+        presentation: false,
+        image: false
+    });
     const [sortField, setSortField] = useState('');
     const [sortOrder, setSortOrder] = useState('');
 
@@ -45,7 +61,13 @@ export default function Myfiles() {
                 .then((data) => {
                     if (data && data.userInfo) {
                         setUserId(data.userInfo.user_id);
-                        getUserFiles(data.userInfo.user_id); 
+                        getUserFiles(data.userInfo.user_id)
+                            .then((files) => {
+                                setFiles(files); 
+                            })
+                            .catch((error) => {
+                                console.error('Erreur lors de la récupération des fichiers utilisateur:', error);
+                            });
                     }
                 })
                 .catch((error) => {
@@ -54,18 +76,14 @@ export default function Myfiles() {
         }
     }, []);
 
-
     // Gestion de l'upload des fichiers
     const handleDrop = useCallback(async (acceptedFiles) => {
-        // Vérifier si l'utilisateur est authentifié
         if (!userId) {
             alert("Utilisateur non authentifié");
             return;
         }
     
         const file = acceptedFiles[0]; 
-
-        console.log('voici le fichier',file);
     
         if (!file) {
             alert("Aucun fichier sélectionné");
@@ -73,27 +91,17 @@ export default function Myfiles() {
         }
     
         try {
-            // Vérifier la limite de stockage
             await checkStorageLimit(file.size);
-    
-            // Envoi du fichier
             await uploadFile(file); 
     
             alert('Fichier téléchargé avec succès');
     
-            // Récupérer les fichiers de l'utilisateur après l'upload
             const updatedFiles = await getUserFiles(userId);
-            setFiles(updatedFiles);  // Mise à jour des fichiers après upload
+            setFiles(updatedFiles);  
         } catch (error) {
             alert(`Erreur: ${error.message}`);
         }
-    
-        console.log(acceptedFiles);
     }, [userId, checkStorageLimit, uploadFile, getUserFiles]);
-    
-
-    
-    
 
     const handleFilterChange = (type) => {
         setFilters(prevFilters => ({ ...prevFilters, [type]: !prevFilters[type] }));
@@ -110,15 +118,17 @@ export default function Myfiles() {
     };
 
     const applyFilters = (files) => {
-        const noFiltersApplied = !filters.doc && !filters.sheet && !filters.slides && !filters.image;
+        const noFiltersApplied = !Object.values(filters).includes(true);
         if (noFiltersApplied) {
             return files;
         }
         return files.filter(file => {
-            if (filters.doc && file.type === 'doc') return true;
-            if (filters.sheet && file.type === 'sheet') return true;
-            if (filters.slides && file.type === 'slides') return true;
-            if (filters.image && file.type === 'image') return true;
+            const extension = file.file_form.toLowerCase();
+            for (const [filterType, extensions] of Object.entries(fileTypes)) {
+                if (filters[filterType] && extensions.includes(extension)) {
+                    return true;
+                }
+            }
             return false;
         });
     };
@@ -135,11 +145,16 @@ export default function Myfiles() {
     };
 
     const searchFiles = (files, query) => {
-        return files.filter(file => file.name.toLowerCase().includes(query.toLowerCase()));
+        return files.filter(file => file.file_name && file.file_name.toLowerCase().includes(query.toLowerCase()));
     };
 
     const resetFiltersAndSort = () => {
-        setFilters({ doc: false, sheet: false, slides: false, image: false });
+        setFilters({
+            pdf: false,
+            spreadsheet: false,
+            presentation: false,
+            image: false
+        });
         setSortField('');
         setSortOrder('');
     };
@@ -172,7 +187,7 @@ export default function Myfiles() {
                         <FilterListIcon /> Filtrer
                     </button>
                     {   // Montrer le bouton de réinitialisation si un filtre ou un tri est appliqué
-                        (filters.doc || filters.sheet || filters.slides || filters.image || sortField || sortOrder) &&
+                        (Object.values(filters).includes(true) || sortField || sortOrder) &&
                         <button onClick={resetFiltersAndSort} className="ml-2 p-2 border rounded-lg shadow bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring focus:border-red-300">Réinitialiser</button>
                     }
                 </div>
@@ -196,12 +211,12 @@ export default function Myfiles() {
                 {/* Liste des fichiers */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {filteredFiles.map((file) => (
-                        <div key={file.name} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <div key={file.file_id} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
                             <div className="flex items-center">
-                                {fileIcons[file.type]}
+                                {fileIcons[file.file_form.replace('.', '')] || <DescriptionIcon className="text-gray-600 text-4xl" />}
                                 <div className="ml-4">
-                                    <h3 className="text-lg font-semibold text-gray-600">{file.name}</h3>
-                                    <p className="text-sm text-gray-600">Modifié le {file.updatedAt}</p>
+                                    <h3 className="text-lg font-semibold text-gray-600">{file.file_name}</h3>
+                                    <p className="text-sm text-gray-600">Modifié le {new Date(file.file_modat).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         </div>

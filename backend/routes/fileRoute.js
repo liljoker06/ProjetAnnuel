@@ -6,4 +6,12 @@ const authenticateToken = require('../middleware/authenticateToken'); // Middlew
 // Route pour uploader un fichier
 router.post('/upload', authenticateToken, fileController.uploadFile);
 
+// Route pour obtenir tous les fichiers de l'utilisateur via id
+router.get('/', authenticateToken, fileController.getfilebyuserid);
+
+// Route pour obtenir un fichier via id
+
+router.post('/userfile', authenticateToken, fileController.getAllFilesbyUser);
+
+
 module.exports = router;

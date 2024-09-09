@@ -60,15 +60,15 @@ export const uploadFile = async (file) => {
 
 
 // Récupérer les fichiers de l'utilisateur
-export const getUserFiles = async () => {
+export const getUserFiles = async (userId) => {
   try {
-    const token = Cookies.get('token'); // Récupérer le token d'authentification
 
+    const token = Cookies.get('token'); // Récupérer le token d'authentification
     if (!token) {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.get(`http://localhost:5555/api/storagefile/user`, {
+    const response = await axios.post(`http://localhost:5555/api/files/userfile`, { userId } , {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
