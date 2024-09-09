@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios'; // Import axios for HTTP requests
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { getUserInfoByToken } from '../../Functions/CallApi/CallUser';
 
 export default function Profile_information({ user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country }) {
     const [open, setOpen] = useState(false);
@@ -19,9 +20,30 @@ export default function Profile_information({ user_name, user_email, user_role, 
     });
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [userId, setUserId] = useState(null);
     const navigate = useNavigate(); // For redirection after account deletion
 
     useEffect(() => {
+        const token = Cookies.get('token');
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            navigate('/login');
+        } else {
+            getUserInfoByToken(token).then((data) => {
+                console.log('User data:', data);
+                const userInfo = data.userInfo;
+                setUserId(userInfo.user_id);
+                console.log('User Info:', userInfo);
+                if (!data) {
+                    console.log('No user data found, redirecting to login');
+                    // navigate('/login');
+                }
+            }).catch((error) => {
+                console.error('Error fetching user data:', error);
+                navigate('/login');
+            });
+        }
+
         if (open) {
             setFormData({
                 user_name,
@@ -34,7 +56,7 @@ export default function Profile_information({ user_name, user_email, user_role, 
                 country,
             });
         }
-    }, [open, user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country]);
+    }, [navigate, open, user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -67,20 +89,17 @@ export default function Profile_information({ user_name, user_email, user_role, 
         }
     };
 
-    const handleDeleteAccount = () => {
-        const token = Cookies.get('token'); // Assume the token is stored in cookies
+    const handleDeleteAccount = (userId) => {
 
-        // Demander une confirmation avant la suppression
         const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');
         if (!confirmed) return;
 
-        axios.delete('http://localhost:5555/api/users/deleteUser', {
-                headers: { Authorization: `Bearer ${token}` },
+        axios.delete(`http://localhost:5555/api/users/deleteUser/${userId}`, {
             })
             .then((response) => {
                 console.log('Compte supprimé avec succès');
-                Cookies.remove('token'); // Supprimer le token des cookies
-                navigate('/'); // Rediriger vers la page d'accueil ou de connexion
+                Cookies.remove('token');
+                navigate('/');
             })
             .catch((error) => {
                 console.error('Erreur lors de la suppression du compte :', error);
@@ -208,15 +227,15 @@ export default function Profile_information({ user_name, user_email, user_role, 
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
+                        className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2 hover:bg-blue-700"
                     >
                         Enregistrer
                     </button>
                     <button
-                    onClick={handleDeleteAccount}
-                    className="px-4 py-2 font-bold text-white bg-red-600 rounded-lg hover:bg-red-700"
+                        onClick={() => handleDeleteAccount(userId)}
+                        className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
                     >
-                    Supprimer mon compte
+                        Supprimer compte
                     </button>
                 </div>
             </Dialog>
