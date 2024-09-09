@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import axios from 'axios'; // Import axios for HTTP requests
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export default function Profile_information({ user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country }) {
     const [open, setOpen] = useState(false);
@@ -16,10 +19,10 @@ export default function Profile_information({ user_name, user_email, user_role, 
     });
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // For redirection after account deletion
 
     useEffect(() => {
         if (open) {
-            // Update form data with the latest props when the dialog is opened
             setFormData({
                 user_name,
                 user_email,
@@ -58,11 +61,31 @@ export default function Profile_information({ user_name, user_email, user_role, 
         if (password === '') {
             setError('Veuillez confirmer votre mot de passe');
         } else {
-            // Here you can add your logic for password verification (e.g., send to the server for validation)
             console.log('Form Data Submitted:', formData);
             console.log('Password Confirmation:', password);
             handleClose();
         }
+    };
+
+    const handleDeleteAccount = () => {
+        const token = Cookies.get('token'); // Assume the token is stored in cookies
+
+        // Demander une confirmation avant la suppression
+        const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');
+        if (!confirmed) return;
+
+        axios.delete('http://localhost:5555/api/users/deleteUser', {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => {
+                console.log('Compte supprimé avec succès');
+                Cookies.remove('token'); // Supprimer le token des cookies
+                navigate('/'); // Rediriger vers la page d'accueil ou de connexion
+            })
+            .catch((error) => {
+                console.error('Erreur lors de la suppression du compte :', error);
+                alert('Une erreur est survenue lors de la suppression du compte.');
+            });
     };
 
     return (
@@ -188,6 +211,12 @@ export default function Profile_information({ user_name, user_email, user_role, 
                         className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
                     >
                         Enregistrer
+                    </button>
+                    <button
+                    onClick={handleDeleteAccount}
+                    className="px-4 py-2 font-bold text-white bg-red-600 rounded-lg hover:bg-red-700"
+                    >
+                    Supprimer mon compte
                     </button>
                 </div>
             </Dialog>
