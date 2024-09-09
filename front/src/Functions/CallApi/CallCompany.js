@@ -28,7 +28,7 @@ export const validateCompany = async (data) => {
 // check si le code entreprise existe
 export const validateCompanyCode = async (data) => {
     try {
-        const response = await axios.post({linkAPI} + '/companies/validateCode', data);
+        const response = await axios.post(`${linkAPI}/companies/validateCode`, data);
         return response.data.isValid;
     } catch (error) {
         return false;

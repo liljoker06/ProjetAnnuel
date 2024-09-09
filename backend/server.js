@@ -88,7 +88,7 @@ app.listen(PORT, async () => {
         console.log('Database connection has been established successfully.');
 
         // reset la base de données à chaque démarrage avec force: true
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ alter: true, force: true });
 
         // await Company.sync({ alter: true, force: true });
         // await Subscription.sync({ alter: true, force: true });

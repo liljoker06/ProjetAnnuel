@@ -16,7 +16,7 @@ export const validateUserEmail = async (data) => {
 // check si l'utilisateur existe
 export const validateUser = async (data) => {
     try {
-        const response = await axios.post(`${linkAPI}/users/validate`, data);
+        const response = await axios.post(`${linkAPI}/users/validateUser`, data);
 
         return response.data.isValid;
     } catch (error) {
@@ -27,7 +27,7 @@ export const validateUser = async (data) => {
 // récupère les infos de l'utilisateur par son token
 export const getUserInfoByToken = async (token) => {
     try {
-        const response = await axios.post(`${linkAPI}/users/getByToken`, {}, {
+        const response = await axios.post(`${linkAPI}/users/getUserInfoByToken`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
