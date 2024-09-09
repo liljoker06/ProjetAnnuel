@@ -1,6 +1,5 @@
 const { User} = require('../database/database');
 
-const { createUserStorageEntry } =  ('../database/services/userStorageService');
 
 
 const jwt = require('jsonwebtoken');
@@ -15,6 +14,7 @@ const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubs
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
 const { connexionMail, welcomeMail, welcomeMail2 } = require('./controllerMailCode');
+const { createUserStorage } = require('./controllerUserStorage');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -320,10 +320,10 @@ const createUser = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    // *** Nouvelle étape : Création de l'entrée dans UserStorage ***
+    // Attribution de l'espace de stockage à l'utilisateur
     try {
       consoleLog('Tentative de création de l\'entrée dans UserStorage...', 'cyan');
-      await createUserStorageEntry(user.user_id, subscription.subs_id);
+      await createUserStorage({ user_id: user.user_id });
       consoleLog(`Entrée dans UserStorage créée pour l'utilisateur : ${user.user_id}`, 'green');
     } catch (error) {
       consoleLog('Erreur lors de la création de l\'entrée dans UserStorage : ' + error.message, 'red');

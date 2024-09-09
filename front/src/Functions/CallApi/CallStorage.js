@@ -11,7 +11,7 @@ export const checkStorageLimit = async (userId, fileSize) => {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.get(`http://localhost:5555/api/userStorages/check/${userId}`, {
+    const response = await axios.get(`http://localhost:5555/api/userStorages/check`, {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
@@ -43,7 +43,7 @@ export const uploadFile = async (file, userId) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axios.post(`http://localhost:5555/api/storagefile/upload/${userId}`, formData, {
+    const response = await axios.post(`http://localhost:5555/api/storagefile/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
@@ -66,7 +66,7 @@ export const getUserFiles = async (userId) => {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.get(`http://localhost:5555/api/storagefile/${userId}`, {
+    const response = await axios.get(`http://localhost:5555/api/storagefile`, {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
