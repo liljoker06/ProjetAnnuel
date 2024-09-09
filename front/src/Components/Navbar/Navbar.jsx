@@ -19,14 +19,11 @@ export default function Navbar() {
           if (checkParent(target, navMenu)) {
             if (navMenuDiv.classList.contains("hidden")) {
               navMenuDiv.classList.remove("hidden");
-              setScrollPos(11);
             } else {
               navMenuDiv.classList.add("hidden");
-              setScrollPos(11);
             }
           } else {
             navMenuDiv.classList.add("hidden");
-            setScrollPos(0);
           }
         }
       }
@@ -74,7 +71,6 @@ export default function Navbar() {
 
   const headerClass = scrollPos > 10 ? "bg-white shadow" : "";
   const navActionClass = scrollPos > 10 ? "gradient text-white" : "bg-white text-gray-800";
-  const activeColourClass = scrollPos > 10 ? "text-gray-800" : "text-white";
   const logoTitleClass = scrollPos > 10 ? "text-blue-500" : "text-white";
 
   if (location.pathname === '/dashboard' || location.pathname === '/myfiles' || location.pathname === '/myProfile' || location.pathname === '/myInvoices') {

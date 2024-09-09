@@ -9,9 +9,6 @@
     "@mui/material": "^5.16.5",
     "@ramonak/react-progress-bar": "^5.2.0",
     "@react-pdf/renderer": "^3.4.4",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.3",
@@ -31,7 +28,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -53,6 +50,10 @@
     ]
   },
   "devDependencies": {
-    "daisyui": "^4.11.1"
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "daisyui": "^4.11.1",
+    "jest": "^27.5.1"
   }
 }
