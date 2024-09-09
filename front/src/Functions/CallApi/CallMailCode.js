@@ -1,8 +1,9 @@
 import axios from "axios";
+const linkAPI = process.env.REACT_APP_LinkAPI;
 
 export const generateMailCode = async (data) => {
     try {
-        const response = await axios.post("http://localhost:5555/api/mailCodes/generate", data);
+        const response = await axios.post(`${linkAPI}/mailCodes/generate`, data);
 
         return { success: true, data: response.data };
     } catch (error) {
@@ -17,7 +18,7 @@ export const generateMailCode = async (data) => {
 
 export const validateMailCode = async (data) => {
     try {
-        const response = await axios.post("http://localhost:5555/api/mailCodes/validate", data);
+        const response = await axios.post(`${linkAPI}/mailCodes/validate`, data);
         return { success: true, status: response.status };
     } catch (error) {
         if (error.response) {
@@ -32,7 +33,7 @@ export const validateMailCode = async (data) => {
 
 export const resendMailCode = async (data) => {
     try {
-        const response = await axios.post("http://localhost:5555/api/mailCodes/resend", data);
+        const response = await axios.post(`${linkAPI}/mailCodes/resend`, data);
 
         return { success: true, data: response.data };
     } catch (error) {
