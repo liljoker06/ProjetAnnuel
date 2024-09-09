@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import ProgressBar from "@ramonak/react-progress-bar";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -161,7 +162,7 @@ const Admin = () => {
                             <li key={user.user_id} className="mb-4 bg-white p-4 rounded-lg shadow-lg">
                                 <h2 className="text-lg font-bold mb-4 text-gray-900">Information utilisateur</h2>
                                 <div className="text-md font-bold mb-4 text-gray-500">
-                                    {user.user_id} - {user.user_fname} - {user.user_lname} - {user.user_email} - {user.user_addre} - {user.user_posta} - {user.user_city} - {user.user_phone} - {user.user_role} - {user.user_date}
+                                    {user.user_fname} - {user.user_lname} - {user.user_email} - {user.user_addre} - {user.user_posta} - {user.user_city} - {user.user_phone} - {user.user_role} - {user.user_date}
                                 </div>
 
                                 {userCompany && (
@@ -195,6 +196,7 @@ const Admin = () => {
 
                                 <div>
                                     <p>{`Stockage utilisé: ${usedStorage} / ${totalStorage} Go (${percentageUsed.toFixed(2)}%)`}</p>
+                                    <ProgressBar completed={percentageUsed} bgColor="#3b82f6" height="20px" />
                                 </div>
 
                                 <button 
