@@ -8,7 +8,7 @@ router.get('/', userController.getAllUsers);
 // router.post('/getByMail', userController.getUserByMail);
 router.post('/getUserInfoByToken', userController.getUserInfoByToken);
 router.post('/create', validateUser, userController.createUser);
-router.post('/changeUserPassword', userController.changeUserPassword);
+// router.post('/changeUserPassword', userController.changeUserPassword);
 router.post('/login', userController.loginUser);
 router.post('/validateEmail', userController.validateUserEmail);
 router.post('/validateUser', userController.validateUser);

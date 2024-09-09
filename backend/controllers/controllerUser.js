@@ -1,4 +1,6 @@
-const { User } = require('../database/database');
+const { User, CurrentSub } = require('../database/database');
+
+
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -33,15 +35,17 @@ const getUserByMail = async (email) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const { user_id } = req.params;
-    console.log(`Tentative de suppression de l'utilisateur avec l'ID: ${user_id}`);
+    const { userId } = req.params;
+    console.log(`Suppression de l'utilisateur avec l'ID: ${userId}`);
+
+    await CurrentSub.destroy({ where: { curs_userid: userId } });
     
-    const user = await User.findOne({ where: { user_id: user_id } });
+    const user = await User.findOne({ where: { user_id: userId } });
     if (!user) {
       console.log('Utilisateur non trouvé');
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
-    
+
     await user.destroy();
     console.log(`Utilisateur supprimé avec succès`);
     res.status(204).end();
@@ -50,6 +54,8 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 const updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
