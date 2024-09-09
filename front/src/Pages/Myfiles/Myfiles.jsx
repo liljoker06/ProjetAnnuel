@@ -40,7 +40,7 @@ export default function Myfiles() {
     const [isSortZoneOpen, setSortZoneIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredFiles, setFilteredFiles] = useState([]);
-    const [files, setFiles] = useState([]); // Initialiser les fichiers vides (données non statiques)
+    const [files, setFiles] = useState([]);
 
     const [filters, setFilters] = useState({
         pdf: false,
@@ -51,9 +51,8 @@ export default function Myfiles() {
     const [sortField, setSortField] = useState('');
     const [sortOrder, setSortOrder] = useState('');
 
-    const [userId, setUserId] = useState(null); // Stocker l'ID utilisateur
+    const [userId, setUserId] = useState(null);
 
-    // Récupérer l'ID de l'utilisateur à partir du token et charger les fichiers dynamiquement
     useEffect(() => {
         const token = Cookies.get('token');
         if (token) {
@@ -63,7 +62,7 @@ export default function Myfiles() {
                         setUserId(data.userInfo.user_id);
                         getUserFiles(data.userInfo.user_id)
                             .then((files) => {
-                                setFiles(files); 
+                                setFiles(files);
                             })
                             .catch((error) => {
                                 console.error('Erreur lors de la récupération des fichiers utilisateur:', error);
@@ -76,7 +75,6 @@ export default function Myfiles() {
         }
     }, []);
 
-    // Gestion de l'upload des fichiers
     const handleDrop = useCallback(async (acceptedFiles) => {
         if (!userId) {
             alert("Utilisateur non authentifié");
@@ -161,13 +159,20 @@ export default function Myfiles() {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleDrop });
 
-    // Mettre à jour les fichiers filtrés et triés dynamiquement lorsque la recherche, les filtres ou le tri changent
     useEffect(() => {
         let updatedFiles = searchFiles(files, searchQuery);
         updatedFiles = applyFilters(updatedFiles);
         updatedFiles = applySort(updatedFiles);
         setFilteredFiles(updatedFiles);
     }, [files, filters, sortField, sortOrder, searchQuery]);
+
+    const openFileInNewTab = (fileUrl) => {
+        if (fileUrl) {
+            window.open(fileUrl, '_blank');
+        } else {
+            console.error('URL du fichier non valide:', fileUrl);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
@@ -211,7 +216,11 @@ export default function Myfiles() {
                 {/* Liste des fichiers */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {filteredFiles.map((file) => (
-                        <div key={file.file_id} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <div 
+                            key={file.file_id} 
+                            className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => openFileInNewTab(file.file_url)} // Ajouter l'événement onClick ici
+                        >
                             <div className="flex items-center">
                                 {fileIcons[file.file_form.replace('.', '')] || <DescriptionIcon className="text-gray-600 text-4xl" />}
                                 <div className="ml-4">
