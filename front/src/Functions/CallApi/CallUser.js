@@ -42,7 +42,7 @@ export const getUserInfoByToken = async (token) => {
 //changer le mot de passe
 export const changeUserPassword = async (data) => {
     try {
-        const response = await axios.post(`${linkAPI}/users/changePassword`, data);
+        const response = await axios.post(`${linkAPI}/users/changeUserPassword`, data);
         return response.data; 
     } catch (error) {
         console.error('API error:', error);
