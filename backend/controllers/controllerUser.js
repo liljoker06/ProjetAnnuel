@@ -1,4 +1,6 @@
-const { User } = require('../database/database');
+const { User, CurrentSub } = require('../database/database');
+
+
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -29,8 +31,46 @@ const getUserByMail = async (email) => {
   } catch (error) {
     throw new Error('Erreur lors de la récupération de l\'utilisateur : ' + error.message);
   }
+}
+
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(`Suppression de l'utilisateur avec l'ID: ${userId}`);
+
+    await CurrentSub.destroy({ where: { curs_userid: userId } });
+    
+    const user = await User.findOne({ where: { user_id: userId } });
+    if (!user) {
+      console.log('Utilisateur non trouvé');
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    await user.destroy();
+    console.log(`Utilisateur supprimé avec succès`);
+    res.status(204).end();
+  } catch (error) {
+    console.error('Erreur lors de la suppression:', error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
+
+const updateUser = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const [updated] = await User.update(req.body, {
+      where: { user_id: user_id }
+    });
+    if (updated) {
+      const updatedUser = await User.findByPk(user_id);
+      return res.status(200).json(updatedUser);
+    }
+    throw new Error('Utilisateur non trouvé');
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 // pas fini
 const getUserInfoByToken = async (req, res) => {
   consoleLog('• [START] controllers/controllerUser/getUserInfoByToken', 'cyan');
@@ -576,9 +616,10 @@ const validateUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserByMail,
+  deleteUser,
+  updateUser,
   getUserInfoByToken,
   createUser,
-  changeUserPassword,
   loginUser,
   validateUserEmail,
   validateUser

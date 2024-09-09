@@ -29,6 +29,7 @@ import Profile from "./Pages/Profile/Profile";
 import Page404 from "./Pages/Page404/Page404";
 
 import Footer from "./Components/Footer/Footer";
+import Admin from "./Pages/Admin/Admin";
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<Admin />} />
 
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/myfiles" element={<Myfiles />} />
