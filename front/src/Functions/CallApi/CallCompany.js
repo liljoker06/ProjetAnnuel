@@ -1,11 +1,12 @@
 import axios from "axios";
 
+const linkAPI = process.env.REACT_APP_LinkAPI;
 
 // get company by code 
 export const getCompanyByCode = async (data) => {
     try {
         console.log('Données envoyées à l\'API:', data);
-        const response = await axios.post('http://localhost:5555/api/companies/getByCode', data);
+        const response = await axios.post(`${linkAPI}/companies/getByCode`, data);
         return response.data;
     } catch (error) {
         console.error('Erreur lors de l\'appel API:', error);
@@ -16,7 +17,7 @@ export const getCompanyByCode = async (data) => {
 // check si l'entreprise existe
 export const validateCompany = async (data) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/companies/validate', data);
+        const response = await axios.post(`${linkAPI}/companies/validate`, data);
 
         return response.data;
     } catch (error) {
@@ -27,8 +28,7 @@ export const validateCompany = async (data) => {
 // check si le code entreprise existe
 export const validateCompanyCode = async (data) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/companies/validateCode', data);
-
+        const response = await axios.post(`${linkAPI}/companies/validateCode`, data);
         return response.data.isValid;
     } catch (error) {
         return false;
