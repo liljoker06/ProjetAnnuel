@@ -24,6 +24,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
 app.use('/api/companies', companyRoute);
 app.use('/api/users', userRoute);
 app.use('/api/userCompanies', userCompanyRoute);
@@ -88,7 +91,7 @@ app.listen(PORT, async () => {
         console.log('Database connection has been established successfully.');
 
         // reset la base de données à chaque démarrage avec force: true
-        await sequelize.sync({ alter: true, force: true });
+        await sequelize.sync({ alter: true});
 
         // await Company.sync({ alter: true, force: true });
         // await Subscription.sync({ alter: true, force: true });

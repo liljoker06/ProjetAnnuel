@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import { useDropzone } from 'react-dropzone';
-import { checkStorageLimit, uploadFile, getUserFiles } from '../../Functions/CallApi/CallStorage'; // Import des API pour récupérer et uploader les fichiers
-import Cookies from 'js-cookie'; // Pour récupérer le token de l'utilisateur
+import { checkStorageLimit, uploadFile, getUserFiles} from '../../Functions/CallApi/CallStorage'; 
 import { getUserInfoByToken } from '../../Functions/CallApi/CallUser'; 
+import Cookies from 'js-cookie';
 
 import './Myfiles.css';
 import Drivebar from '../../Components/Drivebar/Drivebar';
@@ -45,7 +45,7 @@ export default function Myfiles() {
                 .then((data) => {
                     if (data && data.userInfo) {
                         setUserId(data.userInfo.user_id);
-                        loadUserFiles(data.userInfo.user_id); // Charger les fichiers après avoir récupéré l'ID utilisateur
+                        getUserFiles(data.userInfo.user_id); 
                     }
                 })
                 .catch((error) => {
@@ -54,34 +54,46 @@ export default function Myfiles() {
         }
     }, []);
 
-    // Charger les fichiers de l'utilisateur
-    const loadUserFiles = async (userId) => {
-        try {
-            const userFiles = await getUserFiles(userId); // Appel API pour récupérer les fichiers de l'utilisateur
-            setFiles(userFiles); // Mettre à jour les fichiers dans l'état
-        } catch (error) {
-            console.error('Erreur lors du chargement des fichiers:', error);
-        }
-    };
 
     // Gestion de l'upload des fichiers
-    const handleDrop = async (acceptedFiles) => {
+    const handleDrop = useCallback(async (acceptedFiles) => {
+        // Vérifier si l'utilisateur est authentifié
         if (!userId) {
             alert("Utilisateur non authentifié");
             return;
         }
+    
+        const file = acceptedFiles[0]; 
 
-        const file = acceptedFiles[0];
-
-        try {
-            await checkStorageLimit(userId, file.size); // Vérifier la limite de stockage
-            await uploadFile(file, userId); // Upload du fichier
-            alert('Fichier téléchargé avec succès');
-            loadUserFiles(userId); // Recharger la liste des fichiers après un upload réussi
-        } catch (error) {
-            alert(error.message);
+        console.log('voici le fichier',file);
+    
+        if (!file) {
+            alert("Aucun fichier sélectionné");
+            return;
         }
-    };
+    
+        try {
+            // Vérifier la limite de stockage
+            await checkStorageLimit(file.size);
+    
+            // Envoi du fichier
+            await uploadFile(file); 
+    
+            alert('Fichier téléchargé avec succès');
+    
+            // Récupérer les fichiers de l'utilisateur après l'upload
+            const updatedFiles = await getUserFiles(userId);
+            setFiles(updatedFiles);  // Mise à jour des fichiers après upload
+        } catch (error) {
+            alert(`Erreur: ${error.message}`);
+        }
+    
+        console.log(acceptedFiles);
+    }, [userId, checkStorageLimit, uploadFile, getUserFiles]);
+    
+
+    
+    
 
     const handleFilterChange = (type) => {
         setFilters(prevFilters => ({ ...prevFilters, [type]: !prevFilters[type] }));

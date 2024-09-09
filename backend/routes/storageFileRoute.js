@@ -6,6 +6,6 @@ const storageFileController = require('../controllers/controllerStorageFile');
 router.get('/', storageFileController.getAllStorageFiles);
 
 // Route pour uploader un fichier pour un utilisateur spécifique
-router.post('/:userId', storageFileController.uploadFile);
+router.post('/upload', storageFileController.uploadFile);
 
 module.exports = router;

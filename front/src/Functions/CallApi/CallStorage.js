@@ -1,9 +1,9 @@
 import axios from "axios";
-import Cookies from 'js-cookie'; // Utilisation dans le frontend
-import FormData from 'form-data'; // Pour gérer FormData dans Node.js
+import Cookies from 'js-cookie'; 
+import FormData from 'form-data'; // Pour envoyer des données de formulaire
 
 // Vérifier la limite de stockage de l'utilisateur
-export const checkStorageLimit = async (userId, fileSize) => {
+export const checkStorageLimit = async (fileSize) => {
   try {
     const token = Cookies.get('token'); // Récupérer le token d'authentification
 
@@ -31,34 +31,36 @@ export const checkStorageLimit = async (userId, fileSize) => {
 };
 
 // Uploader un fichier pour l'utilisateur
-export const uploadFile = async (file, userId) => {
+export const uploadFile = async (file) => {
+  if (!file) {
+    console.error("Aucun fichier à uploader");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  console.log([...formData.entries()]);
+
+  const token = Cookies.get('token');
+
   try {
-    const token = Cookies.get('token'); // Récupérer le token d'authentification
-
-    if (!token) {
-      throw new Error("Token d'authentification manquant");
-    }
-
-    // Utiliser form-data dans Node.js
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await axios.post(`http://localhost:5555/api/storagefile/upload`, formData, {
+    const response = await axios.post('http://localhost:5555/api/files/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
+        Authorization: `Bearer ${token}`, 
       },
     });
-
-    return response.data;
+    console.log('Fichier uploadé avec succès:', response.data);
   } catch (error) {
-    console.error('Erreur lors de l\'upload du fichier:', error.response?.data || error.message);
-    throw error;
+    console.error('Erreur lors de l\'upload du fichier:', error);
   }
 };
 
+
+
 // Récupérer les fichiers de l'utilisateur
-export const getUserFiles = async (userId) => {
+export const getUserFiles = async () => {
   try {
     const token = Cookies.get('token'); // Récupérer le token d'authentification
 
@@ -66,7 +68,7 @@ export const getUserFiles = async (userId) => {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.get(`http://localhost:5555/api/storagefile`, {
+    const response = await axios.get(`http://localhost:5555/api/storagefile/user`, {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
