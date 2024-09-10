@@ -4,12 +4,12 @@ const { Op } = require('sequelize');
 const consoleLog = require('../consoleLog');
 
 const transporter = nodemailer.createTransport({
-    host: 'mail.vitruvecloud.fr',
-    port: 587,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
     secure: false,
     auth: {
-        user: 'noreply@vitruvecloud.fr',
-        pass: 'xB2!Y_8H9G2znTq'
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     },
     tls: {
         rejectUnauthorized: false
