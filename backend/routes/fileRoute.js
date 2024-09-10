@@ -5,7 +5,6 @@ const authenticateToken = require('../middleware/authenticateToken'); // Middlew
 
 router.post('/upload', authenticateToken, fileController.uploadFile);
 router.get('/', fileController.getAllFiles);
-router.post('/', fileController.createFile);
 router.delete('/deleteFiles/:file_id', fileController.deleteFile);
 router.put('/updateFiles/:file_id', fileController.updateFile);
 

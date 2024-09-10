@@ -164,7 +164,6 @@ module.exports = {
   getfilebyuserid,
   getAllFilesbyUser,
   getAllFiles,
-  createFile,
   deleteFile,
   updateFile,
 };
