@@ -34,7 +34,7 @@ const uploadFile = async (req, res) => {
       return res.status(400).json({ message: 'Le dossier utilisateur n\'existe pas.' });
     }
 
-    const filePath = path.join(userFolderPath, path.extname(file.name));
+    const filePath = path.join(userFolderPath, file.name);
 
     // Déplacer le fichier vers le répertoire utilisateur
     await file.mv(filePath);
@@ -164,7 +164,6 @@ module.exports = {
   getfilebyuserid,
   getAllFilesbyUser,
   getAllFiles,
-  createFile,
   deleteFile,
   updateFile,
 };
