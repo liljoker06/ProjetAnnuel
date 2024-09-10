@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { checkStorageLimit, uploadFile, getUserFiles } from '../../Functions/CallApi/CallStorage'; 
+import { getUserInfoByToken } from '../../Functions/CallApi/CallUser'; 
+import Cookies from 'js-cookie';
 
 import './Myfiles.css';
-
 import Drivebar from '../../Components/Drivebar/Drivebar';
 import FilterZone from './FilterZone';
 import SortZone from './SortZone';
@@ -15,36 +17,89 @@ import SortIcon from '@mui/icons-material/Sort';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import UploadIcon from '@mui/icons-material/Upload';
 
-const files = [
-    { name: 'Document 1', type: 'doc', updatedAt: '2024-07-29' },
-    { name: 'Spreadsheet 1', type: 'sheet', updatedAt: '2024-07-28' },
-    { name: 'Presentation 1', type: 'slides', updatedAt: '2024-07-27' },
-    { name: 'Image 1', type: 'image', updatedAt: '2024-07-26' },
-    { name: 'Document 2', type: 'doc', updatedAt: '2024-07-26' },
-    { name: 'Spreadsheet 2', type: 'sheet', updatedAt: '2024-07-25' },
-    { name: 'Presentation 2', type: 'slides', updatedAt: '2024-07-24' },
-    { name: 'Image 2', type: 'image', updatedAt: '2024-07-23' },
-];
-
 const fileIcons = {
-    doc: <DescriptionIcon className="text-gray-600 text-4xl" />,
-    sheet: <TableChartIcon className="text-gray-600 text-4xl" />,
-    slides: <SlideshowIcon className="text-gray-600 text-4xl" />,
-    image: <ImageIcon className="text-gray-600 text-4xl" />,
+    pdf: <DescriptionIcon className="text-gray-600 text-4xl" />,
+    xls: <TableChartIcon className="text-gray-600 text-4xl" />,
+    xlsx: <TableChartIcon className="text-gray-600 text-4xl" />,
+    ppt: <SlideshowIcon className="text-gray-600 text-4xl" />,
+    jpg: <ImageIcon className="text-gray-600 text-4xl" />,
+    jpeg: <ImageIcon className="text-gray-600 text-4xl" />,
+    png: <ImageIcon className="text-gray-600 text-4xl" />,
+    gif: <ImageIcon className="text-gray-600 text-4xl" />,
+};
+
+const fileTypes = {
+    pdf: ['.pdf'],
+    spreadsheet: ['.xls', '.xlsx'],
+    presentation: ['.ppt'],
+    image: ['.jpg', '.jpeg', '.png', '.gif'],
 };
 
 export default function Myfiles() {
     const [isFilterZoneOpen, setFilterZoneIsOpen] = useState(false);
     const [isSortZoneOpen, setSortZoneIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredFiles, setFilteredFiles] = useState(files);
+    const [filteredFiles, setFilteredFiles] = useState([]);
+    const [files, setFiles] = useState([]);
 
-    const [filters, setFilters] = useState({ doc: false, sheet: false, slides: false, image: false });
+    const [filters, setFilters] = useState({
+        pdf: false,
+        spreadsheet: false,
+        presentation: false,
+        image: false
+    });
     const [sortField, setSortField] = useState('');
     const [sortOrder, setSortOrder] = useState('');
 
+    const [userId, setUserId] = useState(null);
 
-    // Recherche et filtrage des fichiers
+    useEffect(() => {
+        const token = Cookies.get('token');
+        if (token) {
+            getUserInfoByToken(token)
+                .then((data) => {
+                    if (data && data.userInfo) {
+                        setUserId(data.userInfo.user_id);
+                        getUserFiles(data.userInfo.user_id)
+                            .then((files) => {
+                                setFiles(files);
+                            })
+                            .catch((error) => {
+                                console.error('Erreur lors de la récupération des fichiers utilisateur:', error);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de la récupération des informations utilisateur:', error);
+                });
+        }
+    }, []);
+
+    const handleDrop = useCallback(async (acceptedFiles) => {
+        if (!userId) {
+            alert("Utilisateur non authentifié");
+            return;
+        }
+    
+        const file = acceptedFiles[0]; 
+    
+        if (!file) {
+            alert("Aucun fichier sélectionné");
+            return;
+        }
+    
+        try {
+            await checkStorageLimit(file.size);
+            await uploadFile(file); 
+    
+            alert('Fichier téléchargé avec succès');
+    
+            const updatedFiles = await getUserFiles(userId);
+            setFiles(updatedFiles);  
+        } catch (error) {
+            alert(`Erreur: ${error.message}`);
+        }
+    }, [userId, checkStorageLimit, uploadFile, getUserFiles]);
 
     const handleFilterChange = (type) => {
         setFilters(prevFilters => ({ ...prevFilters, [type]: !prevFilters[type] }));
@@ -61,15 +116,17 @@ export default function Myfiles() {
     };
 
     const applyFilters = (files) => {
-        const noFiltersApplied = !filters.doc && !filters.sheet && !filters.slides && !filters.image;
+        const noFiltersApplied = !Object.values(filters).includes(true);
         if (noFiltersApplied) {
             return files;
         }
         return files.filter(file => {
-            if (filters.doc && file.type === 'doc') return true;
-            if (filters.sheet && file.type === 'sheet') return true;
-            if (filters.slides && file.type === 'slides') return true;
-            if (filters.image && file.type === 'image') return true;
+            const extension = file.file_form.toLowerCase();
+            for (const [filterType, extensions] of Object.entries(fileTypes)) {
+                if (filters[filterType] && extensions.includes(extension)) {
+                    return true;
+                }
+            }
             return false;
         });
     };
@@ -86,24 +143,21 @@ export default function Myfiles() {
     };
 
     const searchFiles = (files, query) => {
-        return files.filter(file => file.name.toLowerCase().includes(query.toLowerCase()));
+        return files.filter(file => file.file_name && file.file_name.toLowerCase().includes(query.toLowerCase()));
     };
 
     const resetFiltersAndSort = () => {
-        setFilters({ doc: false, sheet: false, slides: false, image: false });
+        setFilters({
+            pdf: false,
+            spreadsheet: false,
+            presentation: false,
+            image: false
+        });
         setSortField('');
         setSortOrder('');
     };
 
-    const onDrop = useCallback(acceptedFiles => {
-        //mettre un envoi au serveur ici
-        //mettre l'actualisation de l'interface ici
-        console.log(acceptedFiles);
-    }, []);
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleDrop });
 
     useEffect(() => {
         let updatedFiles = searchFiles(files, searchQuery);
@@ -111,6 +165,14 @@ export default function Myfiles() {
         updatedFiles = applySort(updatedFiles);
         setFilteredFiles(updatedFiles);
     }, [files, filters, sortField, sortOrder, searchQuery]);
+
+    const openFileInNewTab = (fileUrl) => {
+        if (fileUrl) {
+            window.open(fileUrl, '_blank');
+        } else {
+            console.error('URL du fichier non valide:', fileUrl);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
@@ -130,7 +192,7 @@ export default function Myfiles() {
                         <FilterListIcon /> Filtrer
                     </button>
                     {   // Montrer le bouton de réinitialisation si un filtre ou un tri est appliqué
-                        (filters.doc || filters.sheet || filters.slides || filters.image || sortField || sortOrder) &&
+                        (Object.values(filters).includes(true) || sortField || sortOrder) &&
                         <button onClick={resetFiltersAndSort} className="ml-2 p-2 border rounded-lg shadow bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring focus:border-red-300">Réinitialiser</button>
                     }
                 </div>
@@ -154,12 +216,16 @@ export default function Myfiles() {
                 {/* Liste des fichiers */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {filteredFiles.map((file) => (
-                        <div key={file.name} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <div 
+                            key={file.file_id} 
+                            className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => openFileInNewTab(file.file_url)} // Ajouter l'événement onClick ici
+                        >
                             <div className="flex items-center">
-                                {fileIcons[file.type]}
+                                {fileIcons[file.file_form.replace('.', '')] || <DescriptionIcon className="text-gray-600 text-4xl" />}
                                 <div className="ml-4">
-                                    <h3 className="text-lg font-semibold text-gray-600">{file.name}</h3>
-                                    <p className="text-sm text-gray-600">Modifié le {file.updatedAt}</p>
+                                    <h3 className="text-lg font-semibold text-gray-600">{file.file_name}</h3>
+                                    <p className="text-sm text-gray-600">Modifié le {new Date(file.file_modat).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         </div>

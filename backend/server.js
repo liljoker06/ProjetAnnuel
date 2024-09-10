@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Op } = require('sequelize');
-const { sequelize, Company, Subscription, User, UserCompany, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
+const { sequelize, User, Subscription, UserCompany, Company, Logs, CurrentSub, Invoice, File, UserStorage, StorageFile, MailCode } = require('./database/database');
 
 const companyRoute = require('./routes/companyRoute');
 const userRoute = require('./routes/userRoute');
@@ -25,13 +25,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
 app.use('/api/companies', companyRoute);
 app.use('/api/users', userRoute);
 app.use('/api/userCompanies', userCompanyRoute);
 app.use('/api/logs', logsRoute);
 app.use('/api/files', fileRoute);
 app.use('/api/userStorages', userStorageRoute);
-app.use('/api/storageFiles', storageFileRoute);
+app.use('/api/storagefiles', storageFileRoute);
 app.use('/api/invoices', invoiceRoute);
 app.use('/api/subscriptions', subscriptionRoute);
 app.use('/api/currentSubs', currentSubRoute);
@@ -56,7 +59,7 @@ const insertDefaultSubscriptions = async () => {
     }
 };
 
-// // Insertion des données pour le développement
+// Insertion des données pour le développement
 // const insertForDev = async () => {
 //     const defaultCompanies = [
 //         { comp_name: 'test', comp_siret: '12345678901234', comp_code: '1234567890' },

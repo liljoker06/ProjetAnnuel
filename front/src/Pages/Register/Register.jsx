@@ -650,7 +650,14 @@ export default function Register() {
             <h2 className='font-bold text-gray-800'>Informations entreprise</h2>
             <ul className='list-disc ml-5'>
               {estEntrepriseExistante ? (
-                <li>Entreprise par code ({codeCompany})</li>
+                <>
+                <li>Nom de l'entreprise: {codeExistCompanyName}</li>
+                <li>SIRET : {codeExistSiret}</li>
+                <li>Adresse : {codeExistAdresse}</li>
+                <li>Code postal : {codeExistCodePostal}</li>
+                <li>Ville : {codeExistCity}</li>
+                <li>Code d'invitation : ({codeCompany})</li>
+                </>
               ) : (
                 <>
                   <li>{nomEntreprise}</li>
@@ -741,7 +748,7 @@ export default function Register() {
             ) : (
               <>
                 <div className="text-center text-gray-800">
-                  <p>Vous êtes inscrit lié à l'entreprise XXX.</p>
+                  <p>Vous êtes inscrit lié à l'entreprise {codeExistCompanyName}</p>
                   <br />
                   <NavLink to='/login' className="mt-5 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Se connecter</NavLink>
                 </div>

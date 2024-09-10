@@ -1,7 +1,5 @@
 const { User, CurrentSub } = require('../database/database');
 
-
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { parse, format } = require('date-fns');
@@ -14,6 +12,7 @@ const { getSubscriptionByName, getSubscriptionById } = require('./controllerSubs
 const { createCurrentSub } = require('./controllerCurrentSub');
 const { createInvoice } = require('./controllerInvoice');
 const { connexionMail, welcomeMail, welcomeMail2 } = require('./controllerMailCode');
+const { createUserStorage } = require('./controllerUserStorage');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -358,6 +357,18 @@ const createUser = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
+    // Attribution de l'espace de stockage à l'utilisateur
+    try {
+      consoleLog('Tentative de création de l\'entrée dans UserStorage...', 'cyan');
+      await createUserStorage({ user_id: user.user_id });
+      consoleLog(`Entrée dans UserStorage créée pour l'utilisateur : ${user.user_id}`, 'green');
+    } catch (error) {
+      consoleLog('Erreur lors de la création de l\'entrée dans UserStorage : ' + error.message, 'red');
+      consoleLog('• [END] controllers/controllerUser/createUser', 'cyan');
+      return res.status(500).json({ error: error.message });
+    }
+
+
     // Création de la facture et/ou envoi du mail de bienvenue
     if (!codeEntreprise) {
       // Création de la facture
@@ -409,6 +420,8 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+
 
 
 const changeUserPassword = async (req, res) => {
