@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const SITE_RELIC_API_URL = '/ping';
 // const API_KEY = '1f896b1c-e9ce-49dc-836e-269c90973830 ';
-const API_KEY = 'xxx';
+const API_KEY = '1f896b1c-e9ce-49dc-836e-269c90973830';
 
 const pingServer = async (url) => {
   try {

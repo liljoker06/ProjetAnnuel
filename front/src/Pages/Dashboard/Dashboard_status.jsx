@@ -37,15 +37,15 @@ export default function Dashboard_status() {
 
   // décommenter pour faire les ping (rester une sec avant de commencer)
   // pour ne pas bouffer toutes les requêtes
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     checkStatus();
-  //     const interval = setInterval(checkStatus, 60000); // Vérifie toutes les 60 secondes
-  //     return () => clearInterval(interval);
-  //   }, 1000); // Attendre 1 seconde avant de commencer les pings
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkStatus();
+      const interval = setInterval(checkStatus, 60000); // Vérifie toutes les 60 secondes
+      return () => clearInterval(interval);
+    }, 1000); // Attendre 1 seconde avant de commencer les pings
 
-  //   return () => clearTimeout(timeoutId);
-  // }, []);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
 
   return (
