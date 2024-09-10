@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import ProgressBar from "@ramonak/react-progress-bar";
+const linkAPI = process.env.REACT_APP_LinkAPI;
+
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -19,7 +21,7 @@ const Admin = () => {
 
     useEffect(() => {
         // Récupérer les utilisateurs
-        axios.get('http://localhost:5555/api/users')
+        axios.get(`${linkAPI}/users`)
             .then(response => {
                 setUsers(response.data);
             })
@@ -28,7 +30,7 @@ const Admin = () => {
             });
 
         // Récupérer les entreprises
-        axios.get('http://localhost:5555/api/companies')
+        axios.get(`${linkAPI}/companies`)
             .then(response => {
                 setCompanies(response.data);
             })
@@ -37,7 +39,7 @@ const Admin = () => {
             });
 
         // Récupérer les abonnements
-        axios.get('http://localhost:5555/api/subscriptions')
+        axios.get(`${linkAPI}/subscriptions`)
             .then(response => {
                 setSubscriptions(response.data);
             })
@@ -46,7 +48,7 @@ const Admin = () => {
             });
 
         // Récupérer les fichiers
-        axios.get('http://localhost:5555/api/files')
+        axios.get(`${linkAPI}/files`)
             .then(response => {
                 setFiles(response.data);
             })
@@ -55,7 +57,7 @@ const Admin = () => {
             });
 
         // Récupérer la liaison UserCompany
-        axios.get('http://localhost:5555/api/userCompanies')
+        axios.get(`${linkAPI}/usercompanies`)
             .then(response => {
                 setUserCompanies(response.data);
             })
@@ -65,7 +67,7 @@ const Admin = () => {
     }, []);
 
     const deleteUser = (userId) => {
-        axios.delete(`http://localhost:5555/api/users/deleteUser/${userId}`)
+        axios.delete(`${linkAPI}/users/deleteUser/${userId}`)
             .then(() => {
                 setUsers(users.filter(user => user.user_id !== userId));
             })

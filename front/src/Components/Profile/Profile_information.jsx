@@ -5,6 +5,7 @@ import axios from 'axios'; // Import axios for HTTP requests
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getUserInfoByToken } from '../../Functions/CallApi/CallUser';
+const linkAPI = process.env.REACT_APP_LinkAPI;
 
 export default function Profile_information({ user_name, user_email, user_role, user_phone, user_addre, user_city, user_posta, country }) {
     const [open, setOpen] = useState(false);
@@ -94,7 +95,7 @@ export default function Profile_information({ user_name, user_email, user_role, 
         const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');
         if (!confirmed) return;
 
-        axios.delete(`http://localhost:5555/api/users/deleteUser/${userId}`, {
+        axios.delete(`${linkAPI}/users/deleteUser/${userId}`, {
             })
             .then((response) => {
                 console.log('Compte supprimé avec succès');
