@@ -1,6 +1,7 @@
 {
   "name": "vcloud-frontend",
-  "version": "0.2.0",
+  "version": "1.0.0",
+  "proxy": "https://api.siterelic.com/",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.13.0",
