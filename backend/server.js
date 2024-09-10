@@ -15,7 +15,6 @@ const invoiceRoute = require('./routes/invoiceRoute');
 const subscriptionRoute = require('./routes/subscriptionRoute');
 const currentSubRoute = require('./routes/currentSubRoute');
 const mailCodeRoute = require('./routes/mailCodeRoute');
-const adminRoute = require('./routes/adminRoute/adminRoute');
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,7 +38,6 @@ app.use('/api/invoices', invoiceRoute);
 app.use('/api/subscriptions', subscriptionRoute);
 app.use('/api/currentSubs', currentSubRoute);
 app.use('/api/mailCodes', mailCodeRoute);
-app.use('/api/admin', adminRoute);
 
 const PORT = 5555;
 
