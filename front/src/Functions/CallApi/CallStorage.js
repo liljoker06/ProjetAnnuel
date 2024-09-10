@@ -1,6 +1,8 @@
 import axios from "axios";
 import Cookies from 'js-cookie'; 
 import FormData from 'form-data'; // Pour envoyer des données de formulaire
+const linkAPI = process.env.REACT_APP_LinkAPI;
+
 
 // Vérifier la limite de stockage de l'utilisateur
 export const checkStorageLimit = async (fileSize) => {
@@ -11,7 +13,7 @@ export const checkStorageLimit = async (fileSize) => {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.get(`http://localhost:5555/api/userStorages/check`, {
+    const response = await axios.get(`${linkAPI}/userStorages/check`, {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
@@ -45,7 +47,7 @@ export const uploadFile = async (file) => {
   const token = Cookies.get('token');
 
   try {
-    const response = await axios.post('http://localhost:5555/api/files/upload', formData, {
+    const response = await axios.post(`${linkAPI}/files/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`, 
@@ -68,7 +70,7 @@ export const getUserFiles = async (userId) => {
       throw new Error("Token d'authentification manquant");
     }
 
-    const response = await axios.post(`http://localhost:5555/api/files/userfile`, { userId } , {
+    const response = await axios.post(`${linkAPI}/files/userfile`, { userId } , {
       headers: {
         Authorization: `Bearer ${token}`, // Ajouter le token d'authentification dans l'en-tête
       },
@@ -80,3 +82,4 @@ export const getUserFiles = async (userId) => {
     throw error;
   }
 };
+

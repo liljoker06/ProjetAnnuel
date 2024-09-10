@@ -182,7 +182,7 @@ export default function Myfiles() {
             <main className="flex-1 p-6">
 
                 {/* Zone de recherche */}
-                <h2 className="text-2xl font-bold mb-4 text-gray-700">Mes Fichiers</h2>
+                <h2 className="text-4xl font-bold mb-4 text-gray-700">Mes Fichiers</h2>
                 <div className="flex items-center mb-4">
                     <input onChange={handleSearch} type="text" placeholder="Rechercher un fichier" className="w-full p-2 border rounded-lg shadow focus:outline-none focus:ring focus:border-blue-300 bg-white text-gray-700" />
                     <button onClick={() => setSortZoneIsOpen(prevState => !prevState)} className="ml-2 p-2 border rounded-lg shadow bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300 flex items-center">
@@ -201,8 +201,8 @@ export default function Myfiles() {
                 <hr className="my-4 border rounded rounded-full h-1.5 dark:bg-blue-500" />
 
                 {/* Zone de dépôt de fichiers */}
-                <div 
-                    {...getRootProps()} 
+                <div
+                    {...getRootProps()}
                     className={`p-10 border-2 border-dashed border-gray-400 rounded-lg text-center mb-4 text-gray-700 ${isDragActive ? 'drag-active' : 'bg-white'}`}
                 >
                     <input {...getInputProps()} />

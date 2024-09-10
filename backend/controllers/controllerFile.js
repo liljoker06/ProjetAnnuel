@@ -4,6 +4,15 @@ const { File, StorageFile, UserStorage } = require('../database/database');
 
 const consoleLog = require('../consoleLog');
 
+const getAllFiles = async (req, res) => {
+  try {
+    const files = await File.findAll();
+    res.status(200).json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Fonction pour uploader un fichier
 const uploadFile = async (req, res) => {
   try {
@@ -116,9 +125,47 @@ const getAllFilesbyUser = async (req, res) => {
   }
 };
 
+const deleteFile = async (req, res) => {
+  const { file_id } = req.params;
+
+  try {
+    const file = await File.findOne({ where: { id: file_id } });
+
+    if (!file) {
+      return res.status(404).json({ message: 'Fichier non trouvé' });
+    }
+
+    await file.destroy();
+    res.status(200).json({ message: 'Fichier supprimé avec succès' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateFile = async (req, res) => {
+  const { file_id } = req.params;
+
+  try {
+    const file = await File.findOne({ where: { id: file_id } });
+
+    if (!file) {
+      return res.status(404).json({ message: 'Fichier non trouvé' });
+    }
+
+    await file.update(req.body);
+    res.status(200).json({ message: 'Fichier mis à jour avec succès', file });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   uploadFile,
   getfilebyuserid,
   getAllFilesbyUser,
+  getAllFiles,
+  createFile,
+  deleteFile,
+  updateFile,
 };
 

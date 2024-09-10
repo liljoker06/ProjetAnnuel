@@ -12,8 +12,8 @@ export default function Profile_cardinfo({ user_name, company }) {
         </div>
         <div className="flex-none w-auto max-w-full px-3 my-auto">
           <div className="h-full">
-            <h5 className="mb-1">{user_name}</h5>
-            <p className="mb-0 font-semibold leading-normal text-sm">{company}</p>
+            <h5 className="mb-1 text-gray-800">{user_name}</h5>
+            <p className="mb-0 font-semibold leading-normal text-sm text-gray-700">{company}</p>
           </div>
         </div>
         <div className="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12"></div>

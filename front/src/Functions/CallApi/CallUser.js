@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const linkAPI = process.env.REACT_APP_LinkAPI;
+
 // check si l'email existe
 export const validateUserEmail = async (data) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/users/validateEmail', data);
+        const response = await axios.post(`${linkAPI}/users/validateEmail`, data);
 
         return response.data.isValid;
     } catch (error) {
@@ -14,7 +16,7 @@ export const validateUserEmail = async (data) => {
 // check si l'utilisateur existe
 export const validateUser = async (data) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/users/validateUser', data);
+        const response = await axios.post(`${linkAPI}/users/validateUser`, data);
 
         return response.data.isValid;
     } catch (error) {
@@ -25,7 +27,7 @@ export const validateUser = async (data) => {
 // récupère les infos de l'utilisateur par son token
 export const getUserInfoByToken = async (token) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/users/getUserInfoByToken', {}, {
+        const response = await axios.post(`${linkAPI}/users/getUserInfoByToken`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -40,7 +42,7 @@ export const getUserInfoByToken = async (token) => {
 //changer le mot de passe
 export const changeUserPassword = async (data) => {
     try {
-        const response = await axios.post('http://localhost:5555/api/users/changeUserPassword', data);
+        const response = await axios.post(`${linkAPI}/users/changeUserPassword`, data);
         return response.data; 
     } catch (error) {
         console.error('API error:', error);
