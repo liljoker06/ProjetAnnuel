@@ -633,6 +633,7 @@ module.exports = {
   updateUser,
   getUserInfoByToken,
   createUser,
+  changeUserPassword,
   loginUser,
   validateUserEmail,
   validateUser

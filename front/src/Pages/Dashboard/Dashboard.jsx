@@ -107,7 +107,7 @@ export default function Dashboard() {
                             <h2 className="text-lg font-bold text-gray-700">Bonjour, {user_name} - {company}</h2>
                             <h3 className="font-bold mb-4 text-gray-700">({user_email})</h3>
                             <p className="text-sm text-gray-600">Bienvenue sur votre tableau de bord.</p>
-                            <pre>{JSON.stringify(userData, null, 2)}</pre> {/* Affichage des données utilisateur */}
+                            {/* <pre>{JSON.stringify(userData, null, 2)}</pre> Affichage des données utilisateur */}
                         </div>
 
                         {/* Abonnement */}
