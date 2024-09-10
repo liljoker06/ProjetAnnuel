@@ -168,7 +168,9 @@ export default function Myfiles() {
 
     const openFileInNewTab = (fileUrl) => {
         if (fileUrl) {
-            window.open(fileUrl, '_blank');
+            // Si l'URL n'est pas complète, la compléter avec l'origine du site web
+            const completeUrl = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}/${fileUrl}`;
+            window.open(completeUrl, '_blank');
         } else {
             console.error('URL du fichier non valide:', fileUrl);
         }
@@ -215,21 +217,24 @@ export default function Myfiles() {
 
                 {/* Liste des fichiers */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filteredFiles.map((file) => (
-                        <div 
-                            key={file.file_id} 
-                            className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => openFileInNewTab(file.file_url)} // Ajouter l'événement onClick ici
-                        >
-                            <div className="flex items-center">
-                                {fileIcons[file.file_form.replace('.', '')] || <DescriptionIcon className="text-gray-600 text-4xl" />}
-                                <div className="ml-4">
-                                    <h3 className="text-lg font-semibold text-gray-600">{file.file_name}</h3>
-                                    <p className="text-sm text-gray-600">Modifié le {new Date(file.file_modat).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                {filteredFiles.map((file) => {
+    console.log(file); // Ajout du console.log pour afficher le contenu de file
+    return (
+        <div 
+            key={file.file_id} 
+            className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => openFileInNewTab(file.file_path)} 
+        >
+            <div className="flex items-center">
+                {fileIcons[file.file_form.replace('.', '')] || <DescriptionIcon className="text-gray-600 text-4xl" />}
+                <div className="ml-4">
+                    <h3 className="text-lg font-semibold text-gray-600">{file.file_name}</h3>
+                    <p className="text-sm text-gray-600">Modifié le {new Date(file.file_modat).toLocaleDateString()}</p>
+                </div>
+            </div>
+        </div>
+    );
+})}
                 </div>
             </main>
         </div>
