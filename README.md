@@ -14,12 +14,16 @@ Tisma : [![wakatime](https://wakatime.com/badge/user/a16f794f-b91d-4818-8dfc-d76
 
 Solution cloud pour la gestion de fichiers, abonnements et facturation.
 
+<div align='center'>
+<img width="548" height="263" alt="image" src="https://github.com/user-attachments/assets/794fe982-b3a2-4984-bcba-362e0488fb1d" />
+<img width="542" height="298" alt="image" src="https://github.com/user-attachments/assets/96094b54-1960-4d6b-bdc6-d965f517ad31" />
+
+</div>
 ---
 
 ## Sommaire
 
 - [Présentation](#présentation)
-- [Contexte académique / objectif](#contexte-academique--objectif)
 - [Architecture générale](#architecture-générale)
 	- [Diagramme d'architecture (Mermaid)](#diagramme-darchitecture-mermaid)
 	- [Diagramme des routes principales](#diagramme-des-routes-principales)
@@ -31,16 +35,12 @@ Solution cloud pour la gestion de fichiers, abonnements et facturation.
 	- [Frontend](#frontend)
 - [Exécution](#exécution)
 	- [Variables d'environnement et sécurité](#variables-denvironnement-et-sécurité)
-- [Tests](#tests)
-- [Déploiement](#déploiement)
-- [Contribution](#contribution)
-- [Licence](#licence)
 
 ---
 
 ## Présentation
 
-Tisma est une solution cloud de type "Google Drive" destinée à stocker et partager des fichiers utilisateurs, gérer des abonnements, générer des factures et conserver des logs d'activité. Le frontend est développé en React et le backend en Node.js avec Express. La base de données et les modèles sont organisés dans `backend/database/models`.
+VitruveCloud (VCloud) est une solution cloud de type "Google Drive" destinée à stocker et partager des fichiers utilisateurs, gérer des abonnements, générer des factures et conserver des logs d'activité. Le frontend est développé en React et le backend en Node.js avec Express. La base de données et les modèles sont organisés dans `backend/database/models`.
 
 
 ### Contexte académique / objectif
@@ -106,17 +106,6 @@ Arborescence principale (extraits) :
 	- src/
 		- Components/        # composants réutilisables
 		- Pages/             # pages de l'application
-
-## Emplacements pour images
-
-- Présentation du projet (bannière) : ajouter `docs/images/banner.png` ou `docs/images/banner.svg`.
-- Diagrammes et captures d'écran : `docs/images/screenshots/`.
-
-Exemple d'insertion dans ce README :
-
-![Bannière du projet](docs/images/banner.png)
-
-> Si l'image n'existe pas, gardez le chemin comme espace réservé.
 
 ## Installation
 
